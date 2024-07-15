@@ -1,0 +1,80 @@
+.block {
+  position: relative;
+  margin: auto;
+  width: 90%;
+  background: linear-gradient(0deg, #000, #272727);
+}
+.block:before,
+.block:after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  background: linear-gradient(
+    45deg,
+    #fb0094,
+    #0000ff,
+    #00ff00,
+    #ffff00,
+    #ff0000,
+    #fb0094,
+    #0000ff,
+    #00ff00,
+    #ffff00,
+    #ff0000
+  );
+  background-size: 400%;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: -1;
+  animation: steam 20s linear infinite;
+}
+@keyframes steam {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+.block:after {
+  filter: blur(50px);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  color: #fff;
+  font-weight: bold;
+}
+
+th {
+  background-color: #008080;
+  color: white;
+  font-weight: bold;
+  /* background-color: yellow;
+  color: black; */
+}
+tbody tr td {
+  color: yellow;
+}
+
+.head_text:nth-child(1) {
+  color: transparent;
+  -webkit-text-stroke: 1px yellow;
+}
+
+.head_text:nth-child(2) {
+  color: white;
+  animation: head-text-animate 4s ease-in-out infinite;
+}

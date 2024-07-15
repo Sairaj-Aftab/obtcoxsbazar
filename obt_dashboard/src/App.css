@@ -1,0 +1,27 @@
+.dt-layout-row {
+  display: flex;
+  justify-content: space-between;
+}
+.dt-paging.paging_full_numbers {
+  display: flex;
+  gap: 5px;
+}
+.dt-input {
+  border: 1px solid #ccc;
+}
+button.dt-paging-button {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.dt-info {
+  font-size: 0.9rem;
+}
+.dt-length label {
+  font-size: 0.9rem;
+}
+.card-body {
+  padding: 0.8rem;
+}
+td.dt-empty {
+  display: none;
+}

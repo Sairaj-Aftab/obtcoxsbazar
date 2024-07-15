@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f0f2f5;
+}
+a {
+  text-decoration: none !important;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+}
+form {
+  width: 100%;
+}
+input {
+  outline: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 2px 5px;
+  width: 100%;
+}
+form select {
+  outline: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 2px 5px;
+  width: 100%;
+}

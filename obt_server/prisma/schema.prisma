@@ -1,0 +1,130 @@
+
+datasource db {
+    provider = "mysql"
+    url = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model AuthUser {
+    id Int @id @default(autoincrement())
+    userName String @unique
+    phone String?
+    role Role? @relation(fields: [roleId], references: [id])
+    roleId Int
+    password String
+    plainPassword String?
+    notice NoticeFromAdmin[] @relation("authUser")
+    paribahanUser ParibahanUser[]
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model NoticeFromAdmin {
+    id Int @id @default(autoincrement())
+    title String
+    authUser AuthUser[] @relation("authUser")
+    status String 
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  slug        String       @unique
+  authUser    AuthUser[]
+  status      Boolean      @default(true)
+  trash       Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[]
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  slug        String           @unique
+  status      Boolean          @default(true)
+  trash       Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  roles       Role[]
+}
+
+
+
+
+model ParibahanUser {
+    id Int @id @default(autoincrement())
+    paribahanName String @unique
+    slug String @unique
+    contactPerson String?
+    contactNumber String?
+    salesPerson String?
+    salesNumber String?
+    password String
+    plainPassword String
+    destination LeaveDestinationPlace[]
+    authUser AuthUser @relation(fields: [authUserId], references: [id])
+    authUserId Int
+    busSchedule BusSchedule[]
+    notice NoticeFromBus?
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+
+model NoticeFromBus {
+    id Int @id @default(autoincrement())
+    title String
+    paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId Int? @unique
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusSchedule {
+    id Int @id @default(autoincrement())
+    busName String
+    slug String
+    type String
+    time String
+    busNo String
+    guideName String
+    guidePhone String
+    leavingPlace String
+    destinationPlace String
+    rent Int?
+    seatStatus Boolean
+    paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId Int
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+model LeaveDestinationPlace {
+    id Int @id @default(autoincrement())
+    placeName String @unique
+    slug String @unique
+    status String
+    paribahanUser ParibahanUser[]
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
