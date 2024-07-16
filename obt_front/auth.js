@@ -1,15 +1,13 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import axios from "axios";
+import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
       credentials: {
-        paribahanName: {},
-        password: {},
+        paribahanName: { label: "Paribahan Name", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
         try {
@@ -21,16 +19,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             { withCredentials: true }
           );
-          console.log(response);
-          return response.data.user;
+          if (response.data.user) {
+            return response.data.user;
+          }
+          return null;
         } catch (error) {
-          throw new Error(error.response.data.message);
+          if (error.response) {
+            throw new CredentialsSignin(error.response.data.message);
+            // throw new Error(error.response.data.message || "Login failed");
+          } else if (error.request) {
+            throw new CredentialsSignin("No response received from server");
+            // throw new Error("No response received from server");
+          } else {
+            throw new CredentialsSignin("An error occurred while logging in");
+            // throw new Error("An error occurred while logging in");
+          }
         }
       },
     }),
   ],
   pages: {
     signIn: "/login",
+    error: "/login",
+    signOut: "/login",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -44,8 +55,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  secret: process.env.AUTH_SECRET,
   session: {
     strategy: "jwt",
   },
+  secret: process.env.AUTH_SECRET,
 });

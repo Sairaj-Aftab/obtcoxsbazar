@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DataTables from "datatables.net-dt";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import { authData } from "../../features/auth/authSlice";
@@ -106,14 +106,14 @@ const Notice = () => {
                       <th>Title & Explanation</th>
                     </tr>
                   </thead>
-                  {authNotices && authNotices.length > 0 && (
-                    <tbody>
-                      {authNotices?.map((data, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td className="text-right">
-                            <div className="actions">
-                              {/* <button
+
+                  <tbody>
+                    {authNotices?.map((data, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td className="text-right">
+                          <div className="actions">
+                            {/* <button
                                 className="btn btn-sm bg-success-light mr-2"
                                 data-toggle="modal"
                                 disabled={
@@ -122,6 +122,36 @@ const Notice = () => {
                               >
                                 <i className="fe fe-pencil"></i>
                               </button> */}
+                            <button
+                              data-toggle="modal"
+                              className="btn btn-sm bg-danger-light"
+                              disabled={
+                                authUser?.role?.name === "VIEWER" && true
+                              }
+                              onClick={() => handleDeleteNotice(data.id)}
+                            >
+                              <i className="fe fe-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          {data?.authUser?.map((data) => data.userName)} To{" "}
+                          <span className="badge badge-success">
+                            {data.status}
+                          </span>
+                        </td>
+                        <td>
+                          {data.title} <br />
+                        </td>
+                      </tr>
+                    ))}
+                    {paribahanNotices &&
+                      paribahanNotices.length > 0 &&
+                      paribahanNotices.map((data, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td className="text-right">
+                            <div className="actions">
                               <button
                                 data-toggle="modal"
                                 className="btn btn-sm bg-danger-light"
@@ -134,44 +164,13 @@ const Notice = () => {
                               </button>
                             </div>
                           </td>
-                          <td>
-                            {data?.authUser?.map((data) => data.userName)} To{" "}
-                            <span className="badge badge-success">
-                              {data.status}
-                            </span>
-                          </td>
+                          <td>{data?.paribahanUser?.paribahanName}</td>
                           <td>
                             {data.title} <br />
                           </td>
                         </tr>
                       ))}
-                      {paribahanNotices &&
-                        paribahanNotices.length > 0 &&
-                        paribahanNotices.map((data, index) => (
-                          <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td className="text-right">
-                              <div className="actions">
-                                <button
-                                  data-toggle="modal"
-                                  className="btn btn-sm bg-danger-light"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                  onClick={() => handleDeleteNotice(data.id)}
-                                >
-                                  <i className="fe fe-trash"></i>
-                                </button>
-                              </div>
-                            </td>
-                            <td>{data?.paribahanUser?.paribahanName}</td>
-                            <td>
-                              {data.title} <br />
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  )}
+                  </tbody>
                 </table>
               </div>
             </div>

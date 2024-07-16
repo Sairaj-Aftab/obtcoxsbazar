@@ -16,19 +16,15 @@ const LoginForm = () => {
     }
     try {
       const res = signIn("credentials", {
+        redirect: false,
         paribahanName,
         password,
         callbackUrl: "/profile",
+      }).then((res) => {
+        console.log(res);
       });
       if (res.error) {
         toast.error(res.error);
-        return;
-      }
-      if (res.ok) {
-        toast.success("Okay!");
-      }
-      if (res.status) {
-        toast.success("Status");
       }
     } catch (error) {
       toast.error("Something went wrong!");

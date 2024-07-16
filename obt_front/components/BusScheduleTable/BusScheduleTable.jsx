@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 
 const BusScheduleTable = () => {
   const { schedules } = useSelector(schedulesData);
-  console.log(schedules);
   return (
     <section className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color rounded-lg">
       <h3 className="text-xl font-semibold mb-4">Recent Bus Schedule</h3>

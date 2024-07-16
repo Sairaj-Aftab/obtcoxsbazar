@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 import Modal from "@/components/Modal/Modal";
 import {
   createSchedule,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/features/notice/noticeApiSlice";
 
 const BusProfile = ({ user }) => {
+  let socket = useRef();
   const dispatch = useDispatch();
   const {
     adminNotices,
@@ -155,6 +157,11 @@ const BusProfile = ({ user }) => {
   const deleteSingleNotice = () => {
     dispatch(deleteNotice(paribahanNotice.id));
   };
+
+  useEffect(() => {
+    socket.current = io(process.env.NEXT_PUBLIC_API_DOMAIN);
+    socket.current.emit("schedule");
+  }, []);
 
   useEffect(() => {
     const getAdminNotice = () => {

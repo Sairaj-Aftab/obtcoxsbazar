@@ -16,7 +16,7 @@ import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: "http://localhost:3000" });
 // dotenv config
 env.config();
 const PORT = process.env.PORT || 5000;
@@ -45,7 +45,15 @@ app.use(errorHandler);
 
 // Socket Connection
 io.on("connection", (socket) => {
+  console.log(socket.id);
+
   console.log("a user connected");
+  socket.on("test", (data) => {
+    console.log(data);
+  });
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
 });
 
 // App listen

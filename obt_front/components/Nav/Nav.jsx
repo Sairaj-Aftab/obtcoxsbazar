@@ -43,20 +43,26 @@ const Nav = () => {
               </Link> */}
               <Link
                 href="/all-bus-services"
-                className="text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/all-bus-services" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
               >
                 All Bus Services
               </Link>
               <Link
                 href="/about"
-                className="text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/about" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
               >
                 About
               </Link>
               {!session && (
                 <Link
                   href="/login"
-                  className="text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/login" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
                 >
                   Login
                 </Link>
@@ -64,7 +70,9 @@ const Nav = () => {
               {session && (
                 <Link
                   href="/profile"
-                  className="text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/profile" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
                 >
                   Profile
                 </Link>
