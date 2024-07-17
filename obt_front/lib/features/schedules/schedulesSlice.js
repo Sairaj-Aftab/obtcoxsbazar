@@ -24,6 +24,22 @@ const schedulesSlice = createSlice({
       state.message = null;
       state.error = null;
     },
+    addScheduleSocket: (state, action) => {
+      state.schedules.push(action.payload);
+    },
+    updateScheduleSocket: (state, action) => {
+      const scheduleIndex = state.schedules.findIndex(
+        (schedule) => schedule.id === action.payload.id
+      );
+      if (scheduleIndex !== -1) {
+        state.schedules[scheduleIndex] = action.payload;
+      }
+    },
+    deleteScheduleSocket: (state, action) => {
+      state.schedules = state.schedules.filter(
+        (item) => item.id !== action.payload
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -126,7 +142,12 @@ const schedulesSlice = createSlice({
 export const schedulesData = (state) => state.schedules;
 
 // Actions
-export const { setMessageEmpty } = schedulesSlice.actions;
+export const {
+  setMessageEmpty,
+  addScheduleSocket,
+  updateScheduleSocket,
+  deleteScheduleSocket,
+} = schedulesSlice.actions;
 
 // exports
 export default schedulesSlice.reducer;

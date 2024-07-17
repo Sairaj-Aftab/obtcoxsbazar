@@ -52,10 +52,11 @@ export const getSchedulesDataByLimit = createAsyncThunk(
 
 export const getSchedulesDataByAuthId = createAsyncThunk(
   "schedules/getSchedulesDataByAuthId",
-  async (id) => {
+  async ({ id, limit }) => {
+    console.log(id, limit);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/schedule/getbyparibahan/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/schedule/getbyparibahan/${id}?limit=${limit}`,
         {
           withCredentials: true,
         }

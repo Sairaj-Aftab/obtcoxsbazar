@@ -4,20 +4,20 @@ import { schedulesData } from "@/lib/features/schedules/schedulesSlice";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { useSelector } from "react-redux";
 
-const BusScheduleTable = () => {
+const AllSchedules = () => {
   const { schedules } = useSelector(schedulesData);
   const now = new Date();
-  const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
   // Filter schedules within the next hour
   const filteredSchedules = schedules?.filter((data) => {
     const scheduleTime = new Date(data.time);
-    return scheduleTime >= fifteenMinutesAgo && scheduleTime <= thirtyDaysLater;
+    return scheduleTime >= oneHourAgo && scheduleTime <= thirtyDaysLater;
   });
   return (
-    <section className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
-      <h3 className="text-xl font-semibold mb-4">Recent Bus Schedule</h3>
+    <div className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
+      <h3 className="text-xl font-semibold mb-4">All Schedule</h3>
       <div className="overflow-x-auto">
         <table>
           <thead>
@@ -35,7 +35,7 @@ const BusScheduleTable = () => {
           </thead>
           <tbody>
             {filteredSchedules
-              ?.slice(0, 15)
+              ?.slice()
               .sort((a, b) => new Date(a.time) - new Date(b.time))
               ?.map((data, index) => (
                 <tr key={index} className="text-base font-normal">
@@ -53,8 +53,8 @@ const BusScheduleTable = () => {
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 };
 
-export default BusScheduleTable;
+export default AllSchedules;

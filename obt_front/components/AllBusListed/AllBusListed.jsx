@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 const AllBusListed = () => {
   const { bus } = useSelector(busData);
   return (
-    <section className="container mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
+    <section className="container mx-auto my-8 p-4 bg-white md:shadow-lg md:rounded-lg">
       <h3 className="text-xl font-semibold mb-4">All Bus Services</h3>
       <div className="flex gap-2 md:gap-5 flex-wrap">
         {bus &&

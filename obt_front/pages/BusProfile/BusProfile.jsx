@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
 import Modal from "@/components/Modal/Modal";
 import {
   createSchedule,
@@ -26,7 +25,6 @@ import {
 } from "@/lib/features/notice/noticeApiSlice";
 
 const BusProfile = ({ user }) => {
-  let socket = useRef();
   const dispatch = useDispatch();
   const {
     adminNotices,
@@ -159,11 +157,6 @@ const BusProfile = ({ user }) => {
   };
 
   useEffect(() => {
-    socket.current = io(process.env.NEXT_PUBLIC_API_DOMAIN);
-    socket.current.emit("schedule");
-  }, []);
-
-  useEffect(() => {
     const getAdminNotice = () => {
       return adminNotices?.find((notice) => notice.status === "Paribahan");
     };
@@ -181,7 +174,7 @@ const BusProfile = ({ user }) => {
   }, [adminNotices, paribahanNotices, user]);
   useEffect(() => {
     if (user) {
-      dispatch(getSchedulesDataByAuthId(user.id));
+      dispatch(getSchedulesDataByAuthId({ id: user.id, limit: 100 }));
     }
     if (message || noticeMessage) {
       toast.success(message || noticeMessage);

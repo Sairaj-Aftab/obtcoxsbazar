@@ -25,7 +25,7 @@ const BusServicesByPlace = ({ params }) => {
   return (
     <div className="container mx-auto bg-white rounded-lg my-5">
       <h1 className="text-lg font-semibold text-white bg-primary-color text-center py-1 rounded-t-lg mb-2">
-        Bus for {params.place.toUpperCase()}
+        Cox's Bazar to {params.place.toUpperCase()}
       </h1>
       <NoticeFromAdmin />
       {busByPlace.length > 0 ? (

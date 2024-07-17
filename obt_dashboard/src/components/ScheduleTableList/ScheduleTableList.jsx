@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import DataTables from "datatables.net-dt";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -11,19 +10,13 @@ import { formatDateTime } from "../../utils/timeAgo";
 import swal from "sweetalert";
 import { deleteSchedule } from "../../features/schedules/schedulesApiSlice";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 const ScheduleTableList = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
 
   const { schedules, message, error } = useSelector(schedulesData);
-  const today = new Date();
-  const formattedToday = today.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-
-  const todaysSchedules = schedules?.filter((schedule) => {
-    const scheduleDate = new Date(schedule.time).toISOString().split("T")[0];
-    return scheduleDate === formattedToday;
-  });
 
   const handleDeleteSchedule = (id) => {
     swal({

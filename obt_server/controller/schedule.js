@@ -40,6 +40,12 @@ export const createSchedule = async (req, res, next) => {
         paribahanUser: true,
       },
     });
+
+    if (busSchedule) {
+      const io = req.app.get("socketio");
+      io.emit("data-created", busSchedule);
+    }
+
     return res
       .status(200)
       .json({ busSchedule, message: "Created successfully" });
@@ -81,6 +87,13 @@ export const updateSchedule = async (req, res, next) => {
         paribahanUser: true,
       },
     });
+
+    // For Socket Io
+    if (busSchedule) {
+      const io = req.app.get("socketio");
+      io.emit("data-updated", busSchedule);
+    }
+
     return res
       .status(200)
       .json({ busSchedule, message: "Updated successfully" });
@@ -91,19 +104,26 @@ export const updateSchedule = async (req, res, next) => {
 
 export const getAllSchedules = async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
     const schedules = await prisma.busSchedule.findMany({
-      // include: {
-      //   paribahanUser: true,
-      // },
+      include: {
+        paribahanUser: true,
+      },
+      skip: offset,
+      take: limit,
       orderBy: {
         time: "asc",
       },
     });
 
+    const count = await prisma.busSchedule.count();
+
     if (schedules.length < 1) {
       return next(createError(400, "Cannot find any schedule!"));
     }
-    return res.status(200).json({ schedules });
+    return res.status(200).json({ schedules, count });
   } catch (error) {
     return next(error);
   }
@@ -121,10 +141,12 @@ export const getSchedulesByLimit = async (req, res, next) => {
       take: limit,
     });
 
+    const count = await prisma.busSchedule.count();
+
     if (schedules.length < 1) {
       return next(createError(400, "Cannot find any schedule!"));
     }
-    return res.status(200).json({ schedules });
+    return res.status(200).json({ schedules, count });
   } catch (error) {
     return next(error);
   }
@@ -133,6 +155,7 @@ export const getSchedulesByLimit = async (req, res, next) => {
 export const getSchedulesByParibahanUserId = async (req, res, next) => {
   try {
     const { paribahanUserId } = req.params;
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;
     const schedules = await prisma.busSchedule.findMany({
       where: {
         paribahanUserId: Number(paribahanUserId),
@@ -140,6 +163,7 @@ export const getSchedulesByParibahanUserId = async (req, res, next) => {
       orderBy: {
         time: "asc",
       },
+      take: limit,
       include: {
         paribahanUser: true,
       },
@@ -187,33 +211,39 @@ export const deleteSchedule = async (req, res, next) => {
         id: Number(id),
       },
     });
+
+    if (schedule) {
+      const io = req.app.get("socketio");
+      io.emit("data-deleted", schedule.id);
+    }
+
     return res.status(200).json({ schedule, message: "Deleted successfully" });
   } catch (error) {
     return next(error);
   }
 };
 
-const formatDate = (date) => {
-  return date.toISOString().replace("T", " ").replace(/\..+/, "");
-};
+// const formatDate = (date) => {
+//   return date.toISOString().replace("T", " ").replace(/\..+/, "");
+// };
 
-cron.schedule("* * * * *", async () => {
-  try {
-    const now = new Date();
-    const fifteenMinutesAgo = new Date(now.getTime() - 30000);
+// cron.schedule("* * * * *", async () => {
+//   try {
+//     const now = new Date();
+//     const fifteenMinutesAgo = new Date(now.getTime() - 30000);
 
-    // Delete schedules that ended more than 15 minutes ago
-    const data = await prisma.busSchedule.deleteMany({
-      where: {
-        time: {
-          lte: formatDate(fifteenMinutesAgo),
-        },
-      },
-    });
-    console.log(data);
+//     // Delete schedules that ended more than 15 minutes ago
+//     const data = await prisma.busSchedule.deleteMany({
+//       where: {
+//         time: {
+//           lte: formatDate(fifteenMinutesAgo),
+//         },
+//       },
+//     });
+//     console.log(data);
 
-    console.log("Expired schedules deleted successfully");
-  } catch (error) {
-    console.error("Error deleting expired schedules:", error);
-  }
-});
+//     console.log("Expired schedules deleted successfully");
+//   } catch (error) {
+//     console.error("Error deleting expired schedules:", error);
+//   }
+// });

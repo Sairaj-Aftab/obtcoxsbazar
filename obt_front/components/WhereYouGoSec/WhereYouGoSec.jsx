@@ -8,14 +8,14 @@ const WhereYouGoSec = () => {
   const { destinationPlaces } = useSelector(schedulesData);
 
   return (
-    <section className="container mx-auto my-8 p-4 bg-white shadow-lg rounded-lg">
+    <section className="container mx-auto my-8 p-4 bg-white md:shadow-lg md:rounded-lg">
       <h3 className="text-xl font-semibold mb-4">Where You Go</h3>
       <div className="flex gap-2 md:gap-5 flex-wrap">
         {destinationPlaces &&
-          destinationPlaces.map((place, index) => (
+          destinationPlaces?.map((place, index) => (
             <Link
               href={`/${place.slug}/${place.id}`}
-              className="bg-primary-color text-white text-sm sm:text-base py-1 px-2 rounded-md"
+              className="bg-primary-color text-white text-base py-1 px-2 rounded-md"
               key={index}
             >
               {place.placeName}

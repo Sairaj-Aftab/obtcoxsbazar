@@ -26,9 +26,9 @@ const BusInformation = ({ params }) => {
   return (
     <div className="container mx-auto bg-white rounded-lg my-5">
       {/* Heading */}
-      <div className="flex justify-between items-center bg-primary-color rounded-t-lg text-white py-2 px-3">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-primary-color rounded-t-lg text-white py-2 px-3">
         <h1 className="text-xl font-medium">{busInfo?.paribahanName}</h1>
-        <p className="text-base font-medium">
+        <p className="text-sm md:text-base font-medium">
           টিকেট এর জন্য যোগাযোগ করুন :{" "}
           <a href="tel:+8801818591572" className="font-semibold underline">
             {busInfo?.salesNumber}
@@ -83,6 +83,11 @@ const BusInformation = ({ params }) => {
             ))}
           </tbody>
         </table>
+        {busInfo?.busSchedule?.length < 1 && (
+          <h1 className="text-red text-lg font-medium text-center py-10">
+            No Schedule
+          </h1>
+        )}
       </div>
     </div>
   );
