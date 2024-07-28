@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { loginAuthUser } from "../../features/auth/authApiSlice";
 import { authData, setMessageEmpty } from "../../features/auth/authSlice";
 import { Link, useNavigate } from "react-router-dom";
-import WhiteLogo from "../../components/Logo/WhiteLogo";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import WhiteLogo from "../../components/Logo/WhiteLogo";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -54,8 +54,8 @@ const Login = () => {
         <div className="container">
           <div className="loginbox">
             <div className="login-left">
-              <h1 className="text-light">OBTCOXSBAZAR</h1>
-              {/* <WhiteLogo /> */}
+              {/* <h1 className="text-light">OBTCOXSBAZAR</h1> */}
+              <WhiteLogo />
             </div>
             <div className="login-right">
               <div className="login-right-wrap">

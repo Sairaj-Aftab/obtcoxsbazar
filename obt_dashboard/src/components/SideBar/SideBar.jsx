@@ -17,88 +17,100 @@ const SideBar = () => {
             <li className="menu-title">
               <span>Main</span>
             </li>
-            {permissions.includes("DASHBOARD") && (
-              <li className={`${location.pathname === "/" && "active"}`}>
-                <Link to="/">
-                  <i className="fe fe-home" aria-hidden="true"></i>{" "}
-                  <span>Dashboard</span>
-                </Link>
-              </li>
-            )}
-            {permissions.includes("DAILY-BUS-SCHEDULE") && (
-              <li
-                className={`${
-                  location.pathname === "/daily-bus-schedule-list" && "active"
-                }`}
-              >
-                <Link to="/daily-bus-schedule-list">
-                  <i class="fa fa-list-alt" aria-hidden="true"></i>{" "}
-                  <span>Daily Bus Schedule</span>
-                </Link>
-              </li>
-            )}
+            <li className={`${location.pathname === "/" && "active"}`}>
+              <Link to="/">
+                <i className="fe fe-home" aria-hidden="true"></i>{" "}
+                <span>Dashboard</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("DASHBOARD") && (
+            )} */}
 
-            {permissions.includes("NOTICE-BOARD") && (
-              <li className={`${location.pathname === "/notice" && "active"}`}>
-                <Link to="/notice">
-                  <i class="fa fa-newspaper-o" aria-hidden="true"></i>{" "}
-                  <span>Notice Board</span>
-                </Link>
-              </li>
-            )}
+            <li
+              className={`${
+                location.pathname === "/regular-bus-schedule" && "active"
+              }`}
+            >
+              <Link to="/regular-bus-schedule">
+                <i className="fa fa-list-alt" aria-hidden="true"></i>{" "}
+                <span>Regular Bus Schedule</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("REGULAR-BUS-SCHEDULE") && (
+            )} */}
 
-            {permissions.includes("ARRIVAL-DESTINATION") && (
-              <li
-                className={`${
-                  location.pathname === "/destination" && "active"
-                }`}
-              >
-                <Link to="/destination">
-                  <i class="fa fa-location-arrow" aria-hidden="true"></i>{" "}
-                  <span>Arrival & Destination</span>
-                </Link>
-              </li>
-            )}
+            <li
+              className={`${
+                location.pathname === "/total-bus-schedule-list" && "active"
+              }`}
+            >
+              <Link to="/total-bus-schedule-list">
+                <i className="fa fa-list-alt" aria-hidden="true"></i>{" "}
+                <span>Schedule Log Book</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("TOTAL-BUS-SCHEDULE") && (
+            )} */}
 
-            {permissions.includes("PARIBAHAN-USERS") && (
-              <li
-                className={`${
-                  location.pathname === "/paribahan-users" && "active"
-                }`}
-              >
-                <Link to="/paribahan-users">
-                  <i class="fa fa-bus" aria-hidden="true"></i>{" "}
-                  <span>Paribahan Users</span>
-                </Link>
-              </li>
-            )}
+            <li className={`${location.pathname === "/notice" && "active"}`}>
+              <Link to="/notice">
+                <i className="fa fa-newspaper-o" aria-hidden="true"></i>{" "}
+                <span>Notice Board</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("NOTICE-BOARD") && (
+            )} */}
 
-            {permissions.includes("USERS") && (
-              <li className={`${location.pathname === "/users" && "active"}`}>
-                <Link to="/users">
-                  <i className="fe fe-users" aria-hidden="true"></i>{" "}
-                  <span>Users</span>
-                </Link>
-              </li>
-            )}
-            {permissions.includes("ROLE") && (
-              <li className={`${location.pathname === "/role" && "active"}`}>
-                <Link to="/role">
-                  <i class="fa fa-arrow-right" aria-hidden="true"></i>{" "}
-                  <span>Role</span>
-                </Link>
-              </li>
-            )}
-            {permissions.includes("PERMISSION") && (
-              <li
-                className={`${location.pathname === "/permission" && "active"}`}
-              >
-                <Link to="/permission">
-                  <i class="fa fa-key" aria-hidden="true"></i>{" "}
-                  <span>Permission</span>
-                </Link>
-              </li>
-            )}
+            <li
+              className={`${location.pathname === "/destination" && "active"}`}
+            >
+              <Link to="/destination">
+                <i className="fa fa-location-arrow" aria-hidden="true"></i>{" "}
+                <span>Arrival & Destination</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("ARRIVAL-DESTINATION") && (
+            )} */}
+
+            <li
+              className={`${
+                location.pathname === "/paribahan-users" && "active"
+              }`}
+            >
+              <Link to="/paribahan-users">
+                <i className="fa fa-bus" aria-hidden="true"></i>{" "}
+                <span>Paribahan Users</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("PARIBAHAN-USERS") && (
+            )} */}
+
+            <li className={`${location.pathname === "/users" && "active"}`}>
+              <Link to="/users">
+                <i className="fe fe-users" aria-hidden="true"></i>{" "}
+                <span>Users</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("USERS") && (
+            )} */}
+            <li className={`${location.pathname === "/role" && "active"}`}>
+              <Link to="/role">
+                <i className="fa fa-arrow-right" aria-hidden="true"></i>{" "}
+                <span>Role</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("ROLE") && (
+            )} */}
+            <li
+              className={`${location.pathname === "/permission" && "active"}`}
+            >
+              <Link to="/permission">
+                <i className="fa fa-key" aria-hidden="true"></i>{" "}
+                <span>Permission</span>
+              </Link>
+            </li>
+            {/* {permissions.includes("PERMISSION") && (
+            )} */}
           </ul>
         </div>
       </div>

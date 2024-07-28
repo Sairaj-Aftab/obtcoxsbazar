@@ -1,9 +1,14 @@
-import whitelogo from "../../assets/img/logo-white.png";
+import blacklogo from "../../assets/img/black_logo.png";
 
 const WhiteLogo = (cssClass) => {
   return (
     <>
-      <img src={whitelogo} alt="Logo" className={cssClass} />
+      <img
+        src={blacklogo}
+        alt="Logo"
+        className={cssClass}
+        style={{ width: "300px" }}
+      />
     </>
   );
 };

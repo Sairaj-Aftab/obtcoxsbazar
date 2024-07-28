@@ -44,6 +44,28 @@ const ParibahanUsers = () => {
     }));
   };
 
+  const [type, setType] = useState("");
+
+  const handleChangeType = (e) => {
+    const select = e.target.value;
+
+    let selectedItem = type;
+
+    if (type.includes(select)) {
+      // Remove the selected item from the string
+      selectedItem = selectedItem.split(select).join("");
+    } else {
+      // Add the selected item to the string
+      selectedItem += select;
+    }
+
+    setType(selectedItem);
+    paribahanSetInput((prevState) => ({
+      ...prevState,
+      type: selectedItem,
+    }));
+  };
+
   const {
     input: paribahanInput,
     handleChangeValue: paribahanHandleChangeValue,
@@ -56,6 +78,7 @@ const ParibahanUsers = () => {
     salesPerson: "",
     salesNumber: "",
     password: "",
+    type: "",
     destinationId: [],
   });
 
@@ -66,7 +89,11 @@ const ParibahanUsers = () => {
 
   const handleCreateParibahanUserSubmit = (e) => {
     e.preventDefault();
-    if (!paribahanInput.paribahanName || !paribahanInput.password) {
+    if (
+      !paribahanInput.paribahanName ||
+      !paribahanInput.password ||
+      !paribahanInput.type
+    ) {
       toast.error("All fields are required");
     } else {
       dispatch(
@@ -86,6 +113,7 @@ const ParibahanUsers = () => {
     const user = paribahanUsers.find((data) => data.id == id);
     setFindUser(user);
     setSelected(user.destination.map((destination) => destination.id));
+    setType(user?.type?.toString());
   };
 
   const handleEditUserSubmit = (e) => {
@@ -100,6 +128,7 @@ const ParibahanUsers = () => {
           salesPerson: findUser.salesPerson,
           salesNumber: findUser.salesNumber,
           plainPassword: findUser.plainPassword,
+          type: type,
           destinationId: selected,
         },
       })
@@ -215,6 +244,56 @@ const ParibahanUsers = () => {
             >
               Generate random password
             </a>
+          </div>
+          <div>
+            <p className="my-2">*Types</p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+              }}
+            >
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={1}
+                  onChange={handleChangeType}
+                  checked={type.includes("1")}
+                />{" "}
+                Non-AC
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={2}
+                  onChange={handleChangeType}
+                  checked={type.includes("2")}
+                />{" "}
+                AC
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={3}
+                  onChange={handleChangeType}
+                  checked={type.includes("3")}
+                />{" "}
+                Sleeper Coach
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={4}
+                  onChange={handleChangeType}
+                  checked={type.includes("4")}
+                />{" "}
+                Double-decker
+              </label>
+            </div>
           </div>
           {destinationPlaces && (
             <div>
@@ -339,6 +418,56 @@ const ParibahanUsers = () => {
               />
             </div>
           </div>
+          <div>
+            <p className="my-2">*Types</p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+              }}
+            >
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={1}
+                  onChange={handleChangeType}
+                  checked={type.includes("1")}
+                />{" "}
+                Non-AC
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={2}
+                  onChange={handleChangeType}
+                  checked={type.includes("2")}
+                />{" "}
+                AC
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={3}
+                  onChange={handleChangeType}
+                  checked={type.includes("3")}
+                />{" "}
+                Sleeper Coach
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={4}
+                  onChange={handleChangeType}
+                  checked={type.includes("4")}
+                />{" "}
+                Double-decker
+              </label>
+            </div>
+          </div>
           {destinationPlaces && (
             <div>
               <p className="my-2">*Destination Places</p>
@@ -405,7 +534,7 @@ const ParibahanUsers = () => {
                   <tbody>
                     {paribahanUsers &&
                       paribahanUsers?.map((data, index) => (
-                        <tr>
+                        <tr key={index}>
                           <td>{index + 1}</td>
                           <td>{data.paribahanName}</td>
                           <th>{data?.contactPerson}</th>

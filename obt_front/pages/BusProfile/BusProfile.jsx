@@ -23,16 +23,11 @@ import {
   createParibahanNotice,
   deleteNotice,
 } from "@/lib/features/notice/noticeApiSlice";
+import NoticeFromAdmin from "@/components/NoticeFromAdmin";
 
 const BusProfile = ({ user }) => {
   const dispatch = useDispatch();
-  const {
-    adminNotices,
-    paribahanNotices,
-    error: noticeError,
-    message: noticeMessage,
-  } = useSelector(noticeData);
-  const [notice, setNotice] = useState("");
+
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const {
@@ -135,49 +130,12 @@ const BusProfile = ({ user }) => {
     dispatch(deleteSchedule(id));
   };
 
-  const handleSubmitNotice = (e) => {
-    e.preventDefault();
-    if (!notice) {
-      toast.error("All field is required");
-    } else {
-      dispatch(createParibahanNotice({ id: user.id, data: { title: notice } }));
-    }
-  };
-
-  // handle logout
-  const handleLogout = () => {
-    signOut({ callbackUrl: "/login" });
-  };
-
-  const [adminNotice, setAdminNotice] = useState(null);
-  const [paribahanNotice, setParibahanNotice] = useState(null);
-
-  const deleteSingleNotice = () => {
-    dispatch(deleteNotice(paribahanNotice.id));
-  };
-
-  useEffect(() => {
-    const getAdminNotice = () => {
-      return adminNotices?.find((notice) => notice.status === "Paribahan");
-    };
-    const getParibahanNotice = () => {
-      return paribahanNotices?.find(
-        (notice) => notice.paribahanUserId === parseInt(user.id)
-      );
-    };
-
-    const AdNotice = getAdminNotice();
-
-    const PaNotice = getParibahanNotice();
-    setAdminNotice(AdNotice);
-    setParibahanNotice(PaNotice);
-  }, [adminNotices, paribahanNotices, user]);
   useEffect(() => {
     if (user) {
       dispatch(getSchedulesDataByAuthId({ id: user.id, limit: 100 }));
     }
-    if (message || noticeMessage) {
-      toast.success(message || noticeMessage);
+    if (message) {
+      toast.success(message);
       setInput({
         busName: user?.paribahanName,
         time: "",
@@ -192,14 +150,14 @@ const BusProfile = ({ user }) => {
       });
       setShowUpdateModal(false);
     }
-    if (error || noticeError) {
-      toast.error(error || noticeError);
+    if (error) {
+      toast.error(error);
     }
     return () => {
       dispatch(setMessageEmpty());
       dispatch(setNoticeMessageEmpty());
     };
-  }, [dispatch, message, error, noticeError, noticeMessage]);
+  }, [dispatch, message, error]);
 
   return (
     <>
@@ -453,68 +411,6 @@ const BusProfile = ({ user }) => {
         </Modal>
       )}
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
-        {/* Profile Header Section */}
-        <div className="flex justify-between items-start ">
-          <div>
-            <h1 className="text-2xl font-medium text-gray-700">
-              Paribahan Name:{" "}
-              <span className="text-primary-color">{user?.paribahanName}</span>
-            </h1>
-            <p className="text-lg font-medium text-gray-700">
-              Sales Number:{" "}
-              <span className="text-primary-color">{user?.salesNumber}</span>
-            </p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
-          >
-            Logout
-          </button>
-        </div>
-
-        <div className="text-base font-semibold pb-5 flex gap-1">
-          <p className="w-full">Notice from Traffic Police :</p>
-          {adminNotice && (
-            <p className="w-full">
-              <marquee behavior="" direction="">
-                {adminNotice?.title}
-              </marquee>
-            </p>
-          )}
-        </div>
-        <div className="pt-5 border-t border-gray  mb-2">
-          {paribahanNotice ? (
-            <div className="flex gap-1 items-center justify-between">
-              <p className="w-full">
-                <marquee behavior="" direction="">
-                  {paribahanNotice?.title}
-                </marquee>
-              </p>
-              <button
-                onClick={deleteSingleNotice}
-                className="bg-red py-1 px-2 text-base font-medium text-white rounded"
-              >
-                Delete
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmitNotice} className="flex gap-1">
-              <input
-                type="text"
-                value={notice}
-                onChange={(e) => setNotice(e.target.value)}
-                placeholder="Notice to Passenger"
-              />
-              <button
-                type="submit"
-                className="bg-primary-color py-1 px-2 rounded text-white text-base font-medium"
-              >
-                Submit
-              </button>
-            </form>
-          )}
-        </div>
         {/* Table Body */}
         <div>
           <div className="flex justify-between items-start">

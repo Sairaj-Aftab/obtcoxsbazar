@@ -11,7 +11,9 @@ const AllBusServices = ({ title }) => {
       <h1 className="text-lg font-semibold text-white bg-primary-color text-center py-1 rounded-t-lg mb-2">
         {title}
       </h1>
-      <NoticeFromAdmin />
+      <p className="text-base font-medium text-black mb-3">
+        <NoticeFromAdmin status="Passenger" />
+      </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-5">
         {bus &&
           bus?.map((data, index) => (

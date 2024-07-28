@@ -5,6 +5,11 @@ import "./display.css";
 import { useSelector } from "react-redux";
 import { schedulesData } from "@/lib/features/schedules/schedulesSlice";
 import { formatDateTime } from "@/utils/formatDateTime";
+import NoticeFromAdmin from "@/components/NoticeFromAdmin";
+import DigitalClock from "@/components/DigitalClock";
+import Image from "next/image";
+import logoImg from "@/public/image/logo1.png";
+import logoImg2 from "@/public/image/logo2.png";
 
 // Font files can be colocated inside of `app`
 const myFont = localFont({
@@ -49,29 +54,29 @@ const Display = () => {
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
-  // Filter schedules within the next hour
-  const filteredSchedules = schedules?.filter((data) => {
-    const scheduleTime = new Date(data.time);
-    return scheduleTime >= fifteenMinutesAgo && scheduleTime <= oneHourLater;
-  });
-
-  // For Digittal Clock
-  const [time, setTime] = useState(new Date());
-
   useEffect(() => {
-    const timerID = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timerID);
-  }, []);
+    const filteredSchedules = schedules?.filter((data) => {
+      const scheduleTime = new Date(data.time);
+      return scheduleTime >= fifteenMinutesAgo && scheduleTime <= oneHourLater;
+    });
+  }, [fifteenMinutesAgo, oneHourLater]);
 
-  const hours = time.getHours() % 12 || 12; // Convert to 12-hour format and handle midnight
-  const minutes = time.getMinutes().toString().padStart(2, "0");
-  const seconds = time.getSeconds().toString().padStart(2, "0");
-  // const ampm = time.getHours() >= 12 ? "PM" : "AM";
+  // Filter schedules within the next hour
+
   return (
     <div className="display bg-black h-screen w-full flex items-center justify-center fixed -z-10">
-      <div className="w-full flex flex-col gap-10">
+      <div className="w-full flex flex-col gap-8">
         <div className="flex justify-between items-center w-[90%] mx-auto">
-          <div className="basis-1/4 text-white">Logo Here</div>
+          <div className="basis-1/4 text-white">
+            <Image
+              src={logoImg2}
+              alt="OBT"
+              width={0}
+              height={0}
+              sizes="100vw"
+              className="w-48"
+            />
+          </div>
           <div className="basis-2/4 text-white flex flex-col items-center">
             <h1 className="text-white text-3xl font-bold"></h1>
             <div className="head_text_parent">
@@ -91,10 +96,7 @@ const Display = () => {
           <div
             className={`${myFont.className} w-40 h-40 flex flex-col justify-center items-center border border-red border-double rounded-full`}
           >
-            <div className="text-white text-6xl font-bold">
-              <span>{hours}</span> : <span>{minutes}</span>
-            </div>
-            <span className="text-red text-4xl font-semibold">{seconds}</span>
+            <DigitalClock />
           </div>
         </div>
 
@@ -138,15 +140,8 @@ const Display = () => {
             )}
           </div>
         </div>
-        <div className="text-white w-[90%] mx-auto text-xl font-semibold">
-          <marquee behavior="" direction="">
-            অনলাইন বাস টার্মিনালে আপনাকে স্বাগতম। কক্সবাজার থেকে সকল বাসের
-            শিডিউল, টিকিট বুকিং, ভাড়া, গাইডের মোবাইল নাম্বার ও যাত্রার স্থান
-            জানতে ভিজিট করুন:{" "}
-            <span className="text-yellow text-2xl font-bold">
-              www.obtcoxsbazar.com
-            </span>
-          </marquee>
+        <div className="text-white w-[90%] mx-auto text-3xl font-semibold">
+          <NoticeFromAdmin status="Display" />
         </div>
       </div>
     </div>

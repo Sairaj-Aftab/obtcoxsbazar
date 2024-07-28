@@ -12,6 +12,9 @@ import places from "./routes/places.js";
 import permission from "./routes/permission.js";
 import role from "./routes/role.js";
 import notice from "./routes/notice.js";
+import busInfo from "./routes/busInfo.js";
+import guideInfo from "./routes/guideInfo.js";
+import driverInfo from "./routes/driverInfo.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -44,6 +47,9 @@ app.use("/api/v1/place", places);
 app.use("/api/v1/permission", permission);
 app.use("/api/v1/role", role);
 app.use("/api/v1/notice", notice);
+app.use("/api/v1/businfo", busInfo);
+app.use("/api/v1/guideinfo", guideInfo);
+app.use("/api/v1/driverinfo", driverInfo);
 
 // Error Handler
 app.use(errorHandler);

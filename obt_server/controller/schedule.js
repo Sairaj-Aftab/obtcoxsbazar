@@ -151,6 +151,25 @@ export const getSchedulesByLimit = async (req, res, next) => {
     return next(error);
   }
 };
+export const todaySchedule = async (req, res, next) => {
+  try {
+    const schedules = await prisma.busSchedule.findMany({
+      include: {
+        paribahanUser: true,
+      },
+      orderBy: {
+        time: "asc",
+      },
+    });
+
+    if (schedules.length < 1) {
+      return next(createError(400, "Cannot find any schedule!"));
+    }
+    return res.status(200).json({ schedules });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 export const getSchedulesByParibahanUserId = async (req, res, next) => {
   try {

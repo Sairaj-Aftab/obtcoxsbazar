@@ -8,21 +8,26 @@ import Role from "../pages/Role/Role";
 import Users from "../pages/Users/Users";
 import DailyBusScheduleList from "../pages/DailyBusScheduleList/DailyBusScheduleList";
 import ParibahanUsers from "../pages/ParibahanUsers/ParibahanUsers";
+import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 
 const privateRoutes = [
   {
     element: <PageLayout />,
     children: [
       {
-        element: <PrivateRouteGird />,
+        // element: <PrivateRouteGird />,
         children: [
           {
             path: "/",
             element: <Dashboard />,
           },
           {
-            path: "/daily-bus-schedule-list",
+            path: "/total-bus-schedule-list",
             element: <DailyBusScheduleList />,
+          },
+          {
+            path: "/regular-bus-schedule",
+            element: <RegularBusSchedule />,
           },
           {
             path: "/notice",

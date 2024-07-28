@@ -19,10 +19,9 @@ export const createParibahanUserAccount = async (req, res, next) => {
       salesPerson,
       salesNumber,
       password,
+      type,
       destinationId,
     } = req.body;
-
-    console.log(req.body);
 
     // Check if paribahanName already exists
     const existingUser = await prisma.paribahanUser.findUnique({
@@ -48,6 +47,7 @@ export const createParibahanUserAccount = async (req, res, next) => {
             connect: destinationId.map((id) => ({ id })),
           },
         }),
+        type: parseInt(type),
         authUserId: Number(authUserId),
       },
       include: {
@@ -80,6 +80,7 @@ export const updateParibahanUser = async (req, res, next) => {
       salesPerson,
       salesNumber,
       plainPassword,
+      type,
       destinationId,
     } = req.body;
     const hashedPassword = await bcrypt.hash(String(plainPassword), 10);
@@ -101,6 +102,7 @@ export const updateParibahanUser = async (req, res, next) => {
             set: destinationId.map((id) => ({ id })),
           },
         }),
+        type: parseInt(type),
       },
       include: {
         authUser: {

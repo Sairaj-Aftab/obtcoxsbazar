@@ -1,4 +1,4 @@
-import logo from "../../assets/img/logo-small.png";
+import logo from "../../assets/img/black_logo.png";
 
 const SmallLogo = ({ width, height }) => {
   return (

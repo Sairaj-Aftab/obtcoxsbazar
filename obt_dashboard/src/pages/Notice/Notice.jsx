@@ -82,6 +82,7 @@ const Notice = () => {
           <option value="">Select Status</option>
           <option value="Paribahan">Paribahan</option>
           <option value="Passenger">Passenger</option>
+          <option value="Display">Display</option>
         </select>
         <button
           disabled={authUser?.role?.name === "VIEWER" && true}

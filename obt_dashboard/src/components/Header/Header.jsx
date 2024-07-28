@@ -1,12 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import ColorLogo from "../Logo/ColorLogo";
-import SmallLogo from "../Logo/SmallLogo";
 import Avatar from "../Avatar/Avatar";
 import { useDispatch, useSelector } from "react-redux";
 import swal from "sweetalert";
 import { logoutAuthUser } from "../../features/auth/authApiSlice";
 import { authData, setLogoutUser } from "../../features/auth/authSlice";
 import { useState } from "react";
+import ColorLogo from "../Logo/ColorLogo";
+import SmallLogo from "../Logo/SmallLogo";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -41,12 +41,10 @@ const Header = () => {
     <div className="header">
       <div className="header-left">
         <Link to="/" className="logo">
-          {/* <ColorLogo /> */}
-          OBTCOX
+          <ColorLogo />
         </Link>
         <Link to="/" className="logo logo-small">
-          {/* <SmallLogo width="30" height="30" /> */}
-          OBTCOX
+          <SmallLogo width="30" height="30" />
         </Link>
       </div>
 

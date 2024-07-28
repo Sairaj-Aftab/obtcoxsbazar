@@ -64,7 +64,7 @@ const ScheduleTableList = () => {
                     <th>Reg No.</th>
                     <th>Guide Name</th>
                     <th>Guide Phone</th>
-                    <th>Starting Place</th>
+                    <th>Departure Place</th>
                     <th>Destination</th>
                     <th>Seat Status</th>
                     <th>Entry Date</th>
