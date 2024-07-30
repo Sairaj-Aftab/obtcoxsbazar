@@ -9,6 +9,9 @@ import Users from "../pages/Users/Users";
 import DailyBusScheduleList from "../pages/DailyBusScheduleList/DailyBusScheduleList";
 import ParibahanUsers from "../pages/ParibahanUsers/ParibahanUsers";
 import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
+import BusInfo from "../pages/BusInfo/BusInfo";
+import GuideInfo from "../pages/GuideInfo/GuideInfo";
+import DriverInfo from "../pages/DriverInfo/DriverInfo";
 
 const privateRoutes = [
   {
@@ -40,6 +43,18 @@ const privateRoutes = [
           {
             path: "/paribahan-users",
             element: <ParibahanUsers />,
+          },
+          {
+            path: "/bus-info",
+            element: <BusInfo />,
+          },
+          {
+            path: "/guide-info",
+            element: <GuideInfo />,
+          },
+          {
+            path: "/driver-info",
+            element: <DriverInfo />,
           },
           {
             path: "/role",

@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import NoticeFromAdmin from "../NoticeFromAdmin";
 
 const ProfileHeader = ({ user }) => {
   const pathName = usePathname();
@@ -35,8 +36,18 @@ const ProfileHeader = ({ user }) => {
     signOut({ callbackUrl: "/login" });
   };
 
-  const [adminNotice, setAdminNotice] = useState(null);
   const [paribahanNotice, setParibahanNotice] = useState(null);
+
+  useEffect(() => {
+    const getParibahanNotice = () => {
+      return paribahanNotices?.find(
+        (notice) => notice.paribahanUserId === parseInt(user.id)
+      );
+    };
+
+    const notice = getParibahanNotice();
+    setParibahanNotice(notice);
+  }, [paribahanNotices, user]);
 
   const deleteSingleNotice = () => {
     dispatch(deleteNotice(paribahanNotice.id));
@@ -78,14 +89,11 @@ const ProfileHeader = ({ user }) => {
 
       <div className="text-base font-semibold pb-5 flex gap-1">
         <p className="w-full">Notice from Traffic Police :</p>
-        {adminNotice && (
-          <p className="w-full">
-            <NoticeFromAdmin status="Paribahan" />
-            {/* <marquee behavior="" direction="">
-          {adminNotice?.title}
-        </marquee> */}
-          </p>
-        )}
+        <p className="w-full">
+          <NoticeFromAdmin status="Paribahan" />
+        </p>
+        {/* {adminNotice && (
+        )} */}
       </div>
       <div className="pt-5 border-t border-gray  mb-2">
         {paribahanNotice ? (
@@ -120,7 +128,7 @@ const ProfileHeader = ({ user }) => {
         )}
       </div>
       {/* Menu */}
-      <ul className="flex gap-3 justify-center">
+      <ul className="flex md:gap-3 justify-between md:justify-center mt-3 md:mt-0">
         <li>
           <Link
             href="/profile"
@@ -128,7 +136,7 @@ const ProfileHeader = ({ user }) => {
               pathName === "/profile"
                 ? "bg-primary-color text-white"
                 : "bg-gray-200 text-primary-color"
-            } border border-primary-color text-base font-medium py-1 px-2 rounded-md`}
+            } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
           >
             Schedule
           </Link>
@@ -140,7 +148,7 @@ const ProfileHeader = ({ user }) => {
               pathName === "/profile/bus-info"
                 ? "bg-primary-color text-white"
                 : "bg-gray-200 text-primary-color"
-            } border border-primary-color text-base font-medium py-1 px-2 rounded-md`}
+            } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
           >
             Bus Info
           </Link>
@@ -152,7 +160,7 @@ const ProfileHeader = ({ user }) => {
               pathName === "/profile/guide-info"
                 ? "bg-primary-color text-white"
                 : "bg-gray-200 text-primary-color"
-            } border border-primary-color text-base font-medium py-1 px-2 rounded-md`}
+            } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
           >
             Guide Info
           </Link>
@@ -164,7 +172,7 @@ const ProfileHeader = ({ user }) => {
               pathName === "/profile/driver-info"
                 ? "bg-primary-color text-white"
                 : "bg-gray-200 text-primary-color"
-            } border border-primary-color text-base font-medium py-1 px-2 rounded-md`}
+            } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
           >
             Driver Info
           </Link>

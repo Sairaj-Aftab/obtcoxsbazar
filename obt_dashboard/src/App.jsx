@@ -21,6 +21,10 @@ import {
   getAllParibahanNotice,
   getAuthNotice,
 } from "./features/notice/noticeApiSlice";
+import { getAllBusInfo } from "./features/busInfo/busInfoApiSlice";
+import { getAllGuideInfo } from "./features/guideInfo/guideInfoApiSlice";
+import { getAllDriverInfo } from "./features/driverInfo/driverInfoApiSlice";
+import { getAllRgSchedules } from "./features/regularSchedule/regularScheduleApiSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -30,6 +34,7 @@ function App() {
       dispatch(getLogedInUser());
     }
     dispatch(getAllSchedules());
+    dispatch(getAllRgSchedules());
     dispatch(getAllPermission());
     dispatch(getAllRoles());
     dispatch(getAllAuthUser());
@@ -39,6 +44,9 @@ function App() {
     dispatch(getDestinationPlaces());
     dispatch(getAuthNotice());
     dispatch(getAllParibahanNotice());
+    dispatch(getAllBusInfo(100));
+    dispatch(getAllGuideInfo(100));
+    dispatch(getAllDriverInfo(100));
   }, [dispatch]);
   return (
     <>

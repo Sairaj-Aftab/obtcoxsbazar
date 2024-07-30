@@ -172,7 +172,7 @@ const ParibahanUsers = () => {
     return () => {
       dispatch(setMessageEmpty());
     };
-  }, [success, message, error]);
+  }, [dispatch, success, message, error]);
   return (
     <>
       {/* Create Paribahan User */}

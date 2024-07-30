@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 export const createDriverInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { paribahanName, name, phone, license, address, comment } = req.body;
+    const { paribahanName, name, phone, license, address, comment, report } =
+      req.body;
 
     const existingPhone = await prisma.driverInfo.findUnique({
       where: {
@@ -36,6 +37,7 @@ export const createDriverInfo = async (req, res, next) => {
         license,
         address,
         comment,
+        report,
         paribahanUserId: parseInt(id),
       },
       include: {
@@ -54,7 +56,7 @@ export const createDriverInfo = async (req, res, next) => {
 export const updateDriverInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, phone, license, address, comment } = req.body;
+    const { name, phone, license, address, comment, report } = req.body;
     const existingDL = await prisma.driverInfo.findFirst({
       where: {
         license,
@@ -87,6 +89,7 @@ export const updateDriverInfo = async (req, res, next) => {
         license,
         address,
         comment,
+        report,
       },
       include: {
         paribahanUser: true,
@@ -131,6 +134,49 @@ export const getDriverInfo = async (req, res, next) => {
       return next(createError(400, "Cannot find any info!"));
     }
     return res.status(200).json({ driverInfo, count, totalCount });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getAllDriverInfo = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+    const driverInfo = await prisma.driverInfo.findMany({
+      skip: offset,
+      take: limit,
+      orderBy: {
+        paribahanName: "asc",
+      },
+      include: {
+        paribahanUser: true,
+      },
+    });
+
+    const totalCount = await prisma.driverInfo.count();
+
+    if (driverInfo.length < 1) {
+      return next(createError(400, "Cannot find any info!"));
+    }
+    return res.status(200).json({ driverInfo, totalCount });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteDriverInfo = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const driverInfo = await prisma.driverInfo.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    return res
+      .status(200)
+      .json({ driverInfo, message: "Deleted successfully" });
   } catch (error) {
     return next(error);
   }

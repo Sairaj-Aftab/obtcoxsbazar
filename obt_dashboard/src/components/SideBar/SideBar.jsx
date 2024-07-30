@@ -85,6 +85,29 @@ const SideBar = () => {
             {/* {permissions.includes("PARIBAHAN-USERS") && (
             )} */}
 
+            <li className={`${location.pathname === "/bus-info" && "active"}`}>
+              <Link to="/bus-info">
+                <i className="fa fa-bus" aria-hidden="true"></i>{" "}
+                <span>Bus Info</span>
+              </Link>
+            </li>
+            <li
+              className={`${location.pathname === "/guide-info" && "active"}`}
+            >
+              <Link to="/guide-info">
+                <i className="fa fa-user" aria-hidden="true"></i>{" "}
+                <span>Guide Info</span>
+              </Link>
+            </li>
+            <li
+              className={`${location.pathname === "/driver-info" && "active"}`}
+            >
+              <Link to="/driver-info">
+                <i className="fa fa-user" aria-hidden="true"></i>{" "}
+                <span>Driver Info</span>
+              </Link>
+            </li>
+
             <li className={`${location.pathname === "/users" && "active"}`}>
               <Link to="/users">
                 <i className="fe fe-users" aria-hidden="true"></i>{" "}

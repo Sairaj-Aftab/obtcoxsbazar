@@ -81,11 +81,7 @@ const ScheduleTableList = () => {
                       <tr key={index}>
                         <td>{index + 1}</td>
                         <td>{formatDateTime(data.time)}</td>
-                        <td>
-                          <h2 className="table-avatar">
-                            <a href="profile.html">{data.busName}</a>
-                          </h2>
-                        </td>
+                        <td>{data.busName}</td>
                         <td>{data.type}</td>
                         <td>{data.busNo}</td>
                         <td>{data.guideName}</td>

@@ -8,6 +8,7 @@ import { createServer } from "node:http";
 import auth from "./routes/auth.js";
 import paribahanUser from "./routes/paribahanUser.js";
 import schedule from "./routes/schedule.js";
+import regularSchedule from "./routes/regularSchedule.js";
 import places from "./routes/places.js";
 import permission from "./routes/permission.js";
 import role from "./routes/role.js";
@@ -35,7 +36,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ],
     credentials: true,
   })
 );
@@ -43,6 +48,7 @@ app.use(
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/paribahan", paribahanUser);
 app.use("/api/v1/schedule", schedule);
+app.use("/api/v1/rgschedule", regularSchedule);
 app.use("/api/v1/place", places);
 app.use("/api/v1/permission", permission);
 app.use("/api/v1/role", role);

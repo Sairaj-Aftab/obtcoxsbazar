@@ -34,7 +34,7 @@ const BusScheduleTable = () => {
             </tr>
           </thead>
           <tbody>
-            {/* {filteredSchedules
+            {filteredSchedules
               ?.slice(0, 15)
               .sort((a, b) => new Date(a.time) - new Date(b.time))
               ?.map((data, index) => (
@@ -49,8 +49,8 @@ const BusScheduleTable = () => {
                   <td>৳ {data.rent ? data.rent : "--"}</td>
                   {data.seatStatus ? <td>Available</td> : <td>Booked</td>}
                 </tr>
-              ))} */}
-            <tr className="text-base font-normal">
+              ))}
+            {/* <tr className="text-base font-normal">
               <td>787788:pm</td>
               <td>PParriibbaaa nnaammmee</td>
               <td>NNoonn AAcc</td>
@@ -60,7 +60,7 @@ const BusScheduleTable = () => {
               <td>jfksdjfskdfjkdsjf</td>
               <td>৳ 8545843</td>
               <td>Available</td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>

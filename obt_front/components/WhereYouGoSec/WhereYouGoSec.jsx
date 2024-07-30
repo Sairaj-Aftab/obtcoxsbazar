@@ -9,7 +9,7 @@ const WhereYouGoSec = () => {
 
   return (
     <section className="container mx-auto my-8 p-4 bg-white md:shadow-lg md:rounded-lg">
-      <h3 className="text-xl font-semibold mb-4">Where You Go</h3>
+      <h3 className="text-xl font-semibold mb-4">Where To Go</h3>
       <div className="flex gap-2 md:gap-5 flex-wrap">
         {destinationPlaces &&
           destinationPlaces?.map((place, index) => (

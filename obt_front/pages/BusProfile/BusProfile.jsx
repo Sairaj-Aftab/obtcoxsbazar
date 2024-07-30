@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import {
   createSchedule,
@@ -12,18 +12,9 @@ import {
   setMessageEmpty,
 } from "@/lib/features/schedules/schedulesSlice";
 import { formatDateTime } from "@/utils/formatDateTime";
-import { signOut } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  noticeData,
-  setNoticeMessageEmpty,
-} from "@/lib/features/notice/noticeSlice";
-import {
-  createParibahanNotice,
-  deleteNotice,
-} from "@/lib/features/notice/noticeApiSlice";
-import NoticeFromAdmin from "@/components/NoticeFromAdmin";
+import { setNoticeMessageEmpty } from "@/lib/features/notice/noticeSlice";
 
 const BusProfile = ({ user }) => {
   const dispatch = useDispatch();
@@ -34,6 +25,8 @@ const BusProfile = ({ user }) => {
     authSchedules: schedules,
     leavingPlaces,
     destinationPlaces,
+    busInfo,
+    guideInfo,
     message,
     error,
   } = useSelector(schedulesData);
@@ -62,7 +55,21 @@ const BusProfile = ({ user }) => {
   });
   const changeInputValue = (e) => {
     const { name, value } = e.target;
-    setInput({ ...input, [name]: value });
+
+    if (name === "guideName") {
+      const selectedGuide = guideInfo.find((guide) => guide.name === value);
+      if (selectedGuide) {
+        setInput({
+          ...input,
+          guideName: selectedGuide.name,
+          guidePhone: selectedGuide.phone,
+        });
+      } else {
+        setInput({ ...input, guideName: value, guidePhone: "" });
+      }
+    } else {
+      setInput({ ...input, [name]: value });
+    }
   };
   const changeUpdateInputValue = (e) => {
     const { name, value } = e.target;
@@ -175,27 +182,46 @@ const BusProfile = ({ user }) => {
               // onChange={changeInputValue}
               placeholder="Paribahan Name"
             />
-            <input
-              type="text"
+            <select
               name="busNo"
+              id="busNo"
               value={input.busNo}
               onChange={changeInputValue}
-              placeholder="Reg No."
-            />
-            <input
-              type="text"
+            >
+              <option value="">Reg No.</option>
+              {busInfo?.map((data, index) => (
+                <option key={index} value={data.regNo}>
+                  {data.regNo}
+                </option>
+              ))}
+            </select>
+            <select
               name="guideName"
+              id="guideName"
               value={input.guideName}
               onChange={changeInputValue}
-              placeholder="Guide Name"
-            />
-            <input
-              type="text"
+            >
+              <option value="">Guide Name</option>
+              {guideInfo?.map((data, index) => (
+                <option key={index} value={data.name}>
+                  {data.name}
+                </option>
+              ))}
+            </select>
+            <select
               name="guidePhone"
+              id="guidePhone"
               value={input.guidePhone}
-              onChange={changeInputValue}
-              placeholder="Guide Phone"
-            />
+              disabled
+            >
+              <option value="">Guide Phone</option>
+              {guideInfo?.map((data, index) => (
+                <option key={index} value={data.phone}>
+                  {data.phone}
+                </option>
+              ))}
+            </select>
+
             <div>
               <label htmlFor="time">Starting Time</label>
               <input

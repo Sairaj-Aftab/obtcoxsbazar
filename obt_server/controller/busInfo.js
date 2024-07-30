@@ -72,6 +72,32 @@ export const updateBusInfo = async (req, res, next) => {
   }
 };
 
+export const getAllBusInfo = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+    const busInfo = await prisma.busInfo.findMany({
+      skip: offset,
+      take: limit,
+      orderBy: {
+        paribahanName: "asc",
+      },
+      include: {
+        paribahanUser: true,
+      },
+    });
+
+    const totalCount = await prisma.busInfo.count();
+
+    if (busInfo.length < 1) {
+      return next(createError(400, "Cannot find any info!"));
+    }
+    return res.status(200).json({ busInfo, totalCount });
+  } catch (error) {
+    return next(error);
+  }
+};
 export const getBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -103,6 +129,20 @@ export const getBusInfo = async (req, res, next) => {
       return next(createError(400, "Cannot find any info!"));
     }
     return res.status(200).json({ busInfo, count, totalCount });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteBusInfo = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const busInfo = await prisma.busInfo.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    return res.status(200).json({ busInfo, message: "Deleted successfully" });
   } catch (error) {
     return next(error);
   }

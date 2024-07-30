@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BiMenu, BiX } from "react-icons/bi";
 import { useState } from "react";
-import blackLogo from "@/public/image/black_logo.png";
+import logo from "@/public/image/white_yellow.png";
+import policeLogo from "@/public/image/police_logo.png";
 
 const Nav = () => {
   const [open, setOpen] = useState(false);
@@ -27,8 +28,18 @@ const Nav = () => {
               </div>
             )}
             {/* Desktop Menu */}
-            <div className="md:flex hidden items-center justify-between">
-              <Image src={blackLogo} alt="OBT" sizes="100vw" className="w-44" />
+            <div className="w-full md:flex hidden items-center md:justify-center md:gap-10">
+              <Link href="/">
+                <Image
+                  src={logo}
+                  alt="OBT"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="w-20"
+                />
+              </Link>
+
               <nav className="flex space-x-4 py-4">
                 <Link
                   href="/"
@@ -98,17 +109,21 @@ const Nav = () => {
                   </Link>
                 )}
               </nav>
-              <div></div>
+              <Link href="/">
+                <Image
+                  src={policeLogo}
+                  alt="OBT"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="w-20 bg-white rounded-full"
+                />
+              </Link>
             </div>
             {/* Mobile Nav */}
             <div className="z-50 py-2 flex md:hidden w-full px-5 justify-between items-center">
               <Link href="/">
-                <Image
-                  src={blackLogo}
-                  alt="OBT"
-                  sizes="100vw"
-                  className="w-32"
-                />
+                <Image src={logo} alt="OBT" sizes="100vw" className="w-16" />
               </Link>
               {open ? (
                 <BiX
@@ -127,7 +142,7 @@ const Nav = () => {
             <nav
               className={`flex flex-col  gap-3
         md:hidden bg-primary-color fixed w-full top-0 overflow-y-auto bottom-0 ${
-          pathName === "/" ? "pt-32" : "pt-32"
+          pathName === "/" ? "pt-32" : "pt-16"
         } pb-3 px-4 duration-500 ${open ? "left-0" : "left-[-100%]"}
         `}
             >

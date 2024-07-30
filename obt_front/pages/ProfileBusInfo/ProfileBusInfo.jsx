@@ -16,7 +16,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 const ProfileBusInfo = ({ user }) => {
-  console.log(user);
   const dispatch = useDispatch();
   const { busInfo, message, error } = useSelector(schedulesData);
   const [showModal, setShowModal] = useState(false);
