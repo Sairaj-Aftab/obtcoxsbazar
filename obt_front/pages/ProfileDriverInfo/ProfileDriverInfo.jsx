@@ -5,11 +5,11 @@ import {
   createDriverInfo,
   getDriverInfo,
   updateDriverInfo,
-} from "@/lib/features/schedules/schedulesApiSlice";
+} from "@/lib/features/driverInfo/driverInfoApiSlice";
 import {
-  schedulesData,
-  setMessageEmpty,
-} from "@/lib/features/schedules/schedulesSlice";
+  driverInfoData,
+  setDriverInfoMessageEmpty,
+} from "@/lib/features/driverInfo/driverInfoSlice";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ProfileDriverInfo = ({ user }) => {
   const dispatch = useDispatch();
-  const { driverInfo, message, error } = useSelector(schedulesData);
+  const { driverInfo, message, error } = useSelector(driverInfoData);
 
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -80,7 +80,7 @@ const ProfileDriverInfo = ({ user }) => {
       toast.error(error);
     }
     return () => {
-      dispatch(setMessageEmpty());
+      dispatch(setDriverInfoMessageEmpty());
     };
   }, [message, error, dispatch]);
   return (

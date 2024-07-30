@@ -5,11 +5,11 @@ import {
   createBusInfo,
   getBusInfo,
   updateBusInfo,
-} from "@/lib/features/schedules/schedulesApiSlice";
+} from "@/lib/features/busInfo/busInfoApiSlice";
 import {
-  schedulesData,
-  setMessageEmpty,
-} from "@/lib/features/schedules/schedulesSlice";
+  busInfoData,
+  setBusInfoMessageEmpty,
+} from "@/lib/features/busInfo/busInfoSlice";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ProfileBusInfo = ({ user }) => {
   const dispatch = useDispatch();
-  const { busInfo, message, error } = useSelector(schedulesData);
+  const { busInfo, message, error } = useSelector(busInfoData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({
@@ -76,7 +76,7 @@ const ProfileBusInfo = ({ user }) => {
       toast.error(error);
     }
     return () => {
-      dispatch(setMessageEmpty());
+      dispatch(setBusInfoMessageEmpty());
     };
   }, [dispatch, message, error]);
   return (

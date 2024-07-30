@@ -15,6 +15,10 @@ import { formatDateTime } from "@/utils/formatDateTime";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setNoticeMessageEmpty } from "@/lib/features/notice/noticeSlice";
+import { busInfoData } from "@/lib/features/busInfo/busInfoSlice";
+import { guideInfoData } from "@/lib/features/guideInfo/guideInfoSlice";
+import { getGuideInfo } from "@/lib/features/guideInfo/guideInfoApiSlice";
+import { getBusInfo } from "@/lib/features/busInfo/busInfoApiSlice";
 
 const BusProfile = ({ user }) => {
   const dispatch = useDispatch();
@@ -25,11 +29,11 @@ const BusProfile = ({ user }) => {
     authSchedules: schedules,
     leavingPlaces,
     destinationPlaces,
-    busInfo,
-    guideInfo,
     message,
     error,
   } = useSelector(schedulesData);
+  const { busInfo } = useSelector(busInfoData);
+  const { guideInfo } = useSelector(guideInfoData);
   const [input, setInput] = useState({
     busName: user?.paribahanName,
     time: "",
@@ -141,6 +145,8 @@ const BusProfile = ({ user }) => {
     if (user) {
       dispatch(getSchedulesDataByAuthId({ id: user.id, limit: 100 }));
     }
+    dispatch(getBusInfo({ id: user.id, limit: 100 }));
+    dispatch(getGuideInfo({ id: user.id, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({
