@@ -2,19 +2,16 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   createBusInfo,
   createDriverInfo,
-  createGuideInfo,
   createSchedule,
   deleteSchedule,
   getBusInfo,
   getDestinationPlace,
   getDriverInfo,
-  getGuideInfo,
   getLeavingPlace,
   getSchedulesDataByAuthId,
   getSchedulesDataByLimit,
   updateBusInfo,
   updateDriverInfo,
-  updateGuideInfo,
   updateSchedule,
 } from "./schedulesApiSlice";
 const schedulesSlice = createSlice({
@@ -25,7 +22,6 @@ const schedulesSlice = createSlice({
     leavingPlaces: null,
     destinationPlaces: null,
     busInfo: null,
-    guideInfo: null,
     driverInfo: null,
     message: null,
     error: null,
@@ -182,44 +178,6 @@ const schedulesSlice = createSlice({
         );
         if (infoIndex !== -1) {
           state.busInfo[infoIndex] = action.payload.busInfo;
-        }
-        state.message = action.payload.message;
-      })
-      .addCase(getGuideInfo.rejected, (state, action) => {
-        // state.error = action.error.message;
-      })
-      .addCase(getGuideInfo.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(getGuideInfo.fulfilled, (state, action) => {
-        state.loader = false;
-        state.guideInfo = action.payload.guideInfo;
-      })
-      .addCase(createGuideInfo.rejected, (state, action) => {
-        state.error = action.error.message;
-      })
-      .addCase(createGuideInfo.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(createGuideInfo.fulfilled, (state, action) => {
-        state.loader = false;
-        state.guideInfo = state.guideInfo ?? [];
-        state.guideInfo.push(action.payload.guideInfo);
-        state.message = action.payload.message;
-      })
-      .addCase(updateGuideInfo.rejected, (state, action) => {
-        state.error = action.error.message;
-      })
-      .addCase(updateGuideInfo.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(updateGuideInfo.fulfilled, (state, action) => {
-        state.loader = false;
-        const infoIndex = state.guideInfo.findIndex(
-          (info) => info.id === action.payload.guideInfo.id
-        );
-        if (infoIndex !== -1) {
-          state.guideInfo[infoIndex] = action.payload.guideInfo;
         }
         state.message = action.payload.message;
       })

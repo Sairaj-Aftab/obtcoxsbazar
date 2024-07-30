@@ -5,11 +5,11 @@ import {
   createGuideInfo,
   getGuideInfo,
   updateGuideInfo,
-} from "@/lib/features/schedules/schedulesApiSlice";
+} from "@/lib/features/guideInfo/guideInfoApiSlice";
 import {
-  schedulesData,
-  setMessageEmpty,
-} from "@/lib/features/schedules/schedulesSlice";
+  guideInfoData,
+  setGuideInfoMessageEmpty,
+} from "@/lib/features/guideInfo/guideInfoSlice";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ProfileGuideInfo = ({ user }) => {
   const dispatch = useDispatch();
-  const { guideInfo, message, error } = useSelector(schedulesData);
+  const { guideInfo, message, error } = useSelector(guideInfoData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({
@@ -78,7 +78,7 @@ const ProfileGuideInfo = ({ user }) => {
       toast.error(error);
     }
     return () => {
-      dispatch(setMessageEmpty());
+      dispatch(setGuideInfoMessageEmpty());
     };
   }, [message, error, dispatch]);
   return (
@@ -196,7 +196,7 @@ const ProfileGuideInfo = ({ user }) => {
             <tbody>
               {guideInfo
                 ?.slice()
-                .sort((a, b) => a.name.localeCompare(b.name))
+                ?.sort((a, b) => a.name.localeCompare(b.name))
                 ?.map((data, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
@@ -212,12 +212,6 @@ const ProfileGuideInfo = ({ user }) => {
                       >
                         Edit
                       </button>
-                      {/* <button
-                      onClick={() => handleDeleteSchedule(data.id)}
-                      className="bg-red py-1 px-2 text-sm font-medium text-white rounded"
-                    >
-                      Delete
-                    </button> */}
                     </td>
                   </tr>
                 ))}
