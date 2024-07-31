@@ -70,10 +70,26 @@ export const updateDriverInfo = async (req, res, next) => {
     }
     const existingPhone = await prisma.driverInfo.findFirst({
       where: {
-        phone,
-        id: {
-          not: Number(id),
-        },
+        AND: [
+          {
+            phone,
+          },
+          {
+            phone: {
+              not: null,
+            },
+          },
+          {
+            phone: {
+              not: "",
+            },
+          },
+          {
+            id: {
+              not: Number(id),
+            },
+          },
+        ],
       },
     });
     if (existingPhone) {

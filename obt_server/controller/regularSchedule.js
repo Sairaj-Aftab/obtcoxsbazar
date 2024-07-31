@@ -57,7 +57,7 @@ export const updateSchedule = async (req, res, next) => {
 export const getAllSchedules = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit + 1) || 500;
     const offset = (page - 1) * limit;
     const schedules = await prisma.regularBusSchedule.findMany({
       skip: offset,

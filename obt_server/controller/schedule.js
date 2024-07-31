@@ -111,11 +111,11 @@ export const getAllSchedules = async (req, res, next) => {
       include: {
         paribahanUser: true,
       },
+      orderBy: {
+        time: "desc",
+      },
       skip: offset,
       take: limit,
-      orderBy: {
-        time: "asc",
-      },
     });
 
     const count = await prisma.busSchedule.count();

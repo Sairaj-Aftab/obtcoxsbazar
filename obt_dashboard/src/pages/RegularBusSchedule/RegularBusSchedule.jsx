@@ -16,12 +16,14 @@ import { formatDateTime } from "../../utils/timeAgo";
 import { placeData } from "../../features/place/placeSlice";
 import { getAllData } from "../../features/user/userSlice";
 import swal from "sweetalert";
+import DataTable from "react-data-table-component";
 
 const RegularBusSchedule = () => {
   const dispatch = useDispatch();
   const { paribahanUsers } = useSelector(getAllData);
   const { authUser } = useSelector(authData);
-  const { rgSchedules, message, error } = useSelector(rgSchedulesData);
+  const { rgSchedules, totalCount, message, error } =
+    useSelector(rgSchedulesData);
   const { leavingPlaces, destinationPlaces } = useSelector(placeData);
 
   const [input, setInput] = useState({
@@ -84,6 +86,70 @@ const RegularBusSchedule = () => {
       dispatch(setRgScheduleMessageEmpty());
     };
   }, [dispatch, message, error]);
+
+  const columns = [
+    {
+      name: "#",
+      selector: (data, index) => index + 1,
+      width: "50px",
+    },
+    {
+      name: "Time",
+      selector: (data) => data.time,
+      sortable: true,
+    },
+    {
+      name: "Paribahan",
+      selector: (data) => data.busName,
+      sortable: true,
+    },
+    {
+      name: "Type",
+      selector: (data) => data.type,
+    },
+    {
+      name: "Departure Place",
+      selector: (data) => data.leavingPlace,
+      sortable: true,
+    },
+    {
+      name: "Destination",
+      selector: (data) => data.destinationPlace,
+      sortable: true,
+    },
+    {
+      name: "Entry Date",
+      selector: (data) => formatDateTime(data.createdAt),
+      sortable: true,
+    },
+  ];
+
+  if (authUser?.role?.name !== "VIEWER") {
+    columns.push({
+      name: "Actions",
+      cell: (data) => (
+        <div className="text-right actions">
+          <a
+            data-toggle="modal"
+            href="#delete_modal"
+            className="btn btn-sm bg-danger-light"
+            onClick={() => handleDeleteSchedule(data.id)}
+          >
+            <i className="fe fe-trash"></i> Delete
+          </a>
+        </div>
+      ),
+      right: true, // Align the column to the right
+    });
+  }
+  // const handlePageChange = (newPage) => {
+  //   setPage(newPage);
+  // };
+
+  // const handleRowsPerPageChange = (newRowsPerPage) => {
+  //   setRowsPerPage(newRowsPerPage);
+  //   setPage(1); // Reset to first page
+  // };
   return (
     <>
       <ModalPopup title="Create Regular Schedule" target="busScheduleModal">
@@ -177,69 +243,21 @@ const RegularBusSchedule = () => {
       >
         Add regular schedule
       </button>
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                <table className="datatable table table-hover table-center mb-0">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Time</th>
-                      <th>Paribahan</th>
-                      <th>Bus Type</th>
-                      <th>Departure Place</th>
-                      <th>Destination</th>
-                      <th>Entry Date</th>
-                      {authUser?.role?.name === "VIEWER" ? (
-                        ""
-                      ) : (
-                        <th className="text-right">Actions</th>
-                      )}
-                    </tr>
-                  </thead>
-                  {rgSchedules && rgSchedules.length > 0 && (
-                    <tbody>
-                      {rgSchedules?.map((data, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{data.time}</td>
-                          <td>
-                            <h2 className="table-avatar">
-                              <a href="profile.html">{data.busName}</a>
-                            </h2>
-                          </td>
-                          <td>{data.type}</td>
-                          <td>{data.leavingPlace}</td>
-                          <td>{data.destinationPlace}</td>
-                          <td>{formatDateTime(data.createdAt)}</td>
-                          {authUser?.role?.name === "VIEWER" ? (
-                            ""
-                          ) : (
-                            <td className="text-right">
-                              <div className="actions">
-                                <a
-                                  data-toggle="modal"
-                                  href="#delete_modal"
-                                  className="btn btn-sm bg-danger-light"
-                                  onClick={() => handleDeleteSchedule(data.id)}
-                                >
-                                  <i className="fe fe-trash"></i> Delete
-                                </a>
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  )}
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div>
+        <input type="text" placeholder="Search" className="form-control" />
       </div>
+      {rgSchedules?.length > 0 && (
+        <DataTable
+          columns={columns}
+          data={rgSchedules}
+          fixedHeader
+          pagination
+          paginationTotalRows={totalCount}
+          paginationPerPage={100}
+          paginationRowsPerPageOptions={[5, 10, 20, 50, 100]}
+          responsive
+        />
+      )}
     </>
   );
 };

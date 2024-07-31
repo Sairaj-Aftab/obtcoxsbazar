@@ -4,10 +4,13 @@ import { useSelector } from "react-redux";
 import { getAllData } from "../../features/user/userSlice";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
 import ScheduleTableList from "../../components/ScheduleTableList/ScheduleTableList";
+import { rgSchedulesData } from "../../features/regularSchedule/regularScheduleSlice";
 
 const Dashboard = () => {
   const { schedules, totalScheduleCount } = useSelector(schedulesData);
   const { paribahanUsers } = useSelector(getAllData);
+  const { rgSchedules, totalCount, message, error } =
+    useSelector(rgSchedulesData);
   const today = new Date();
   const formattedToday = today.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
 
@@ -47,7 +50,7 @@ const Dashboard = () => {
                   <i className="fa fa-calendar" aria-hidden="true"></i>
                 </span>
                 <div className="dash-count">
-                  <h3>{totalScheduleCount}</h3>
+                  <h3>{totalCount}</h3>
                 </div>
               </div>
               <div className="dash-widget-info">

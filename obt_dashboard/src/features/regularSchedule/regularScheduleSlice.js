@@ -31,10 +31,11 @@ const regularSchedulesSlice = createSlice({
         state.loader = false;
         state.rgSchedules = state.rgSchedules ?? [];
         state.rgSchedules.push(action.payload.busSchedule);
+        state.totalCount++;
         state.message = action.payload.message;
       })
       .addCase(getAllRgSchedules.rejected, (state, action) => {
-        state.error = action.error.message;
+        // state.error = action.error.message;
       })
       .addCase(getAllRgSchedules.pending, (state) => {
         state.loader = true;
