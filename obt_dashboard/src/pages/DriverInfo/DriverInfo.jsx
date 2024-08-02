@@ -54,7 +54,7 @@ const DriverInfo = () => {
   };
   const handleSubmitInfo = (e) => {
     e.preventDefault();
-    if (!input.paribahanName || !input.name || !input.license) {
+    if (!input.paribahanName || !input.name) {
       toast.error("Fields are required!");
     } else {
       dispatch(createDriverInfo({ id: input.id, data: input }));

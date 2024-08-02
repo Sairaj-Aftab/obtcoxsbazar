@@ -89,7 +89,7 @@ export const register = async (req, res, next) => {
         phone,
         password: hashedPassword,
         plainPassword: String(password),
-        roleId: Number(roleId),
+        roleId: String(roleId),
       },
       include: {
         role: true,
@@ -125,7 +125,7 @@ export const updateUser = async (req, res, next) => {
       where: {
         userName: userName,
         id: {
-          not: Number(id),
+          not: String(id),
         },
       },
     });
@@ -135,14 +135,14 @@ export const updateUser = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
     const user = await prisma.authUser.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         userName,
         phone,
         password: hashedPassword,
         plainPassword,
-        roleId: Number(roleId),
+        roleId: String(roleId),
       },
       include: {
         role: true,
@@ -159,7 +159,7 @@ export const deleteUser = async (req, res, next) => {
     const { id } = req.params;
     const user = await prisma.authUser.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ user });

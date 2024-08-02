@@ -38,7 +38,7 @@ export const getSingleParibahanNotice = async (req, res, next) => {
     const { id } = req.params;
     const notice = await prisma.noticeFromBus.findUnique({
       where: {
-        paribahanUserId: Number(id),
+        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -78,7 +78,7 @@ export const createParibahanNotice = async (req, res, next) => {
     const { title } = req.body;
     const fromSameId = await prisma.noticeFromBus.findUnique({
       where: {
-        paribahanUserId: Number(id),
+        paribahanUserId: String(id),
       },
     });
     if (fromSameId) {
@@ -87,7 +87,7 @@ export const createParibahanNotice = async (req, res, next) => {
     const notice = await prisma.noticeFromBus.create({
       data: {
         title,
-        paribahanUserId: Number(id),
+        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -116,7 +116,7 @@ export const createAdminNotice = async (req, res, next) => {
         status,
         authUser: {
           connect: {
-            id: Number(id),
+            id: String(id),
           },
         },
       },
@@ -135,7 +135,7 @@ export const deleteParibahanNotice = async (req, res, next) => {
     const { id } = req.params;
     const notice = await prisma.noticeFromBus.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ notice, message: "Notice deleted" });
@@ -148,7 +148,7 @@ export const deleteAdminNotice = async (req, res, next) => {
     const { id } = req.params;
     const notice = await prisma.noticeFromAdmin.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ notice });
@@ -163,7 +163,7 @@ export const updateParibahanNotice = async (req, res, next) => {
     const { title } = req.body;
     const notice = await prisma.noticeFromBus.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         title,
@@ -180,7 +180,7 @@ export const updateAdminNotice = async (req, res, next) => {
     const { title } = req.body;
     const notice = await prisma.noticeFromAdmin.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         title,

@@ -27,7 +27,7 @@ const Role = () => {
   const [selected, setSelected] = useState([]);
 
   const handleChangeCheckbox = (e) => {
-    const select = parseInt(e.target.value);
+    const select = String(e.target.value);
 
     const selectedItem = [...selected];
 
@@ -128,7 +128,7 @@ const Role = () => {
           {permissions && (
             <div>
               <p className="my-2">*Permission</p>
-              {permissions.map((data, index) => (
+              {permissions?.map((data, index) => (
                 <label key={index} className="d-block">
                   <input
                     type="checkbox"

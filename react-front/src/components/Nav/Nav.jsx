@@ -1,0 +1,219 @@
+import { BiMenu, BiX } from "react-icons/bi";
+import { useState } from "react";
+import logo from "../../assets/image/white_yellow.png";
+import policeLogo from "../../assets/image/police_logo.png";
+import { Link, useLocation } from "react-router-dom";
+
+const Nav = () => {
+  const [open, setOpen] = useState(false);
+  const pathName = useLocation();
+  return (
+    <>
+      {pathName === "/display" ? null : (
+        <header className="bg-primary-color">
+          <div className="container mx-auto flex items-center flex-col">
+            {pathName === "/" && (
+              <div className="z-50 flex flex-col items-center">
+                <h1 className="text-white text-3xl font-bold">
+                  Online Bus Terminal
+                </h1>
+                <span className="text-white text-xl font-semibold">
+                  Cox's Bazar
+                </span>
+              </div>
+            )}
+            {/* Desktop Menu */}
+            <div className="w-full md:flex hidden items-center md:justify-center md:gap-10">
+              <Link to="/">
+                <img src={logo} alt="OBT" sizes="100vw" className="w-20" />
+              </Link>
+
+              <nav className="flex space-x-4 py-4">
+                <Link
+                  to="/"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/all-bus-services"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/all-bus-services" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  All Bus Services
+                </Link>
+                <Link
+                  to="/all-bus-schedules"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/all-bus-schedules" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  All Bus Schedules
+                </Link>
+                <Link
+                  to="http://coxscab.com/apex/osman_erp/r/coxscab//transport-permission"
+                  target="_blank"
+                  className={`text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  Tourist Bus Entry Permission
+                </Link>
+                <Link
+                  to="/about"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/about" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  About
+                </Link>
+                <Link
+                  to="/contact-us"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/contact-us" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  Contact Us
+                </Link>
+                {!session && (
+                  <Link
+                    to="/login"
+                    className={`text-base font-medium text-white border border-transparent ${
+                      pathName === "/login" && "border-white"
+                    } hover:border-white py-1 px-2 rounded-sm`}
+                  >
+                    Login
+                  </Link>
+                )}
+                {session && (
+                  <Link
+                    to="/profile"
+                    className={`text-base font-medium text-white border border-transparent ${
+                      pathName === "/profile" && "border-white"
+                    } hover:border-white py-1 px-2 rounded-sm`}
+                  >
+                    Profile
+                  </Link>
+                )}
+              </nav>
+              <Link to="/">
+                <Image
+                  src={policeLogo}
+                  alt="OBT"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="w-20 bg-white rounded-full"
+                />
+              </Link>
+            </div>
+            {/* Mobile Nav */}
+            <div className="z-50 py-2 flex md:hidden w-full px-5 justify-between items-center">
+              <Link to="/">
+                <Image src={logo} alt="OBT" sizes="100vw" className="w-16" />
+              </Link>
+              {open ? (
+                <BiX
+                  className="text-white"
+                  size={35}
+                  onClick={() => setOpen(!open)}
+                />
+              ) : (
+                <BiMenu
+                  className="text-white"
+                  size={35}
+                  onClick={() => setOpen(!open)}
+                />
+              )}
+            </div>
+            <nav
+              className={`flex flex-col  gap-3
+        md:hidden bg-primary-color fixed w-full top-0 overflow-y-auto bottom-0 ${
+          pathName === "/" ? "pt-32" : "pt-16"
+        } pb-3 px-4 duration-500 ${open ? "left-0" : "left-[-100%]"}
+        `}
+            >
+              <Link
+                onClick={() => setOpen(!open)}
+                to="/"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                Home
+              </Link>
+              <Link
+                onClick={() => setOpen(!open)}
+                to="/all-bus-services"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/all-bus-services" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                All Bus Services
+              </Link>
+              <Link
+                onClick={() => setOpen(!open)}
+                to="/all-bus-schedules"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/all-bus-schedules" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                All Bus Schedules
+              </Link>
+              <Link
+                onClick={() => setOpen(!open)}
+                to="http://coxscab.com/apex/osman_erp/r/coxscab//transport-permission"
+                className={`text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm`}
+              >
+                Tourist Bus Entry Permission
+              </Link>
+              <Link
+                onClick={() => setOpen(!open)}
+                to="/about"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/about" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                About
+              </Link>
+              <Link
+                onClick={() => setOpen(!open)}
+                to="/contact-us"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/contact-us" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                Contact Us
+              </Link>
+              {!session && (
+                <Link
+                  onClick={() => setOpen(!open)}
+                  to="/login"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/login" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  Login
+                </Link>
+              )}
+              {session && (
+                <Link
+                  onClick={() => setOpen(!open)}
+                  to="/profile"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/profile" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  Profile
+                </Link>
+              )}
+            </nav>
+          </div>
+        </header>
+      )}
+    </>
+  );
+};
+
+export default Nav;

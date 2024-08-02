@@ -32,6 +32,7 @@ const RegularBusSchedule = () => {
     type: "",
     leavingPlace: "",
     destinationPlace: "",
+    rent: "",
   });
 
   const changeInputValue = (e) => {

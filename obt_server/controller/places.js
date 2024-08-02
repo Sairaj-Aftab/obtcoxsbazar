@@ -77,7 +77,7 @@ export const deletePlace = async (req, res, next) => {
   try {
     const { id } = req.params;
     const place = await prisma.leaveDestinationPlace.delete({
-      where: { id: Number(id) },
+      where: { id: String(id) },
     });
     return res.status(200).json({ place });
   } catch (error) {

@@ -27,7 +27,7 @@ export const createGuideInfo = async (req, res, next) => {
         address,
         comment,
         report,
-        paribahanUserId: Number(id),
+        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -48,7 +48,7 @@ export const updateGuideInfo = async (req, res, next) => {
       where: {
         phone,
         id: {
-          not: Number(id),
+          not: String(id),
         },
       },
     });
@@ -57,7 +57,7 @@ export const updateGuideInfo = async (req, res, next) => {
     }
     const guideInfo = await prisma.guideInfo.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         name,
@@ -84,7 +84,7 @@ export const getGuideInfo = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const guideInfo = await prisma.guideInfo.findMany({
       where: {
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
       skip: offset,
       take: limit,
@@ -98,7 +98,7 @@ export const getGuideInfo = async (req, res, next) => {
 
     const count = await prisma.guideInfo.count({
       where: {
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
     });
     const totalCount = await prisma.guideInfo.count();
@@ -144,7 +144,7 @@ export const deleteGuideInfo = async (req, res, next) => {
     const { id } = req.params;
     const guideInfo = await prisma.guideInfo.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ guideInfo, message: "Deleted successfully" });

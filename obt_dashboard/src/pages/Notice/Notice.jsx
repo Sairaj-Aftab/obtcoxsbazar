@@ -136,7 +136,7 @@ const Notice = () => {
                           </div>
                         </td>
                         <td>
-                          {data?.authUser?.map((data) => data.userName)} To{" "}
+                          {data?.authUser?.userName} To{" "}
                           <span className="badge badge-success">
                             {data.status}
                           </span>

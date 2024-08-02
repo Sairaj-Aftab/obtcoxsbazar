@@ -18,7 +18,7 @@ export const getPermission = async (req, res, next) => {
 export const createPermission = async (req, res, next) => {
   try {
     const { name } = req.body;
-    const existingPermission = await prisma.permission.findUnique({
+    const existingPermission = await prisma.permission.findFirst({
       where: {
         name,
       },
@@ -44,7 +44,7 @@ export const deletePermission = async (req, res, next) => {
     const { id } = req.params;
     const permission = await prisma.permission.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ permission });
@@ -60,7 +60,7 @@ export const updatePermissionStatus = async (req, res, next) => {
 
     const permission = await prisma.permission.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         status: !status,

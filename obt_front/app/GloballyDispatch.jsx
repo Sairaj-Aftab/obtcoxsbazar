@@ -51,7 +51,7 @@ const GloballyDispatch = ({ children }) => {
     };
   }, [dispatch]);
 
-  return <>{children}</>;
+  return <div>{children}</div>;
 };
 
 export default GloballyDispatch;

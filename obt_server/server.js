@@ -22,7 +22,15 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://admin.obtcoxsbazar.com",
+      "https://admin.obtcoxsbazar.com",
+      "http://obtcoxsbazar.com",
+      "https://obtcoxsbazar.com",
+    ],
     credentials: true,
   },
 });
@@ -40,6 +48,10 @@ app.use(
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:3001",
+      "http://admin.obtcoxsbazar.com",
+      "https://admin.obtcoxsbazar.com",
+      "http://obtcoxsbazar.com",
+      "https://obtcoxsbazar.com",
     ],
     credentials: true,
   })

@@ -48,7 +48,7 @@ export const createParibahanUserAccount = async (req, res, next) => {
           },
         }),
         type: parseInt(type),
-        authUserId: Number(authUserId),
+        authUserId: String(authUserId),
       },
       include: {
         authUser: {
@@ -86,7 +86,7 @@ export const updateParibahanUser = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(String(plainPassword), 10);
     const paribahanUser = await prisma.paribahanUser.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         paribahanName,
@@ -158,7 +158,7 @@ export const getParibahanUser = async (req, res, next) => {
     const { id } = req.params;
     const paribahanUser = await prisma.paribahanUser.findUnique({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       include: {
         busSchedule: true,
@@ -179,7 +179,7 @@ export const deleteParibahanUser = async (req, res, next) => {
     const { id } = req.params;
     const paribahanUser = await prisma.paribahanUser.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res

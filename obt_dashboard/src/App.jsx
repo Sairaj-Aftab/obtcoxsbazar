@@ -47,6 +47,7 @@ function App() {
     dispatch(getAllBusInfo(100));
     dispatch(getAllGuideInfo(100));
     dispatch(getAllDriverInfo(100));
+    dispatch(getAllRgSchedules(101));
   }, [dispatch]);
   return (
     <>

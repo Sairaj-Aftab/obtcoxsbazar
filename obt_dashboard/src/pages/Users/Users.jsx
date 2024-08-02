@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import DataTables from "datatables.net-dt";
 import ModalPopup from "../../components/ModalPopup/ModalPopup";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import Avatar from "../../components/Avatar/Avatar";
 import FormInputValue from "../../hooks/formInputValue";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllData, setMessageEmpty } from "../../features/user/userSlice";
@@ -27,6 +26,7 @@ const Users = () => {
     password: "",
     roleId: "",
   });
+  console.log(input);
 
   const handleGenRanPassword = () => {
     const ranPass = generateRandomPassword();
@@ -74,25 +74,25 @@ const Users = () => {
     }
   };
 
-  const handleDeleteUser = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
-          icon: "success",
-        });
-        dispatch(deleteAuthUser(id));
-        dispatch(setMessageEmpty());
-      } else {
-        swal("Your imaginary file is safe!");
-      }
-    });
-  };
+  // const handleDeleteUser = (id) => {
+  //   swal({
+  //     title: "Are you sure?",
+  //     text: "Once deleted, you will not be able to recover this imaginary file!",
+  //     icon: "warning",
+  //     buttons: true,
+  //     dangerMode: true,
+  //   }).then((willDelete) => {
+  //     if (willDelete) {
+  //       swal(`Poof! Successfully deleted`, {
+  //         icon: "success",
+  //       });
+  //       dispatch(deleteAuthUser(id));
+  //       dispatch(setMessageEmpty());
+  //     } else {
+  //       swal("Your imaginary file is safe!");
+  //     }
+  //   });
+  // };
 
   useEffect(() => {
     new DataTables(".datatable");
@@ -252,7 +252,7 @@ const Users = () => {
             type="submit"
             className="btn btn-primary"
           >
-            Create
+            Edit
           </button>
         </form>
       </ModalPopup>
@@ -285,7 +285,7 @@ const Users = () => {
                     </thead>
                     <tbody>
                       {users?.map((data, index) => (
-                        <tr>
+                        <tr key={index}>
                           <td>{index + 1}</td>
                           <td>{data.userName}</td>
                           <td>{data.role?.name}</td>

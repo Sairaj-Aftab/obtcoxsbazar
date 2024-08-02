@@ -57,6 +57,7 @@ const regularSchedulesSlice = createSlice({
         state.rgSchedules = state.rgSchedules.filter(
           (item) => item.id !== action.payload.schedule.id
         );
+        state.totalCount--;
       });
   },
 });

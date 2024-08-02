@@ -35,7 +35,7 @@ export const updateSchedule = async (req, res, next) => {
     const { type, time, leavingPlace, destinationPlace, rent } = req.body;
     const busSchedule = await prisma.regularBusSchedule.update({
       where: {
-        id: Number(id), // Convert id to number
+        id: String(id), // Convert id to number
       },
       data: {
         type,
@@ -106,7 +106,7 @@ export const deleteSchedule = async (req, res, next) => {
     const { id } = req.params;
     const schedule = await prisma.regularBusSchedule.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
 

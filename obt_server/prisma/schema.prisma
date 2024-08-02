@@ -1,6 +1,6 @@
 
 datasource db {
-    provider = "mysql"
+    provider = "mongodb"
     url = env("DATABASE_URL")
 }
 
@@ -9,14 +9,14 @@ generator client {
 }
 
 model AuthUser {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     userName String @unique
     phone String?
     role Role? @relation(fields: [roleId], references: [id])
-    roleId Int
+    roleId String @db.ObjectId
     password String
     plainPassword String?
-    notice NoticeFromAdmin[] @relation("authUser")
+    notice NoticeFromAdmin[]
     paribahanUser ParibahanUser[]
     status Boolean @default(true)
     trash Boolean @default(false)
@@ -25,9 +25,10 @@ model AuthUser {
 }
 
 model NoticeFromAdmin {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     title String
-    authUser AuthUser[] @relation("authUser")
+    authUser AuthUser? @relation(fields: [authUserId], references: [id])
+    authUserId String? @unique @db.ObjectId
     status String 
     trash Boolean @default(false)
     createdAt DateTime @default(now())
@@ -36,7 +37,7 @@ model NoticeFromAdmin {
 
 
 model Role {
-  id          Int          @id @default(autoincrement())
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   name        String       @unique
   slug        String       @unique
   authUser    AuthUser[]
@@ -44,25 +45,27 @@ model Role {
   trash       Boolean      @default(false)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  permissions Permission[]
+  permissions Permission[] @relation(fields: [permissionId], references: [id])
+  permissionId String[] @db.ObjectId
 }
 
 model Permission {
-  id          Int              @id @default(autoincrement())
+  id String @id @default(auto()) @map("_id") @db.ObjectId
   name        String           @unique
   slug        String           @unique
   status      Boolean          @default(true)
   trash       Boolean          @default(false)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  roles       Role[]
+  roles       Role[] @relation(fields: [roleId], references: [id])
+  roleId String[] @db.ObjectId
 }
 
 
 
 
 model ParibahanUser {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     paribahanName String @unique
     slug String @unique
     contactPerson String?
@@ -72,9 +75,10 @@ model ParibahanUser {
     password String
     plainPassword String
     type Int?
-    destination LeaveDestinationPlace[]
+    destination LeaveDestinationPlace[] @relation(fields: [destinationId], references: [id])
+    destinationId String[] @db.ObjectId
     authUser AuthUser @relation(fields: [authUserId], references: [id])
-    authUserId Int
+    authUserId String @db.ObjectId
     busSchedule BusSchedule[]
     notice NoticeFromBus?
     busInfo BusInfo[]
@@ -87,21 +91,21 @@ model ParibahanUser {
 }
 
 model BusInfo {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     paribahanName String
     slug String
     regNo String @unique
     type String
     comment String?
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
-    paribahanUserId Int
+    paribahanUserId String @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 model GuideInfo {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     paribahanName String
     slug String
     name String
@@ -111,25 +115,25 @@ model GuideInfo {
     report String?
     image String?
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
-    paribahanUserId Int
+    paribahanUserId String @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 model DriverInfo {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     paribahanName String
     slug String
     name String
-    phone String? @unique
-    license String? @unique
+    phone String?
+    license String?
     address String?
     comment String?
     report String?
     image String?
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
-    paribahanUserId Int
+    paribahanUserId String @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
@@ -137,10 +141,10 @@ model DriverInfo {
 }
 
 model NoticeFromBus {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     title String
     paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
-    paribahanUserId Int? @unique
+    paribahanUserId String? @unique @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
@@ -148,7 +152,7 @@ model NoticeFromBus {
 }
 
 model BusSchedule {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     busName String
     slug String
     type String
@@ -161,7 +165,7 @@ model BusSchedule {
     rent Int?
     seatStatus Boolean
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
-    paribahanUserId Int
+    paribahanUserId String @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
@@ -169,7 +173,7 @@ model BusSchedule {
 }
 
 model RegularBusSchedule {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     busName String
     slug String
     type String
@@ -185,11 +189,12 @@ model RegularBusSchedule {
 
 
 model LeaveDestinationPlace {
-    id Int @id @default(autoincrement())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
     placeName String @unique
     slug String @unique
     status String
-    paribahanUser ParibahanUser[]
+    paribahanUser ParibahanUser[] @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String[] @db.ObjectId
     trash Boolean @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

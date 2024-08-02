@@ -17,27 +17,27 @@ const SideBar = () => {
             <li className="menu-title">
               <span>Main</span>
             </li>
-            <li className={`${location.pathname === "/" && "active"}`}>
-              <Link to="/">
-                <i className="fe fe-home" aria-hidden="true"></i>{" "}
-                <span>Dashboard</span>
-              </Link>
-            </li>
-            {/* {permissions.includes("DASHBOARD") && (
-            )} */}
+            {permissions.includes("DASHBOARD") && (
+              <li className={`${location.pathname === "/" && "active"}`}>
+                <Link to="/">
+                  <i className="fe fe-home" aria-hidden="true"></i>{" "}
+                  <span>Dashboard</span>
+                </Link>
+              </li>
+            )}
 
-            <li
-              className={`${
-                location.pathname === "/regular-bus-schedule" && "active"
-              }`}
-            >
-              <Link to="/regular-bus-schedule">
-                <i className="fa fa-list-alt" aria-hidden="true"></i>{" "}
-                <span>Regular Bus Schedule</span>
-              </Link>
-            </li>
-            {/* {permissions.includes("REGULAR-BUS-SCHEDULE") && (
-            )} */}
+            {permissions.includes("REGULAR-BUS-SCHEDULE") && (
+              <li
+                className={`${
+                  location.pathname === "/regular-bus-schedule" && "active"
+                }`}
+              >
+                <Link to="/regular-bus-schedule">
+                  <i className="fa fa-list-alt" aria-hidden="true"></i>{" "}
+                  <span>Regular Bus Schedule</span>
+                </Link>
+              </li>
+            )}
 
             <li
               className={`${

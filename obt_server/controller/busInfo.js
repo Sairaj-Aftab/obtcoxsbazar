@@ -25,7 +25,7 @@ export const createBusInfo = async (req, res, next) => {
         regNo,
         type,
         comment,
-        paribahanUserId: Number(id),
+        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -46,7 +46,7 @@ export const updateBusInfo = async (req, res, next) => {
       where: {
         regNo,
         id: {
-          not: Number(id),
+          not: String(id),
         },
       },
     });
@@ -55,7 +55,7 @@ export const updateBusInfo = async (req, res, next) => {
     }
     const busInfo = await prisma.busInfo.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         regNo,
@@ -106,7 +106,7 @@ export const getBusInfo = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const busInfo = await prisma.busInfo.findMany({
       where: {
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
       skip: offset,
       take: limit,
@@ -120,7 +120,7 @@ export const getBusInfo = async (req, res, next) => {
 
     const count = await prisma.busInfo.count({
       where: {
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
     });
     const totalCount = await prisma.busInfo.count();
@@ -139,7 +139,7 @@ export const deleteBusInfo = async (req, res, next) => {
     const { id } = req.params;
     const busInfo = await prisma.busInfo.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ busInfo, message: "Deleted successfully" });

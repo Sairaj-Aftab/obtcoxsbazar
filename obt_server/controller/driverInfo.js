@@ -9,7 +9,7 @@ export const createDriverInfo = async (req, res, next) => {
     const { paribahanName, name, phone, license, address, comment, report } =
       req.body;
 
-    const existingPhone = await prisma.driverInfo.findUnique({
+    const existingPhone = await prisma.driverInfo.findFirst({
       where: {
         phone,
       },
@@ -18,7 +18,7 @@ export const createDriverInfo = async (req, res, next) => {
       return next(createError(400, "Phone number already exist!"));
     }
 
-    const existingDL = await prisma.driverInfo.findUnique({
+    const existingDL = await prisma.driverInfo.findFirst({
       where: {
         license,
       },
@@ -38,7 +38,7 @@ export const createDriverInfo = async (req, res, next) => {
         address,
         comment,
         report,
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -61,7 +61,7 @@ export const updateDriverInfo = async (req, res, next) => {
       where: {
         license,
         id: {
-          not: Number(id),
+          not: String(id),
         },
       },
     });
@@ -70,26 +70,10 @@ export const updateDriverInfo = async (req, res, next) => {
     }
     const existingPhone = await prisma.driverInfo.findFirst({
       where: {
-        AND: [
-          {
-            phone,
-          },
-          {
-            phone: {
-              not: null,
-            },
-          },
-          {
-            phone: {
-              not: "",
-            },
-          },
-          {
-            id: {
-              not: Number(id),
-            },
-          },
-        ],
+        phone,
+        id: {
+          not: String(id),
+        },
       },
     });
     if (existingPhone) {
@@ -97,7 +81,7 @@ export const updateDriverInfo = async (req, res, next) => {
     }
     const driverInfo = await prisma.driverInfo.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         name,
@@ -127,7 +111,7 @@ export const getDriverInfo = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const driverInfo = await prisma.driverInfo.findMany({
       where: {
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
       skip: offset,
       take: limit,
@@ -141,7 +125,7 @@ export const getDriverInfo = async (req, res, next) => {
 
     const count = await prisma.driverInfo.count({
       where: {
-        paribahanUserId: parseInt(id),
+        paribahanUserId: String(id),
       },
     });
     const totalCount = await prisma.driverInfo.count();
@@ -187,7 +171,7 @@ export const deleteDriverInfo = async (req, res, next) => {
     const { id } = req.params;
     const driverInfo = await prisma.driverInfo.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res

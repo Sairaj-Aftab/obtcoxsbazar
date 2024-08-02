@@ -18,7 +18,7 @@ const privateRoutes = [
     element: <PageLayout />,
     children: [
       {
-        // element: <PrivateRouteGird />,
+        element: <PrivateRouteGird />,
         children: [
           {
             path: "/",

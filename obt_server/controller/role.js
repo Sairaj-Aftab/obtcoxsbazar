@@ -58,7 +58,7 @@ export const updateRole = async (req, res, next) => {
       where: {
         name,
         id: {
-          not: Number(id),
+          not: String(id),
         },
       },
     });
@@ -68,7 +68,7 @@ export const updateRole = async (req, res, next) => {
 
     const role = await prisma.role.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         name,
@@ -91,7 +91,7 @@ export const deleteRole = async (req, res, next) => {
     const { id } = req.params;
     const role = await prisma.role.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
     return res.status(200).json({ role });
@@ -106,7 +106,7 @@ export const updateRoleStatus = async (req, res, next) => {
     const { status } = req.body;
     const role = await prisma.role.update({
       where: {
-        id: Number(id),
+        id: String(id),
       },
       data: {
         status: !status,

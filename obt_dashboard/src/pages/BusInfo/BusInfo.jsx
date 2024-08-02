@@ -90,7 +90,7 @@ const BusInfo = () => {
     if (!infoData.paribahanName || !infoData.regNo || !infoData.type) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateBusInfo({ id: Number(id), data: infoData }));
+      dispatch(updateBusInfo({ id, data: infoData }));
     }
   };
   const handleDeleteBusInfo = (id) => {

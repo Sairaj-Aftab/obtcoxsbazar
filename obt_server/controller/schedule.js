@@ -34,7 +34,7 @@ export const createSchedule = async (req, res, next) => {
         destinationPlace,
         rent: Number(rent),
         seatStatus: seatStatus === "true" ? true : false,
-        paribahanUserId: Number(paribahanUserId),
+        paribahanUserId: String(paribahanUserId),
       },
       include: {
         paribahanUser: true,
@@ -70,7 +70,7 @@ export const updateSchedule = async (req, res, next) => {
     } = req.body;
     const busSchedule = await prisma.busSchedule.update({
       where: {
-        id: Number(id), // Convert id to number
+        id: String(id), // Convert id to number
       },
       data: {
         type,
@@ -80,7 +80,7 @@ export const updateSchedule = async (req, res, next) => {
         guidePhone,
         leavingPlace,
         destinationPlace,
-        rent: Number(rent),
+        rent: String(rent),
         seatStatus: seatStatus === "true" ? true : false,
       },
       include: {
@@ -177,7 +177,7 @@ export const getSchedulesByParibahanUserId = async (req, res, next) => {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;
     const schedules = await prisma.busSchedule.findMany({
       where: {
-        paribahanUserId: Number(paribahanUserId),
+        paribahanUserId: String(paribahanUserId),
       },
       orderBy: {
         time: "asc",
@@ -227,7 +227,7 @@ export const deleteSchedule = async (req, res, next) => {
     const { id } = req.params;
     const schedule = await prisma.busSchedule.delete({
       where: {
-        id: Number(id),
+        id: String(id),
       },
     });
 

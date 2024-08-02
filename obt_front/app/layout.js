@@ -18,17 +18,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <StoreProvider>
-      <GloballyDispatch>
-        <SessionProviders>
-          <html lang="en">
-            <body className={roboto.className}>
+    <SessionProviders>
+      <html lang="en">
+        <body className={roboto.className}>
+          <StoreProvider>
+            <GloballyDispatch>
               <Nav />
               {children}
-            </body>
-          </html>
-        </SessionProviders>
-      </GloballyDispatch>
-    </StoreProvider>
+            </GloballyDispatch>
+          </StoreProvider>
+        </body>
+      </html>
+    </SessionProviders>
   );
 }

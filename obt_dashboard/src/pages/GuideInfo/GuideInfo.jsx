@@ -78,7 +78,7 @@ const GuideInfo = () => {
     if (!infoData.name || !infoData.phone) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateGuideInfo({ id: Number(id), data: infoData }));
+      dispatch(updateGuideInfo({ id, data: infoData }));
     }
   };
 
