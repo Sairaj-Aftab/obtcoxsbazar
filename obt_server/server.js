@@ -28,10 +28,7 @@ const io = new Server(server, {
       "http://localhost:3001",
       "https://admin.obtcoxsbazar.com",
       "https://www.admin.obtcoxsbazar.com",
-<<<<<<< HEAD
       "http://obtcoxsbazar.com",
-=======
->>>>>>> 8d823c24485235eac72605dee592f912579a6b5f
       "https://obtcoxsbazar.com",
       "https://www.obtcoxsbazar.com",
       "http://obtcoxsbazar.com",
