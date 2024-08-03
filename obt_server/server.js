@@ -53,10 +53,7 @@ app.use(
       "https://admin.obtcoxsbazar.com",
       "https://www.admin.obtcoxsbazar.com",
       "https://obtcoxsbazar.com",
-<<<<<<< HEAD
-=======
       "https://www.obtcoxsbazar.com",
->>>>>>> 8d823c24485235eac72605dee592f912579a6b5f
       "http://obtcoxsbazar.com",
     ],
     credentials: true,
