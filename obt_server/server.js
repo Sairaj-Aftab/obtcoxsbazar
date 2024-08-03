@@ -28,6 +28,7 @@ const io = new Server(server, {
       "http://localhost:3001",
       "https://admin.obtcoxsbazar.com",
       "https://www.admin.obtcoxsbazar.com",
+      "http://obtcoxsbazar.com",
       "https://obtcoxsbazar.com",
       "https://www.obtcoxsbazar.com",
       "http://obtcoxsbazar.com",
