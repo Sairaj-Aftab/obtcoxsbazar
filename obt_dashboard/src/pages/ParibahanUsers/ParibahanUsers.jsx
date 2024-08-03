@@ -27,7 +27,7 @@ const ParibahanUsers = () => {
   const [selected, setSelected] = useState([]);
 
   const handleChangeCheckbox = (e) => {
-    const select = parseInt(e.target.value);
+    const select = String(e.target.value);
 
     const selectedItem = [...selected];
 
