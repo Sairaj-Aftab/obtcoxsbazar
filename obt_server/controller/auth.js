@@ -29,7 +29,7 @@ export const login = async (req, res, next) => {
     const token = createToken({ userName: user.userName }, "365d");
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.APP_ENV == "Development" ? false : true,
+      secure: process.env.NODE_ENV == "Development" ? false : true,
       sameSite: "strict",
       path: "/",
       maxAge: 7 * 24 * 60 * 1000,
