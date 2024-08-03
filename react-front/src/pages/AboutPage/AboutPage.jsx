@@ -1,5 +1,3 @@
-import React from "react";
-
 const AboutPage = () => {
   return (
     <section className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto sm:my-5">

@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font for Digital Clock */
+@font-face {
+  font-family: "Digital";
+  src: local("Digital"), url("./assets/fonts/digital-7.ttf") format("opentype");
+  font-weight: normal;
+}
+
 body {
   background-color: #f0f2f5;
 }

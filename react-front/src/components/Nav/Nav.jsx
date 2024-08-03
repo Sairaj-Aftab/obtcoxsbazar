@@ -1,12 +1,15 @@
 import { BiMenu, BiX } from "react-icons/bi";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import logo from "../../assets/image/white_yellow.png";
 import policeLogo from "../../assets/image/police_logo.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 
 const Nav = () => {
+  const { paribahanAuth } = useSelector(paribahanAuthData);
   const [open, setOpen] = useState(false);
-  const pathName = useLocation();
+  const { pathname: pathName } = useLocation();
   return (
     <>
       {pathName === "/display" ? null : (
@@ -76,7 +79,7 @@ const Nav = () => {
                 >
                   Contact Us
                 </Link>
-                {!session && (
+                {!paribahanAuth && (
                   <Link
                     to="/login"
                     className={`text-base font-medium text-white border border-transparent ${
@@ -86,11 +89,15 @@ const Nav = () => {
                     Login
                   </Link>
                 )}
-                {session && (
+                {paribahanAuth && (
                   <Link
                     to="/profile"
                     className={`text-base font-medium text-white border border-transparent ${
-                      pathName === "/profile" && "border-white"
+                      pathName ===
+                        ("/profile" ||
+                          "/profile/bus-info" ||
+                          "/profile/guide-info" ||
+                          "/profile/driver-info") && "border-white"
                     } hover:border-white py-1 px-2 rounded-sm`}
                   >
                     Profile
@@ -98,11 +105,9 @@ const Nav = () => {
                 )}
               </nav>
               <Link to="/">
-                <Image
+                <img
                   src={policeLogo}
                   alt="OBT"
-                  width={0}
-                  height={0}
                   sizes="100vw"
                   className="w-20 bg-white rounded-full"
                 />
@@ -111,7 +116,7 @@ const Nav = () => {
             {/* Mobile Nav */}
             <div className="z-50 py-2 flex md:hidden w-full px-5 justify-between items-center">
               <Link to="/">
-                <Image src={logo} alt="OBT" sizes="100vw" className="w-16" />
+                <img src={logo} alt="OBT" sizes="100vw" className="w-16" />
               </Link>
               {open ? (
                 <BiX
@@ -186,7 +191,7 @@ const Nav = () => {
               >
                 Contact Us
               </Link>
-              {!session && (
+              {!paribahanAuth && (
                 <Link
                   onClick={() => setOpen(!open)}
                   to="/login"
@@ -197,7 +202,7 @@ const Nav = () => {
                   Login
                 </Link>
               )}
-              {session && (
+              {paribahanAuth && (
                 <Link
                   onClick={() => setOpen(!open)}
                   to="/profile"
@@ -212,6 +217,7 @@ const Nav = () => {
           </div>
         </header>
       )}
+      <Outlet />
     </>
   );
 };

@@ -1,13 +1,38 @@
+import Nav from "../components/Nav/Nav";
+import ProfileHeader from "../components/ProfileHeader/ProfileHeader";
+import BusProfile from "../pages/BusProfile/BusProfile";
+import ProfileBusInfo from "../pages/ProfileBusInfo/ProfileBusInfo";
+import ProfileDriverInfo from "../pages/ProfileDriverInfo/ProfileDriverInfo";
+import ProfileGuideInfo from "../pages/ProfileGuideInfo/ProfileGuideInfo";
+import PrivateRouteGird from "./PrivateRouteGrid";
+
 const privateRoutes = [
   {
-    // element: <PageLayout />,
+    element: <Nav />,
     children: [
       {
-        // element: <PrivateRouteGird />,
+        element: <PrivateRouteGird />,
         children: [
           {
-            path: "/",
-            element: "",
+            element: <ProfileHeader />,
+            children: [
+              {
+                path: "/profile",
+                element: <BusProfile />,
+              },
+              {
+                path: "/profile/bus-info",
+                element: <ProfileBusInfo />,
+              },
+              {
+                path: "/profile/guide-info",
+                element: <ProfileGuideInfo />,
+              },
+              {
+                path: "/profile/driver-info",
+                element: <ProfileDriverInfo />,
+              },
+            ],
           },
         ],
       },

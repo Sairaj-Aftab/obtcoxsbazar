@@ -1,27 +1,23 @@
-"use client";
-
-import Modal from "@/components/Modal/Modal";
+import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { getBusInfoData } from "../../features/bus/busApiSlice";
 import {
   createBusInfo,
   getBusInfo,
   updateBusInfo,
-} from "@/lib/features/busInfo/busInfoApiSlice";
-import {
-  busInfoData,
-  setBusInfoMessageEmpty,
-} from "@/lib/features/busInfo/busInfoSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
-import { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+} from "../../features/busInfo/busInfoApiSlice";
+import Modal from "../../components/Modal/Modal";
+import { formatDateTime } from "../../utils/formatDateTime";
+import { setBusInfoMessageEmpty } from "../../features/busInfo/busInfoSlice";
 
 const ProfileBusInfo = ({ user }) => {
   const dispatch = useDispatch();
-  const { busInfo, message, error } = useSelector(busInfoData);
+  const { busInfo, message, error } = useSelector(getBusInfoData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({
-    paribahanName: user.paribahanName,
+    paribahanName: user?.paribahanName,
     regNo: "",
     type: "",
     comment: "",
@@ -63,7 +59,7 @@ const ProfileBusInfo = ({ user }) => {
   };
 
   useEffect(() => {
-    dispatch(getBusInfo({ id: user.id, limit: 100 }));
+    dispatch(getBusInfo({ id: user?.id, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({

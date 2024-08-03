@@ -1,9 +1,8 @@
-"use client";
-import NoticeFromAdmin from "@/components/NoticeFromAdmin";
-import { busData } from "@/lib/features/bus/busSlice";
-import Link from "next/link";
 import { LiaBusSolid } from "react-icons/lia";
 import { useSelector } from "react-redux";
+import { busData } from "../../features/bus/busSlice";
+import { Link } from "react-router-dom";
+import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 const AllBusServices = ({ title }) => {
   const { bus } = useSelector(busData);
   return (
@@ -18,7 +17,7 @@ const AllBusServices = ({ title }) => {
         {bus &&
           bus?.map((data, index) => (
             <Link
-              href={`/all-bus-services/${data.slug}/${data.id}`}
+              to={`/all-bus-services/${data.slug}/${data.id}`}
               className="p-2 rounded shadow flex flex-col gap-1 items-center justify-center hover:shadow-lg"
               key={index}
             >

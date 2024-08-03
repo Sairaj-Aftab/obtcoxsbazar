@@ -14,12 +14,15 @@ const DigitalClock = () => {
   const seconds = time.getSeconds().toString().padStart(2, "0");
   // const ampm = time.getHours() >= 12 ? "PM" : "AM";
   return (
-    <>
+    <div
+      style={{ fontFamily: "Digital" }}
+      className="flex flex-col items-center mt-3"
+    >
       <div className="text-white text-6xl font-bold">
         <span>{hours}</span> : <span>{minutes}</span>
       </div>
       <span className="text-red text-4xl font-semibold">{seconds}</span>
-    </>
+    </div>
   );
 };
 

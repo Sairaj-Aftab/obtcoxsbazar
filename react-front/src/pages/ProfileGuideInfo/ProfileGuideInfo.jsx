@@ -1,19 +1,17 @@
-"use client";
-
-import Modal from "@/components/Modal/Modal";
+import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  guideInfoData,
+  setGuideInfoMessageEmpty,
+} from "../../features/guideInfo/guideInfoSlice";
 import {
   createGuideInfo,
   getGuideInfo,
   updateGuideInfo,
-} from "@/lib/features/guideInfo/guideInfoApiSlice";
-import {
-  guideInfoData,
-  setGuideInfoMessageEmpty,
-} from "@/lib/features/guideInfo/guideInfoSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
-import { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+} from "../../features/guideInfo/guideInfoApiSlice";
+import Modal from "../../components/Modal/Modal";
+import { formatDateTime } from "../../utils/formatDateTime";
 
 const ProfileGuideInfo = ({ user }) => {
   const dispatch = useDispatch();
@@ -21,7 +19,7 @@ const ProfileGuideInfo = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({
-    paribahanName: user.paribahanName,
+    paribahanName: user?.paribahanName,
     name: "",
     phone: "",
     address: "",
@@ -59,12 +57,12 @@ const ProfileGuideInfo = ({ user }) => {
     if (!infoData.name || !infoData.phone) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateGuideInfo({ id: Number(id), data: infoData }));
+      dispatch(updateGuideInfo({ id, data: infoData }));
     }
   };
 
   useEffect(() => {
-    dispatch(getGuideInfo({ id: user.id, limit: 100 }));
+    dispatch(getGuideInfo({ id: user?.id, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({

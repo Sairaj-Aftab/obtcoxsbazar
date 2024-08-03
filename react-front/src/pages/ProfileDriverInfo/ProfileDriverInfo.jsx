@@ -1,19 +1,17 @@
-"use client";
-
-import Modal from "@/components/Modal/Modal";
+import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  driverInfoData,
+  setDriverInfoMessageEmpty,
+} from "../../features/driverInfo/driverInfoSlice";
 import {
   createDriverInfo,
   getDriverInfo,
   updateDriverInfo,
-} from "@/lib/features/driverInfo/driverInfoApiSlice";
-import {
-  driverInfoData,
-  setDriverInfoMessageEmpty,
-} from "@/lib/features/driverInfo/driverInfoSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
-import { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+} from "../../features/driverInfo/driverInfoApiSlice";
+import Modal from "../../components/Modal/Modal";
+import { formatDateTime } from "../../utils/formatDateTime";
 
 const ProfileDriverInfo = ({ user }) => {
   const dispatch = useDispatch();
@@ -22,7 +20,7 @@ const ProfileDriverInfo = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({
-    paribahanName: user.paribahanName,
+    paribahanName: user?.paribahanName,
     name: "",
     phone: "",
     license: "",
@@ -61,11 +59,11 @@ const ProfileDriverInfo = ({ user }) => {
     if (!infoData.name) {
       toast.error("Name is required");
     } else {
-      dispatch(updateDriverInfo({ id: Number(id), data: infoData }));
+      dispatch(updateDriverInfo({ id, data: infoData }));
     }
   };
   useEffect(() => {
-    dispatch(getDriverInfo({ id: user.id, limit: 100 }));
+    dispatch(getDriverInfo({ id: user?.id, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({

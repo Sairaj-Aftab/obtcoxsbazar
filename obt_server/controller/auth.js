@@ -30,7 +30,7 @@ export const login = async (req, res, next) => {
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV == "Development" ? false : true,
-      sameSite: "strict",
+      sameSite: "none",
       path: "/",
       maxAge: 7 * 24 * 60 * 1000,
     });

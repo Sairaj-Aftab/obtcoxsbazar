@@ -219,8 +219,8 @@ export const login = async (req, res, next) => {
     const token = createToken({ paribahanName: user.paribahanName }, "365d");
     res.cookie("paribahan_auth_token", token, {
       httpOnly: true,
-      secure: process.env.APP_ENV == "Development" ? false : true,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV == "Development" ? false : true,
+      sameSite: "none",
       path: "/",
       maxAge: 7 * 24 * 60 * 1000,
     });

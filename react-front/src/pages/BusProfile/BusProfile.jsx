@@ -1,24 +1,24 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import Modal from "@/components/Modal/Modal";
+import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  schedulesData,
+  setMessageEmpty,
+} from "../../features/schedules/schedulesSlice";
+import { getBusInfoData } from "../../features/bus/busApiSlice";
 import {
   createSchedule,
   deleteSchedule,
   getSchedulesDataByAuthId,
   updateSchedule,
-} from "@/lib/features/schedules/schedulesApiSlice";
-import {
-  schedulesData,
-  setMessageEmpty,
-} from "@/lib/features/schedules/schedulesSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
-import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { setNoticeMessageEmpty } from "@/lib/features/notice/noticeSlice";
-import { busInfoData } from "@/lib/features/busInfo/busInfoSlice";
-import { guideInfoData } from "@/lib/features/guideInfo/guideInfoSlice";
-import { getGuideInfo } from "@/lib/features/guideInfo/guideInfoApiSlice";
-import { getBusInfo } from "@/lib/features/busInfo/busInfoApiSlice";
+} from "../../features/schedules/schedulesApiSlice";
+import { useEffect } from "react";
+import { setNoticeMessageEmpty } from "../../features/notice/noticeSlice";
+import { formatDateTime } from "../../utils/formatDateTime";
+import Modal from "../../components/Modal/Modal";
+import { getGuideInfo } from "../../features/guideInfo/guideInfoApiSlice";
+import { getBusInfo } from "../../features/busInfo/busInfoApiSlice";
+import { guideInfoData } from "../../features/guideInfo/guideInfoSlice";
 
 const BusProfile = ({ user }) => {
   const dispatch = useDispatch();
@@ -32,7 +32,7 @@ const BusProfile = ({ user }) => {
     message,
     error,
   } = useSelector(schedulesData);
-  const { busInfo } = useSelector(busInfoData);
+  const { busInfo } = useSelector(getBusInfoData);
   const { guideInfo } = useSelector(guideInfoData);
   const [input, setInput] = useState({
     busName: user?.paribahanName,
@@ -143,10 +143,10 @@ const BusProfile = ({ user }) => {
 
   useEffect(() => {
     if (user) {
-      dispatch(getSchedulesDataByAuthId({ id: user.id, limit: 100 }));
+      dispatch(getSchedulesDataByAuthId({ id: user?.id, limit: 100 }));
     }
-    dispatch(getBusInfo({ id: user.id, limit: 100 }));
-    dispatch(getGuideInfo({ id: user.id, limit: 100 }));
+    dispatch(getBusInfo({ id: user?.id, limit: 100 }));
+    dispatch(getGuideInfo({ id: user?.id, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({

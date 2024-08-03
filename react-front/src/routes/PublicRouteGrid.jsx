@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
+import { paribahanAuthData } from "../features/paribahanAuth/paribahanAuthSlice";
 
 const PublicRouteGrid = () => {
-  const { authUser } = useSelector((state) => state.auth);
-  if (localStorage.getItem("authUser")) {
-    return authUser ? <Navigate to="/" /> : <Outlet />;
+  const { paribahanAuth } = useSelector(paribahanAuthData);
+  if (localStorage.getItem("paribahanAuth")) {
+    return paribahanAuth ? <Navigate to="/" /> : <Outlet />;
   }
   return <Outlet />;
 };

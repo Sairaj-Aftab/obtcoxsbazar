@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
+import { paribahanAuthData } from "../features/paribahanAuth/paribahanAuthSlice";
 
 const PrivateRouteGird = () => {
-  const { authUser } = useSelector((state) => state.auth);
+  const { paribahanAuth } = useSelector(paribahanAuthData);
 
-  // return authUser ? <Outlet /> : <Navigate to="/login" />;
+  return paribahanAuth ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRouteGird;

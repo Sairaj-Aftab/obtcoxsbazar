@@ -1,8 +1,6 @@
-"use client";
-
-import { schedulesData } from "@/lib/features/schedules/schedulesSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
 import { useSelector } from "react-redux";
+import { schedulesData } from "../../features/schedules/schedulesSlice";
+import { formatDateTime } from "../../utils/formatDateTime";
 
 const AllSchedules = () => {
   const { schedules } = useSelector(schedulesData);

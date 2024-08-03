@@ -1,12 +1,13 @@
-"use client";
-import { getBusInfoData } from "@/lib/features/bus/busApiSlice";
-import { busData } from "@/lib/features/bus/busSlice";
-import { noticeData } from "@/lib/features/notice/noticeSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { busData } from "../../features/bus/busSlice";
+import { noticeData } from "../../features/notice/noticeSlice";
+import { getBusInfoData } from "../../features/bus/busApiSlice";
+import { formatDateTime } from "../../utils/formatDateTime";
 
-const BusInformation = ({ params }) => {
+const BusInformation = () => {
+  const params = useParams();
   const dispatch = useDispatch();
   const { busInfo } = useSelector(busData);
   const { paribahanNotices } = useSelector(noticeData);

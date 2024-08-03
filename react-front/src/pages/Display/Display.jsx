@@ -1,20 +1,12 @@
-"use client";
-import localFont from "next/font/local";
 import { useEffect, useRef, useState } from "react";
 import "./display.css";
 import { useSelector } from "react-redux";
-import { schedulesData } from "@/lib/features/schedules/schedulesSlice";
-import { formatDateTime } from "@/utils/formatDateTime";
-import NoticeFromAdmin from "@/components/NoticeFromAdmin";
-import DigitalClock from "@/components/DigitalClock";
-import Image from "next/image";
-import logoImg2 from "@/public/image/white_yellow.png";
+import logoImg2 from "../../assets/image/white_yellow.png";
+import { schedulesData } from "../../features/schedules/schedulesSlice";
+import DigitalClock from "../../components/DigitalClock";
+import { formatDateTime } from "../../utils/formatDateTime";
+import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 
-// Font files can be colocated inside of `app`
-const myFont = localFont({
-  src: "../../public/fonts/digital-7.ttf",
-  display: "swap",
-});
 const Display = () => {
   const { schedules } = useSelector(schedulesData);
 
@@ -69,14 +61,7 @@ const Display = () => {
       <div className="w-full flex flex-col gap-8">
         <div className="flex justify-between items-center w-[90%] mx-auto">
           <div className="w-40 text-white">
-            <Image
-              src={logoImg2}
-              alt="OBT"
-              width={0}
-              height={0}
-              sizes="100vw"
-              className="w-48"
-            />
+            <img src={logoImg2} alt="OBT" sizes="100vw" className="w-48" />
           </div>
           <div className="basis-2/4 text-white flex flex-col items-center">
             <h1 className="text-white text-3xl font-bold"></h1>
@@ -90,12 +75,12 @@ const Display = () => {
             </div>
 
             <span className="text-white text-3xl font-semibold">
-              Cox's Bazar
+              Cox&apos;s Bazar
             </span>
           </div>
 
           <div
-            className={`${myFont.className} w-40 h-40 flex flex-col justify-center items-center border border-red border-double rounded-full`}
+            className={`w-40 h-40 flex flex-col justify-center items-center border border-red border-double rounded-full`}
           >
             <DigitalClock />
           </div>
