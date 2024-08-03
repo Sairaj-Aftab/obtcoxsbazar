@@ -48,17 +48,6 @@ const BusScheduleTable = () => {
                   {data.seatStatus ? <td>Available</td> : <td>Booked</td>}
                 </tr>
               ))}
-            {/* <tr className="text-base font-normal">
-              <td>787788:pm</td>
-              <td>PParriibbaaa nnaammmee</td>
-              <td>NNoonn AAcc</td>
-              <td>8888676</td>
-              <td>8899585544</td>
-              <td>fldjf kdjfsdkfj jfkds</td>
-              <td>jfksdjfskdfjkdsjf</td>
-              <td>৳ 8545843</td>
-              <td>Available</td>
-            </tr> */}
           </tbody>
         </table>
       </div>

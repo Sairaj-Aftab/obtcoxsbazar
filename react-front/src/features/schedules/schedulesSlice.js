@@ -6,12 +6,14 @@ import {
   getLeavingPlace,
   getSchedulesDataByAuthId,
   getSchedulesDataByLimit,
+  getTodaysSchedules,
   updateSchedule,
 } from "./schedulesApiSlice";
 const schedulesSlice = createSlice({
   name: "schedules",
   initialState: {
     schedules: null,
+    todaySchedules: null,
     authSchedules: null,
     leavingPlaces: null,
     destinationPlaces: null,
@@ -53,8 +55,10 @@ const schedulesSlice = createSlice({
         state.loader = false;
         state.schedules = state.schedules ?? [];
         state.authSchedules = state.authSchedules ?? [];
+        state.todaySchedules = state.todaySchedules ?? [];
         state.schedules.push(action.payload.busSchedule);
         state.authSchedules.push(action.payload.busSchedule);
+        state.todaySchedules.push(action.payload.busSchedule);
         state.message = action.payload.message;
       })
       .addCase(updateSchedule.rejected, (state, action) => {
@@ -78,6 +82,16 @@ const schedulesSlice = createSlice({
           state.authSchedules[authScheduleIndex] = action.payload.busSchedule;
         }
         state.message = action.payload.message;
+      })
+      .addCase(getTodaysSchedules.rejected, (state, action) => {
+        // state.error = action.error.message;
+      })
+      .addCase(getTodaysSchedules.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(getTodaysSchedules.fulfilled, (state, action) => {
+        state.loader = false;
+        state.todaySchedules = action.payload.schedules;
       })
       .addCase(getSchedulesDataByLimit.rejected, (state, action) => {
         // state.error = action.error.message;

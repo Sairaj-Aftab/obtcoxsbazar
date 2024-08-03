@@ -33,6 +33,22 @@ export const updateSchedule = createAsyncThunk(
   }
 );
 
+export const getTodaysSchedules = createAsyncThunk(
+  "schedules/getTodaysSchedules",
+  async (limit) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/schedule/todays?limit=${limit}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
 export const getSchedulesDataByLimit = createAsyncThunk(
   "schedules/getSchedulesDataByLimit",
   async (limit) => {

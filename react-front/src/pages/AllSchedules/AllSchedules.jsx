@@ -3,7 +3,7 @@ import { schedulesData } from "../../features/schedules/schedulesSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 
 const AllSchedules = () => {
-  const { schedules } = useSelector(schedulesData);
+  const { schedules, todaySchedules } = useSelector(schedulesData);
   const now = new Date();
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);

@@ -8,6 +8,7 @@ import {
   getDestinationPlace,
   getLeavingPlace,
   getSchedulesDataByLimit,
+  getTodaysSchedules,
 } from "./features/schedules/schedulesApiSlice";
 import { getAllBusServices } from "./features/bus/busApiSlice";
 import {
@@ -28,6 +29,7 @@ function App() {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
     }
+    dispatch(getTodaysSchedules(500));
     dispatch(getSchedulesDataByLimit(500));
     dispatch(getLeavingPlace());
     dispatch(getDestinationPlace());

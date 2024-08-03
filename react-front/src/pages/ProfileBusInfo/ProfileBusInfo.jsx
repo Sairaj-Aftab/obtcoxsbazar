@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { getBusInfoData } from "../../features/bus/busApiSlice";
 import {
   createBusInfo,
   getBusInfo,
@@ -9,11 +8,16 @@ import {
 } from "../../features/busInfo/busInfoApiSlice";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
-import { setBusInfoMessageEmpty } from "../../features/busInfo/busInfoSlice";
+import {
+  busInfoData,
+  setBusInfoMessageEmpty,
+} from "../../features/busInfo/busInfoSlice";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 
-const ProfileBusInfo = ({ user }) => {
+const ProfileBusInfo = () => {
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const dispatch = useDispatch();
-  const { busInfo, message, error } = useSelector(getBusInfoData);
+  const { busInfo, message, error } = useSelector(busInfoData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({

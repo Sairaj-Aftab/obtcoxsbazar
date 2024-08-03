@@ -12,8 +12,10 @@ import {
 } from "../../features/driverInfo/driverInfoApiSlice";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 
-const ProfileDriverInfo = ({ user }) => {
+const ProfileDriverInfo = () => {
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const dispatch = useDispatch();
   const { driverInfo, message, error } = useSelector(driverInfoData);
 

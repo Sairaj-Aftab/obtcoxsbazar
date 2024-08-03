@@ -7,6 +7,7 @@ import {
   paribahanAuthData,
   setParibahanAuthMessageEmpty,
 } from "../../features/paribahanAuth/paribahanAuthSlice";
+import logo from "../../assets/image/red_yellow.png";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -49,11 +50,7 @@ const LoginForm = () => {
       >
         <div className="bg-white p-8 rounded-lg sm:shadow-lg max-w-sm w-full">
           <div className="flex justify-center mb-4">
-            <img
-              src="https://via.placeholder.com/100"
-              alt="Logo"
-              className="h-20 w-20"
-            />
+            <img src={logo} alt="Logo" className="h-20 w-32 object-cover" />
           </div>
           <h2 className="text-2xl text-black font-bold text-center mb-6">
             Login

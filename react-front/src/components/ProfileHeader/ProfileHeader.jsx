@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,8 +20,7 @@ const ProfileHeader = () => {
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const pathName = useLocation();
   const dispatch = useDispatch();
-  const { adminNotices, paribahanNotices, error, message } =
-    useSelector(noticeData);
+  const { paribahanNotices, error, message } = useSelector(noticeData);
   const [notice, setNotice] = useState("");
   const handleSubmitNotice = (e) => {
     e.preventDefault();
@@ -41,7 +41,7 @@ const ProfileHeader = () => {
   useEffect(() => {
     const getParibahanNotice = () => {
       return paribahanNotices?.find(
-        (notice) => notice.paribahanUserId === parseInt(user.id)
+        (notice) => notice.paribahanUserId === user.id
       );
     };
 
@@ -79,7 +79,7 @@ const ProfileHeader = () => {
               <span className="text-primary-color">{user?.paribahanName}</span>
             </h1>
             <p className="text-lg font-medium text-gray-700">
-              Sales Number:{" "}
+              Sale Number:{" "}
               <span className="text-primary-color">{user?.salesNumber}</span>
             </p>
           </div>

@@ -5,7 +5,6 @@ import {
   schedulesData,
   setMessageEmpty,
 } from "../../features/schedules/schedulesSlice";
-import { getBusInfoData } from "../../features/bus/busApiSlice";
 import {
   createSchedule,
   deleteSchedule,
@@ -19,8 +18,11 @@ import Modal from "../../components/Modal/Modal";
 import { getGuideInfo } from "../../features/guideInfo/guideInfoApiSlice";
 import { getBusInfo } from "../../features/busInfo/busInfoApiSlice";
 import { guideInfoData } from "../../features/guideInfo/guideInfoSlice";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
+import { busInfoData } from "../../features/busInfo/busInfoSlice";
 
-const BusProfile = ({ user }) => {
+const BusProfile = () => {
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const dispatch = useDispatch();
 
   const [showModal, setShowModal] = useState(false);
@@ -32,7 +34,7 @@ const BusProfile = ({ user }) => {
     message,
     error,
   } = useSelector(schedulesData);
-  const { busInfo } = useSelector(getBusInfoData);
+  const { busInfo } = useSelector(busInfoData);
   const { guideInfo } = useSelector(guideInfoData);
   const [input, setInput] = useState({
     busName: user?.paribahanName,
@@ -46,17 +48,7 @@ const BusProfile = ({ user }) => {
     rent: "",
     seatStatus: "",
   });
-  const [updateInput, setUpdateInput] = useState({
-    time: "",
-    busNo: "",
-    type: "",
-    leavingPlace: "",
-    destinationPlace: "",
-    guideName: "",
-    guidePhone: "",
-    rent: "",
-    seatStatus: "",
-  });
+
   const changeInputValue = (e) => {
     const { name, value } = e.target;
 
@@ -74,10 +66,6 @@ const BusProfile = ({ user }) => {
     } else {
       setInput({ ...input, [name]: value });
     }
-  };
-  const changeUpdateInputValue = (e) => {
-    const { name, value } = e.target;
-    setUpdateInput({ ...updateInput, [name]: value });
   };
 
   const handleSubmitSchedule = (e) => {
@@ -101,19 +89,16 @@ const BusProfile = ({ user }) => {
   };
 
   const [id, setId] = useState();
+  const [updateInput, setUpdateInput] = useState();
+  const changeUpdateInputValue = (e) => {
+    const { name, value } = e.target;
+    setUpdateInput({ ...updateInput, [name]: value });
+  };
   const handleOpenUpdateForm = (id) => {
     const data = schedules.find((schedule) => schedule.id === id);
     setId(data.id);
     setUpdateInput({
-      time: data.time,
-      busNo: data.busNo,
-      type: data.type,
-      leavingPlace: data.leavingPlace,
-      destinationPlace: data.destinationPlace,
-      guideName: data.guideName,
-      guidePhone: data.guidePhone,
-      rent: data.rent,
-      seatStatus: data.seatStatus,
+      ...data,
     });
     setShowUpdateModal(true);
   };
@@ -128,12 +113,11 @@ const BusProfile = ({ user }) => {
       !updateInput.destinationPlace ||
       !updateInput.guideName ||
       !updateInput.guidePhone ||
-      !updateInput.rent ||
-      !updateInput.seatStatus
+      !updateInput.rent
     ) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateSchedule({ id: Number(id), data: updateInput }));
+      dispatch(updateSchedule({ id, data: updateInput }));
     }
   };
 
@@ -143,10 +127,10 @@ const BusProfile = ({ user }) => {
 
   useEffect(() => {
     if (user) {
-      dispatch(getSchedulesDataByAuthId({ id: user?.id, limit: 100 }));
+      dispatch(getSchedulesDataByAuthId({ id: user.id, limit: 100 }));
     }
-    dispatch(getBusInfo({ id: user?.id, limit: 100 }));
-    dispatch(getGuideInfo({ id: user?.id, limit: 100 }));
+    dispatch(getBusInfo({ id: user.id, limit: 500 }));
+    dispatch(getGuideInfo({ id: user.id, limit: 500 }));
     if (message) {
       toast.success(message);
       setInput({
@@ -170,7 +154,7 @@ const BusProfile = ({ user }) => {
       dispatch(setMessageEmpty());
       dispatch(setNoticeMessageEmpty());
     };
-  }, [dispatch, message, error]);
+  }, [dispatch, message, error, user]);
 
   return (
     <>

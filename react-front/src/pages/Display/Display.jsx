@@ -43,16 +43,18 @@ const Display = () => {
   }, []);
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
-  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+  // const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+  // const twoHourLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  const fiveHourLater = new Date(now.getTime() + 15 * 60 * 60 * 1000);
 
   const [disSchedules, setDisSchedules] = useState(null);
   useEffect(() => {
     const filteredSchedules = schedules?.filter((data) => {
       const scheduleTime = new Date(data.time);
-      return scheduleTime >= fifteenMinutesAgo && scheduleTime <= oneHourLater;
+      return scheduleTime >= fifteenMinutesAgo && scheduleTime <= fiveHourLater;
     });
     setDisSchedules(filteredSchedules);
-  }, [fifteenMinutesAgo, oneHourLater]);
+  }, [fifteenMinutesAgo, fiveHourLater, schedules]);
 
   // Filter schedules within the next hour
 

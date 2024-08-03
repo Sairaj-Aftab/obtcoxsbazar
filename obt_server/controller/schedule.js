@@ -80,7 +80,7 @@ export const updateSchedule = async (req, res, next) => {
         guidePhone,
         leavingPlace,
         destinationPlace,
-        rent: String(rent),
+        rent: Number(rent),
         seatStatus: seatStatus === "true" ? true : false,
       },
       include: {
@@ -128,6 +128,59 @@ export const getAllSchedules = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const getTodaysSchedules = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 500;
+    const offset = (page - 1) * limit;
+
+    // Calculate the start and end of today
+    const now = new Date();
+    const startOfDay = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setUTCDate(startOfDay.getUTCDate() + 1); // Set to midnight of the next day
+
+    const schedules = await prisma.busSchedule.findMany({
+      where: {
+        time: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+      },
+      include: {
+        paribahanUser: true,
+      },
+      orderBy: {
+        time: "desc",
+      },
+      skip: offset,
+      take: limit,
+    });
+
+    const count = await prisma.busSchedule.count({
+      where: {
+        time: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+      },
+    });
+
+    if (schedules.length < 1) {
+      return next(createError(400, "Cannot find any schedule!"));
+    }
+
+    console.log(schedules);
+
+    return res.status(200).json({ schedules, count });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const getSchedulesByLimit = async (req, res, next) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;

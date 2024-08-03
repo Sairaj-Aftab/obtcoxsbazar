@@ -12,8 +12,10 @@ import {
 } from "../../features/guideInfo/guideInfoApiSlice";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 
-const ProfileGuideInfo = ({ user }) => {
+const ProfileGuideInfo = () => {
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const dispatch = useDispatch();
   const { guideInfo, message, error } = useSelector(guideInfoData);
   const [showModal, setShowModal] = useState(false);
@@ -62,7 +64,7 @@ const ProfileGuideInfo = ({ user }) => {
   };
 
   useEffect(() => {
-    dispatch(getGuideInfo({ id: user?.id, limit: 100 }));
+    dispatch(getGuideInfo({ id: user.id, limit: 500 }));
     if (message) {
       toast.success(message);
       setInput({

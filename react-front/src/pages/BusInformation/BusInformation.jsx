@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -17,7 +18,7 @@ const BusInformation = () => {
     dispatch(getBusInfoData(params.id));
     const getParibahanNotice = () => {
       return paribahanNotices?.find(
-        (notice) => notice.paribahanUserId === parseInt(params.id)
+        (notice) => notice.paribahanUserId === params.id
       );
     };
 
@@ -31,7 +32,10 @@ const BusInformation = () => {
         <h1 className="text-xl font-medium">{busInfo?.paribahanName}</h1>
         <p className="text-sm md:text-base font-medium">
           টিকেট এর জন্য যোগাযোগ করুন :{" "}
-          <a href="tel:+8801818591572" className="font-semibold underline">
+          <a
+            href={`tel:+88${busInfo?.salesNumber}`}
+            className="font-semibold underline"
+          >
             {busInfo?.salesNumber}
           </a>
         </p>

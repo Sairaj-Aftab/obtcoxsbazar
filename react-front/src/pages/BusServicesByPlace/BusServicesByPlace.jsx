@@ -25,7 +25,7 @@ const BusServicesByPlace = () => {
   return (
     <div className="container mx-auto bg-white rounded-lg my-5">
       <h1 className="text-lg font-semibold text-white bg-primary-color text-center py-1 rounded-t-lg mb-2">
-        Cox's Bazar to {params?.place?.toUpperCase()}
+        Cox&apos;s Bazar to {params?.place?.toUpperCase()}
       </h1>
       <p className="text-base font-medium text-black mb-3">
         <NoticeFromAdmin status="Passenger" />

@@ -28,7 +28,7 @@ model NoticeFromAdmin {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     title String
     authUser AuthUser? @relation(fields: [authUserId], references: [id])
-    authUserId String? @unique @db.ObjectId
+    authUserId String? @db.ObjectId
     status String 
     trash Boolean @default(false)
     createdAt DateTime @default(now())
