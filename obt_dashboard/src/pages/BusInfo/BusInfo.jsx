@@ -11,17 +11,21 @@ import { useEffect, useState } from "react";
 import {
   createBusInfo,
   deleteBusInfo,
+  getAllBusInfo,
   updateBusInfo,
 } from "../../features/busInfo/busInfoApiSlice";
 import { toast } from "react-hot-toast";
 import { getAllData } from "../../features/user/userSlice";
 import swal from "sweetalert";
+import DataTable from "react-data-table-component";
+import Loading from "../../components/Loading/Loading";
 
 const BusInfo = () => {
   const dispatch = useDispatch();
   const { paribahanUsers } = useSelector(getAllData);
   const { authUser } = useSelector(authData);
-  const { busInfo, message, error } = useSelector(busInfoData);
+  const { busInfo, totalCount, searchCount, loader, message, error } =
+    useSelector(busInfoData);
 
   const [input, setInput] = useState({
     id: "",
@@ -29,6 +33,7 @@ const BusInfo = () => {
     regNo: "",
     type: "",
     comment: "",
+    report: "",
   });
   const changeInputValue = (e) => {
     const { name, value } = e.target;
@@ -113,6 +118,90 @@ const BusInfo = () => {
     });
   };
 
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const handlePageChange = (page) => {
+    setPage(page);
+    dispatch(getAllBusInfo({ page, limit: rowPage, search }));
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowPage(newPerPage);
+    dispatch(getAllBusInfo({ page, limit: newPerPage, search }));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    dispatch(getAllBusInfo({ page, limit: rowPage, search: e.target.value })); // Fetch schedules with the search term
+  };
+
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
+  };
+
+  const columns = [
+    {
+      name: "#",
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "50px",
+    },
+    {
+      name: "Paribahan",
+      selector: (data) => data.paribahanName,
+      sortable: true,
+    },
+    {
+      name: "Reg No",
+      selector: (data) => data.regNo,
+      sortable: true,
+    },
+    {
+      name: "Type",
+      selector: (data) => data.type,
+      sortable: true,
+    },
+    {
+      name: "Remark",
+      selector: (data) => data.comment,
+      sortable: true,
+    },
+    {
+      name: "Report",
+      selector: (data) => data.report,
+      sortable: true,
+    },
+    {
+      name: "Entry Date",
+      selector: (data) => formatDate(data.createdAt),
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (data) => (
+        <div className="actions">
+          <a
+            className="btn btn-sm bg-success-light mr-2"
+            data-target="#busInfoEditPopup"
+            data-toggle="modal"
+            href="#edit_specialities_details"
+            onClick={() => handleOpenUpdateForm(data.id)}
+          >
+            <i className="fe fe-pencil"></i>
+          </a>
+          <button
+            onClick={() => handleDeleteBusInfo(data.id)}
+            className="btn btn-sm bg-danger-light"
+            disabled={authUser?.role?.name === "VIEWER" && true}
+          >
+            <i className="fe fe-trash"></i>
+          </button>
+        </div>
+      ),
+      right: true, // Align the column to the right
+    },
+  ];
+
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -191,7 +280,17 @@ const BusInfo = () => {
               value={input.comment}
               onChange={changeInputValue}
               className="form-control"
-              placeholder="Comment"
+              placeholder="Remark"
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              name="report"
+              value={input.report}
+              onChange={changeInputValue}
+              className="form-control"
+              placeholder="Report"
             />
           </div>
           <button type="submit" className="btn btn-primary">
@@ -264,7 +363,17 @@ const BusInfo = () => {
               value={infoData?.comment}
               onChange={changeInfoData}
               className="form-control"
-              placeholder="Comment"
+              placeholder="Remark"
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              name="report"
+              value={infoData?.report}
+              onChange={changeInfoData}
+              className="form-control"
+              placeholder="Report"
             />
           </div>
           <button type="submit" className="btn btn-primary">
@@ -281,64 +390,27 @@ const BusInfo = () => {
       >
         Add new
       </button>
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                <table className="datatable table table-hover table-center mb-0 w-100">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Paribahan</th>
-                      <th>Reg No</th>
-                      <th>Type</th>
-                      <th>Remark</th>
-                      <th>Created At</th>
-                      <th className="text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {busInfo &&
-                      busInfo?.map((data, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{data.paribahanName}</td>
-                          <th>{data.regNo}</th>
-                          <td>{data.type}</td>
-                          <td>{data?.comment}</td>
-                          <td>{formatDate(data.createdAt)}</td>
-                          <td className="text-right">
-                            <div className="actions">
-                              <a
-                                className="btn btn-sm bg-success-light mr-2"
-                                data-target="#busInfoEditPopup"
-                                data-toggle="modal"
-                                href="#edit_specialities_details"
-                                onClick={() => handleOpenUpdateForm(data.id)}
-                              >
-                                <i className="fe fe-pencil"></i>
-                              </a>
-                              <button
-                                onClick={() => handleDeleteBusInfo(data.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <input
+        type="text"
+        placeholder="Search"
+        className="form-control table-search-box"
+        onChange={handleSearchChange}
+      />
+
+      <DataTable
+        // title="Regular Schedules"
+        columns={columns}
+        data={busInfo}
+        responsive
+        progressPending={loader}
+        progressComponent={<Loading />}
+        pagination
+        paginationServer
+        paginationTotalRows={searchCount ? searchCount : totalCount}
+        onChangeRowsPerPage={handlePerRowsChange}
+        onChangePage={handlePageChange}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+      />
     </>
   );
 };

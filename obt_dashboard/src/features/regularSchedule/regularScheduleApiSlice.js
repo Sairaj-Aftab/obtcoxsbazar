@@ -19,13 +19,12 @@ export const createSchedule = createAsyncThunk(
 
 export const getAllRgSchedules = createAsyncThunk(
   "regularSchedules/getAllSchedules",
-  async ({ page, limit }) => {
+  async ({ page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/rgschedule?page=${page}&limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/rgschedule`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

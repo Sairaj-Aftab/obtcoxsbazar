@@ -33,8 +33,8 @@ function App() {
     if (localStorage.getItem("authUser")) {
       dispatch(getLogedInUser());
     }
-    dispatch(getAllSchedules());
-    dispatch(getAllRgSchedules());
+    dispatch(getAllSchedules({ page: 1, limit: 10 }));
+    dispatch(getAllRgSchedules({ page: 1, limit: 10 }));
     dispatch(getAllPermission());
     dispatch(getAllRoles());
     dispatch(getAllAuthUser());
@@ -44,10 +44,9 @@ function App() {
     dispatch(getDestinationPlaces());
     dispatch(getAuthNotice());
     dispatch(getAllParibahanNotice());
-    dispatch(getAllBusInfo(100));
-    dispatch(getAllGuideInfo(100));
-    dispatch(getAllDriverInfo(100));
-    dispatch(getAllRgSchedules(101));
+    dispatch(getAllBusInfo({ page: 1, limit: 10 }));
+    dispatch(getAllGuideInfo({ page: 1, limit: 10 }));
+    dispatch(getAllDriverInfo({ page: 1, limit: 10 }));
   }, [dispatch]);
   return (
     <>

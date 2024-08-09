@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Get by Paribahan ID
 export const getGuideInfo = createAsyncThunk(
   "guideInfo/getGuideInfo",
   async ({ id, limit }) => {
@@ -54,11 +55,12 @@ export const updateGuideInfo = createAsyncThunk(
 
 export const getAllGuideInfo = createAsyncThunk(
   "guideInfo/getAllGuideInfo",
-  async (limit) => {
+  async ({ page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/guideinfo/getall?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/guideinfo/getall`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

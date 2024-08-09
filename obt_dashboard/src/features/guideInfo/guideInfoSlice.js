@@ -10,9 +10,10 @@ import {
 const guideInfoSlice = createSlice({
   name: "guideInfo",
   initialState: {
-    guideInfo: null,
-    totalCount: null,
-    userGuideInfo: null,
+    guideInfo: [],
+    userGuideInfo: [],
+    totalCount: 0,
+    searchCount: 0,
     error: null,
     message: null,
     success: false,
@@ -31,12 +32,13 @@ const guideInfoSlice = createSlice({
         state.loader = true;
       })
       .addCase(getAllGuideInfo.rejected, (state, action) => {
-        //   state.error = action.error.message;
+        state.error = action.error.message;
         state.loader = false;
       })
       .addCase(getAllGuideInfo.fulfilled, (state, action) => {
         state.guideInfo = action.payload.guideInfo;
         state.totalCount = action.payload.totalCount;
+        state.searchCount = action.payload.searchCount;
         state.success = true;
         state.loader = false;
       })
@@ -44,7 +46,7 @@ const guideInfoSlice = createSlice({
         state.loader = true;
       })
       .addCase(getGuideInfo.rejected, (state, action) => {
-        //   state.error = action.error.message;
+        // state.error = action.error.message;
         state.loader = false;
       })
       .addCase(getGuideInfo.fulfilled, (state, action) => {
@@ -63,9 +65,8 @@ const guideInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
         state.message = action.payload.message;
-
-        state.guideInfo = state.guideInfo ?? [];
         state.guideInfo.push(action.payload.guideInfo);
+        state.totalCount++;
       })
       .addCase(updateGuideInfo.rejected, (state, action) => {
         state.error = action.error.message;
@@ -95,6 +96,7 @@ const guideInfoSlice = createSlice({
         state.guideInfo = state.guideInfo.filter(
           (item) => item.id !== action.payload.guideInfo.id
         );
+        state.totalCount--;
 
         state.loader = false;
       });

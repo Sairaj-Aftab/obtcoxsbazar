@@ -105,25 +105,48 @@ export const updateSchedule = async (req, res, next) => {
 export const getAllSchedules = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const where = searchQuery
+      ? {
+          OR: [
+            { time: { contains: searchQuery, mode: "insensitive" } },
+            { busName: { contains: searchQuery, mode: "insensitive" } },
+            { busNo: { contains: searchQuery, mode: "insensitive" } },
+            {
+              destinationPlace: { contains: searchQuery, mode: "insensitive" },
+            },
+            { leavingPlace: { contains: searchQuery, mode: "insensitive" } },
+            { guideName: { contains: searchQuery, mode: "insensitive" } },
+            { guidePhone: { contains: searchQuery, mode: "insensitive" } },
+            { type: { contains: searchQuery, mode: "insensitive" } },
+          ],
+        }
+      : {};
+
     const schedules = await prisma.busSchedule.findMany({
+      skip: offset,
+      take: limit,
+      where,
       include: {
         paribahanUser: true,
       },
       orderBy: {
         time: "desc",
       },
-      skip: offset,
-      take: limit,
     });
 
     const count = await prisma.busSchedule.count();
+    const searchCount = await prisma.busSchedule.count({
+      where,
+    });
 
     if (schedules.length < 1) {
       return next(createError(400, "Cannot find any schedule!"));
     }
-    return res.status(200).json({ schedules, count });
+    return res.status(200).json({ schedules, count, searchCount });
   } catch (error) {
     return next(error);
   }

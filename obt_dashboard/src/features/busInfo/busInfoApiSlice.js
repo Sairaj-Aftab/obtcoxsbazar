@@ -20,11 +20,12 @@ export const getBusInfo = createAsyncThunk(
 
 export const getAllBusInfo = createAsyncThunk(
   "busInfo/getAllBusInfo",
-  async (limit) => {
+  async ({ page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/businfo/getall?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/businfo/getall`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

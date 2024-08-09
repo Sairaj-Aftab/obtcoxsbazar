@@ -10,9 +10,10 @@ import {
 const busInfoSlice = createSlice({
   name: "notice",
   initialState: {
-    busInfo: null,
-    totalCount: null,
-    userBusInfo: null,
+    busInfo: [],
+    userBusInfo: [],
+    totalCount: 0,
+    searchCount: 0,
     error: null,
     message: null,
     success: false,
@@ -31,12 +32,13 @@ const busInfoSlice = createSlice({
         state.loader = true;
       })
       .addCase(getAllBusInfo.rejected, (state, action) => {
-        //   state.error = action.error.message;
+        state.error = action.error.message;
         state.loader = false;
       })
       .addCase(getAllBusInfo.fulfilled, (state, action) => {
         state.busInfo = action.payload.busInfo;
         state.totalCount = action.payload.totalCount;
+        state.searchCount = action.payload.searchCount;
         state.success = true;
         state.loader = false;
       })
@@ -63,9 +65,8 @@ const busInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
         state.message = action.payload.message;
-
-        state.busInfo = state.busInfo ?? [];
         state.busInfo.push(action.payload.busInfo);
+        state.totalCount++;
       })
       .addCase(updateBusInfo.rejected, (state, action) => {
         state.error = action.error.message;
@@ -97,6 +98,7 @@ const busInfoSlice = createSlice({
         );
 
         state.loader = false;
+        state.totalCount--;
       });
   },
 });

@@ -11,18 +11,20 @@ import {
 import {
   createSchedule,
   deleteSchedule,
+  getAllRgSchedules,
 } from "../../features/regularSchedule/regularScheduleApiSlice";
 import { formatDateTime } from "../../utils/timeAgo";
 import { placeData } from "../../features/place/placeSlice";
 import { getAllData } from "../../features/user/userSlice";
 import swal from "sweetalert";
 import DataTable from "react-data-table-component";
+import Loading from "../../components/Loading/Loading";
 
 const RegularBusSchedule = () => {
   const dispatch = useDispatch();
   const { paribahanUsers } = useSelector(getAllData);
   const { authUser } = useSelector(authData);
-  const { rgSchedules, totalCount, message, error } =
+  const { rgSchedules, totalCount, searchCount, message, error, loader } =
     useSelector(rgSchedulesData);
   const { leavingPlaces, destinationPlaces } = useSelector(placeData);
 
@@ -76,6 +78,29 @@ const RegularBusSchedule = () => {
     });
   };
 
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const handlePageChange = (page) => {
+    setPage(page);
+    dispatch(getAllRgSchedules({ page, limit: rowPage, search }));
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowPage(newPerPage);
+    dispatch(getAllRgSchedules({ page, limit: newPerPage, search }));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    dispatch(
+      getAllRgSchedules({ page, limit: rowPage, search: e.target.value })
+    );
+  };
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
+  };
+
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -91,7 +116,7 @@ const RegularBusSchedule = () => {
   const columns = [
     {
       name: "#",
-      selector: (data, index) => index + 1,
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
       width: "50px",
     },
     {
@@ -143,14 +168,7 @@ const RegularBusSchedule = () => {
       right: true, // Align the column to the right
     });
   }
-  // const handlePageChange = (newPage) => {
-  //   setPage(newPage);
-  // };
 
-  // const handleRowsPerPageChange = (newRowsPerPage) => {
-  //   setRowsPerPage(newRowsPerPage);
-  //   setPage(1); // Reset to first page
-  // };
   return (
     <>
       <ModalPopup title="Create Regular Schedule" target="busScheduleModal">
@@ -244,21 +262,26 @@ const RegularBusSchedule = () => {
       >
         Add regular schedule
       </button>
-      <div>
-        <input type="text" placeholder="Search" className="form-control" />
-      </div>
-      {rgSchedules?.length > 0 && (
-        <DataTable
-          columns={columns}
-          data={rgSchedules}
-          fixedHeader
-          pagination
-          paginationTotalRows={totalCount}
-          paginationPerPage={100}
-          paginationRowsPerPageOptions={[5, 10, 20, 50, 100]}
-          responsive
-        />
-      )}
+      <input
+        type="text"
+        placeholder="Search"
+        className="form-control table-search-box"
+        onChange={handleSearchChange}
+      />
+      <DataTable
+        columns={columns}
+        data={rgSchedules}
+        responsive
+        fixedHeader
+        progressPending={loader}
+        progressComponent={<Loading />}
+        pagination
+        paginationServer
+        paginationTotalRows={searchCount ? searchCount : totalCount}
+        onChangeRowsPerPage={handlePerRowsChange}
+        onChangePage={handlePageChange}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+      />
     </>
   );
 };

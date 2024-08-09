@@ -142,11 +142,27 @@ export const getDriverInfo = async (req, res, next) => {
 export const getAllDriverInfo = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const where = searchQuery
+      ? {
+          OR: [
+            { paribahanName: { contains: searchQuery, mode: "insensitive" } },
+            { name: { contains: searchQuery, mode: "insensitive" } },
+            { phone: { contains: searchQuery, mode: "insensitive" } },
+            { license: { contains: searchQuery, mode: "insensitive" } },
+            { address: { contains: searchQuery, mode: "insensitive" } },
+            { comment: { contains: searchQuery, mode: "insensitive" } },
+            { report: { contains: searchQuery, mode: "insensitive" } },
+          ],
+        }
+      : {};
     const driverInfo = await prisma.driverInfo.findMany({
       skip: offset,
       take: limit,
+      where,
       orderBy: {
         paribahanName: "asc",
       },
@@ -156,11 +172,14 @@ export const getAllDriverInfo = async (req, res, next) => {
     });
 
     const totalCount = await prisma.driverInfo.count();
+    const searchCount = await prisma.driverInfo.count({
+      where,
+    });
 
     if (driverInfo.length < 1) {
       return next(createError(400, "Cannot find any info!"));
     }
-    return res.status(200).json({ driverInfo, totalCount });
+    return res.status(200).json({ driverInfo, totalCount, searchCount });
   } catch (error) {
     return next(error);
   }

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export const createBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { paribahanName, regNo, type, comment } = req.body;
+    const { paribahanName, regNo, type, comment, report } = req.body;
 
     const existingInfo = await prisma.busInfo.findUnique({
       where: {
@@ -25,6 +25,7 @@ export const createBusInfo = async (req, res, next) => {
         regNo,
         type,
         comment,
+        report,
         paribahanUserId: String(id),
       },
       include: {
@@ -41,7 +42,7 @@ export const createBusInfo = async (req, res, next) => {
 export const updateBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { regNo, type, comment } = req.body;
+    const { regNo, type, comment, report } = req.body;
     const existingInfo = await prisma.busInfo.findFirst({
       where: {
         regNo,
@@ -61,6 +62,7 @@ export const updateBusInfo = async (req, res, next) => {
         regNo,
         type,
         comment,
+        report,
       },
       include: {
         paribahanUser: true,
@@ -75,11 +77,26 @@ export const updateBusInfo = async (req, res, next) => {
 export const getAllBusInfo = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const where = searchQuery
+      ? {
+          OR: [
+            { paribahanName: { contains: searchQuery, mode: "insensitive" } },
+            { regNo: { contains: searchQuery, mode: "insensitive" } },
+            { type: { contains: searchQuery, mode: "insensitive" } },
+            { comment: { contains: searchQuery, mode: "insensitive" } },
+            { report: { contains: searchQuery, mode: "insensitive" } },
+          ],
+        }
+      : {};
+
     const busInfo = await prisma.busInfo.findMany({
       skip: offset,
       take: limit,
+      where,
       orderBy: {
         paribahanName: "asc",
       },
@@ -89,11 +106,14 @@ export const getAllBusInfo = async (req, res, next) => {
     });
 
     const totalCount = await prisma.busInfo.count();
+    const searchCount = await prisma.busInfo.count({
+      where,
+    });
 
     if (busInfo.length < 1) {
       return next(createError(400, "Cannot find any info!"));
     }
-    return res.status(200).json({ busInfo, totalCount });
+    return res.status(200).json({ busInfo, totalCount, searchCount });
   } catch (error) {
     return next(error);
   }

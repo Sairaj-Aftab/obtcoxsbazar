@@ -25,3 +25,21 @@ button.dt-paging-button {
 td.dt-empty {
   display: none;
 }
+
+/* React Data Table Component Table Header */
+.rdt_TableHeadRow {
+  /* background-color: #f8f9fa !important; */
+  font-weight: 700;
+}
+.rdt_TableRow {
+  font-weight: 500 !important;
+}
+.table-search-box {
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+@media (min-width: 640px) {
+  .table-search-box {
+    max-width: 300px;
+  }
+}

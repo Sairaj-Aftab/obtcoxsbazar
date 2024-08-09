@@ -10,9 +10,10 @@ import {
 const driverInfoSlice = createSlice({
   name: "driverInfo",
   initialState: {
-    driverInfo: null,
-    totalCount: null,
-    userDriverInfo: null,
+    driverInfo: [],
+    userDriverInfo: [],
+    totalCount: 0,
+    searchCount: 0,
     error: null,
     message: null,
     success: false,
@@ -37,6 +38,7 @@ const driverInfoSlice = createSlice({
       .addCase(getAllDriverInfo.fulfilled, (state, action) => {
         state.driverInfo = action.payload.driverInfo;
         state.totalCount = action.payload.totalCount;
+        state.searchCount = action.payload.searchCount;
         state.success = true;
         state.loader = false;
       })
@@ -63,9 +65,8 @@ const driverInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
         state.message = action.payload.message;
-
-        state.driverInfo = state.driverInfo ?? [];
         state.driverInfo.push(action.payload.driverInfo);
+        state.totalCount++;
       })
       .addCase(updateDriverInfo.rejected, (state, action) => {
         state.error = action.error.message;
@@ -95,6 +96,7 @@ const driverInfoSlice = createSlice({
         state.driverInfo = state.driverInfo.filter(
           (item) => item.id !== action.payload.driverInfo.id
         );
+        state.totalCount--;
 
         state.loader = false;
       });

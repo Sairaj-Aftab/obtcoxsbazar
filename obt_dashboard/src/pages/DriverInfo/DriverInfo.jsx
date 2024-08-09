@@ -12,16 +12,20 @@ import { toast } from "react-hot-toast";
 import {
   createDriverInfo,
   deleteDriverInfo,
+  getAllDriverInfo,
   updateDriverInfo,
 } from "../../features/driverInfo/driverInfoApiSlice";
 import ModalPopup from "../../components/ModalPopup/ModalPopup";
 import swal from "sweetalert";
+import DataTable from "react-data-table-component";
+import Loading from "../../components/Loading/Loading";
 
 const DriverInfo = () => {
   const dispatch = useDispatch();
   const { paribahanUsers } = useSelector(getAllData);
   const { authUser } = useSelector(authData);
-  const { driverInfo, message, error } = useSelector(driverInfoData);
+  const { driverInfo, totalCount, searchCount, loader, message, error } =
+    useSelector(driverInfoData);
 
   const [input, setInput] = useState({
     id: "",
@@ -82,7 +86,7 @@ const DriverInfo = () => {
       dispatch(updateDriverInfo({ id: Number(id), data: infoData }));
     }
   };
-  const handleDeleteDriverInfo = (id) => {
+  const handleDeleteInfo = (id) => {
     swal({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this imaginary file!",
@@ -101,6 +105,102 @@ const DriverInfo = () => {
       }
     });
   };
+
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const handlePageChange = (page) => {
+    setPage(page);
+    dispatch(getAllDriverInfo({ page, limit: rowPage, search }));
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowPage(newPerPage);
+    dispatch(getAllDriverInfo({ page, limit: newPerPage, search }));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    dispatch(
+      getAllDriverInfo({ page, limit: rowPage, search: e.target.value })
+    ); // Fetch schedules with the search term
+  };
+
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
+  };
+
+  const columns = [
+    {
+      name: "#",
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "50px",
+    },
+    {
+      name: "Paribahan",
+      selector: (data) => data.paribahanName,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: (data) => data.name,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: (data) => data.phone,
+      sortable: true,
+    },
+    {
+      name: "License",
+      selector: (data) => data.license,
+      sortable: true,
+    },
+    {
+      name: "Address",
+      selector: (data) => data.address,
+      sortable: true,
+    },
+    {
+      name: "Remark",
+      selector: (data) => data.comment,
+      sortable: true,
+    },
+    {
+      name: "Report",
+      selector: (data) => data.report,
+      sortable: true,
+    },
+    {
+      name: "Entry Date",
+      selector: (data) => formatDate(data.createdAt),
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (data) => (
+        <div className="actions">
+          <a
+            className="btn btn-sm bg-success-light mr-2"
+            data-target="#guideInfoEditPopup"
+            data-toggle="modal"
+            href="#edit_specialities_details"
+            onClick={() => handleOpenUpdateForm(data.id)}
+          >
+            <i className="fe fe-pencil"></i>
+          </a>
+          <button
+            onClick={() => handleDeleteInfo(data.id)}
+            className="btn btn-sm bg-danger-light"
+            disabled={authUser?.role?.name === "VIEWER" && true}
+          >
+            <i className="fe fe-trash"></i>
+          </button>
+        </div>
+      ),
+      right: true, // Align the column to the right
+    },
+  ];
 
   useEffect(() => {
     if (message) {
@@ -122,7 +222,7 @@ const DriverInfo = () => {
     return () => {
       dispatch(setDriverInfoMessageEmpty());
     };
-  }, [message, error, dispatch]);
+  }, [message, loader, error, dispatch]);
   return (
     <>
       {/* Create  Bus Info */}
@@ -205,7 +305,7 @@ const DriverInfo = () => {
               value={input.comment}
               onChange={changeInputValue}
               className="form-control"
-              placeholder="Comment"
+              placeholder="Remark"
             />
           </div>
           <div className="form-group">
@@ -303,7 +403,7 @@ const DriverInfo = () => {
               value={infoData?.comment}
               onChange={changeInfoData}
               className="form-control"
-              placeholder="Comment"
+              placeholder="Remark"
             />
           </div>
           <div className="form-group">
@@ -330,70 +430,25 @@ const DriverInfo = () => {
       >
         Add new
       </button>
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                <table className="datatable table table-hover table-center mb-0 w-100">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Paribahan</th>
-                      <th>Name</th>
-                      <th>Phone</th>
-                      <th>License</th>
-                      <th>Address</th>
-                      <th>Remark</th>
-                      <th>Report</th>
-                      <th>Created At</th>
-                      <th className="text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {driverInfo &&
-                      driverInfo?.map((data, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{data.paribahanName}</td>
-                          <th>{data.name}</th>
-                          <td>{data?.phone}</td>
-                          <td>{data?.license}</td>
-                          <td>{data?.address}</td>
-                          <td>{data?.comment}</td>
-                          <td>{data?.report}</td>
-                          <td>{formatDate(data.createdAt)}</td>
-                          <td className="text-right">
-                            <div className="actions">
-                              <a
-                                className="btn btn-sm bg-success-light mr-2"
-                                data-target="#driverInfoEditPopup"
-                                data-toggle="modal"
-                                href="#edit_specialities_details"
-                                onClick={() => handleOpenUpdateForm(data.id)}
-                              >
-                                <i className="fe fe-pencil"></i>
-                              </a>
-                              <button
-                                onClick={() => handleDeleteDriverInfo(data.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <input
+        type="text"
+        placeholder="Search"
+        className="form-control table-search-box"
+        onChange={handleSearchChange}
+      />
+      <DataTable
+        columns={columns}
+        data={driverInfo}
+        responsive
+        progressPending={loader}
+        progressComponent={<Loading />}
+        pagination
+        paginationServer
+        paginationTotalRows={searchCount ? searchCount : totalCount}
+        onChangeRowsPerPage={handlePerRowsChange}
+        onChangePage={handlePageChange}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+      />
     </>
   );
 };

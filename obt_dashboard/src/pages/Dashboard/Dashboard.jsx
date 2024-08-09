@@ -99,7 +99,7 @@ const Dashboard = () => {
         </Link>
       </div>
       {/* Table Data */}
-      <ScheduleTableList />
+      {/* <ScheduleTableList /> */}
     </>
   );
 };

@@ -54,11 +54,12 @@ export const updateDriverInfo = createAsyncThunk(
 
 export const getAllDriverInfo = createAsyncThunk(
   "driverInfo/getAllDriverInfo",
-  async (limit) => {
+  async ({ page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/driverinfo/getall?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/driverinfo/getall`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

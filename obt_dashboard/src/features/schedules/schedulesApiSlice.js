@@ -3,11 +3,12 @@ import axios from "axios";
 
 export const getAllSchedules = createAsyncThunk(
   "schedules/getAllSchedules",
-  async () => {
+  async ({ page, limit, search }) => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/schedule`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );
