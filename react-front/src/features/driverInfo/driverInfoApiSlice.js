@@ -3,13 +3,12 @@ import axios from "axios";
 
 export const getDriverInfo = createAsyncThunk(
   "driverInfo/getDriverInfo",
-  async ({ id, limit }) => {
+  async ({ id, page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/driverinfo/getbyid/${id}?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/driverinfo/getbyid/${id}`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

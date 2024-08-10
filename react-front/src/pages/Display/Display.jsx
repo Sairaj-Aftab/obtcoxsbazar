@@ -8,7 +8,7 @@ import { formatDateTime } from "../../utils/formatDateTime";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 
 const Display = () => {
-  const { schedules } = useSelector(schedulesData);
+  const { todaySchedules } = useSelector(schedulesData);
 
   const scrollRef = useRef(null);
 
@@ -49,12 +49,12 @@ const Display = () => {
 
   const [disSchedules, setDisSchedules] = useState(null);
   useEffect(() => {
-    const filteredSchedules = schedules?.filter((data) => {
+    const filteredSchedules = todaySchedules?.filter((data) => {
       const scheduleTime = new Date(data.time);
       return scheduleTime >= fifteenMinutesAgo && scheduleTime <= fiveHourLater;
     });
     setDisSchedules(filteredSchedules);
-  }, [fifteenMinutesAgo, fiveHourLater, schedules]);
+  }, [fifteenMinutesAgo, fiveHourLater, todaySchedules]);
 
   // Filter schedules within the next hour
 

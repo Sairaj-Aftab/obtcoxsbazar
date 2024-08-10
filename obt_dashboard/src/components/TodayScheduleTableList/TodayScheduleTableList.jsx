@@ -1,26 +1,31 @@
+import { useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
 import { useDispatch, useSelector } from "react-redux";
 import {
   schedulesData,
   setMessageEmpty,
 } from "../../features/schedules/schedulesSlice";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { authData } from "../../features/auth/authSlice";
-import DataTable from "react-data-table-component";
-import Loading from "../../components/Loading/Loading";
 import { formatDateTime } from "../../utils/timeAgo";
 import swal from "sweetalert";
 import {
   deleteSchedule,
-  getAllSchedules,
+  getTodaysSchedule,
 } from "../../features/schedules/schedulesApiSlice";
-import PageHeader from "../../components/PageHeader/PageHeader";
+import toast from "react-hot-toast";
+import Loading from "../Loading/Loading";
 
-const DailyBusScheduleList = () => {
+const TodayScheduleTableList = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
-  const { schedules, totalScheduleCount, searchCount, message, error, loader } =
-    useSelector(schedulesData);
+  const {
+    todaySchedule,
+    todayTotalCount,
+    todaySearchCount,
+    message,
+    error,
+    todayLoader,
+  } = useSelector(schedulesData);
 
   const handleDeleteSchedule = (id) => {
     swal({
@@ -46,17 +51,19 @@ const DailyBusScheduleList = () => {
   const [rowPage, setRowPage] = useState(10);
   const handlePageChange = (page) => {
     setPage(page);
-    dispatch(getAllSchedules({ page, limit: rowPage, search }));
+    dispatch(getTodaysSchedule({ page, limit: rowPage, search }));
   };
 
   const handlePerRowsChange = (newPerPage, page) => {
     setRowPage(newPerPage);
-    dispatch(getAllSchedules({ page, limit: newPerPage, search }));
+    dispatch(getTodaysSchedule({ page, limit: newPerPage, search }));
   };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    dispatch(getAllSchedules({ page, limit: rowPage, search: e.target.value })); // Fetch schedules with the search term
+    dispatch(
+      getTodaysSchedule({ page, limit: rowPage, search: e.target.value })
+    ); // Fetch schedules with the search term
   };
 
   const calculateItemIndex = (page, rowPage, index) => {
@@ -146,10 +153,10 @@ const DailyBusScheduleList = () => {
     return () => {
       dispatch(setMessageEmpty());
     };
-  }, [dispatch, loader, error, message]);
+  }, [dispatch, todayLoader, error, message]);
+
   return (
     <>
-      <PageHeader title="Schedule Log Book" />
       <input
         type="text"
         placeholder="Search"
@@ -158,19 +165,21 @@ const DailyBusScheduleList = () => {
       />
       <DataTable
         columns={columns}
-        data={schedules}
+        data={todaySchedule}
         responsive
-        progressPending={loader}
+        progressPending={todayLoader}
         progressComponent={<Loading />}
         pagination
         paginationServer
-        paginationTotalRows={searchCount ? searchCount : totalScheduleCount}
+        paginationTotalRows={
+          todaySearchCount ? todaySearchCount : todayTotalCount
+        }
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
-        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+        paginationRowsPerPageOptions={[100, 150, 200]}
       />
     </>
   );
 };
 
-export default DailyBusScheduleList;
+export default TodayScheduleTableList;

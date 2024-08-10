@@ -21,7 +21,7 @@ const Nav = () => {
                   Online Bus Terminal
                 </h1>
                 <span className="text-white text-xl font-semibold">
-                  Cox's Bazar
+                  Cox&apos;s Bazar
                 </span>
               </div>
             )}
@@ -93,11 +93,12 @@ const Nav = () => {
                   <Link
                     to="/profile"
                     className={`text-base font-medium text-white border border-transparent ${
-                      pathName ===
-                        ("/profile" ||
-                          "/profile/bus-info" ||
-                          "/profile/guide-info" ||
-                          "/profile/driver-info") && "border-white"
+                      [
+                        "/profile",
+                        "/profile/bus-info",
+                        "/profile/guide-info",
+                        "/profile/driver-info",
+                      ].includes(pathName) && "border-white"
                     } hover:border-white py-1 px-2 rounded-sm`}
                   >
                     Profile

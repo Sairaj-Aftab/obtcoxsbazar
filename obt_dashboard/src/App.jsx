@@ -16,7 +16,10 @@ import {
   getDestinationPlaces,
   getLeavingPlaces,
 } from "./features/place/placeApiSlice";
-import { getAllSchedules } from "./features/schedules/schedulesApiSlice";
+import {
+  getAllSchedules,
+  getTodaysSchedule,
+} from "./features/schedules/schedulesApiSlice";
 import {
   getAllParibahanNotice,
   getAuthNotice,
@@ -33,6 +36,7 @@ function App() {
     if (localStorage.getItem("authUser")) {
       dispatch(getLogedInUser());
     }
+    dispatch(getTodaysSchedule({ page: 1, limit: 100 }));
     dispatch(getAllSchedules({ page: 1, limit: 10 }));
     dispatch(getAllRgSchedules({ page: 1, limit: 10 }));
     dispatch(getAllPermission());

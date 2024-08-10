@@ -14,7 +14,6 @@ const Header = () => {
   const location = useLocation();
   const permissions =
     authUser?.role?.permissions?.map((permission) => permission.name) || [];
-  console.log(authUser);
   const [toggle, setToggle] = useState(false);
 
   const handleLogout = (e) => {
@@ -76,16 +75,30 @@ const Header = () => {
                 </Link>
               </li>
             )}
-            {permissions.includes("DAILY-BUS-SCHEDULE") && (
+            {permissions.includes("REGULAR-BUS-SCHEDULE") && (
               <li
                 onClick={() => setToggle(!toggle)}
                 className={`${
-                  location.pathname === "/daily-bus-schedule-list" && "active"
+                  location.pathname === "/regular-bus-schedule" && "active"
                 }`}
               >
-                <Link to="/daily-bus-schedule-list">
-                  <i class="fa fa-list-alt" aria-hidden="true"></i>{" "}
-                  <span>Daily Bus Schedule</span>
+                <Link to="/regular-bus-schedule">
+                  <i className="fa fa-list-alt" aria-hidden="true"></i>{" "}
+                  <span>Regular Bus Schedule</span>
+                </Link>
+              </li>
+            )}
+
+            {permissions.includes("TOTAL-BUS-SCHEDULE") && (
+              <li
+                onClick={() => setToggle(!toggle)}
+                className={`${
+                  location.pathname === "/total-bus-schedule-list" && "active"
+                }`}
+              >
+                <Link to="/total-bus-schedule-list">
+                  <i className="fa fa-list-alt" aria-hidden="true"></i>{" "}
+                  <span>Schedule Log Book</span>
                 </Link>
               </li>
             )}
@@ -96,7 +109,7 @@ const Header = () => {
                 className={`${location.pathname === "/notice" && "active"}`}
               >
                 <Link to="/notice">
-                  <i class="fa fa-newspaper-o" aria-hidden="true"></i>{" "}
+                  <i className="fa fa-newspaper-o" aria-hidden="true"></i>{" "}
                   <span>Notice Board</span>
                 </Link>
               </li>
@@ -110,7 +123,7 @@ const Header = () => {
                 }`}
               >
                 <Link to="/destination">
-                  <i class="fa fa-location-arrow" aria-hidden="true"></i>{" "}
+                  <i className="fa fa-location-arrow" aria-hidden="true"></i>{" "}
                   <span>Arrival & Destination</span>
                 </Link>
               </li>
@@ -124,8 +137,44 @@ const Header = () => {
                 }`}
               >
                 <Link to="/paribahan-users">
-                  <i class="fa fa-bus" aria-hidden="true"></i>{" "}
+                  <i className="fa fa-bus" aria-hidden="true"></i>{" "}
                   <span>Paribahan Users</span>
+                </Link>
+              </li>
+            )}
+
+            {permissions.includes("BUS-INFO") && (
+              <li
+                onClick={() => setToggle(!toggle)}
+                className={`${location.pathname === "/bus-info" && "active"}`}
+              >
+                <Link to="/bus-info">
+                  <i className="fa fa-bus" aria-hidden="true"></i>{" "}
+                  <span>Bus Info</span>
+                </Link>
+              </li>
+            )}
+            {permissions.includes("GUIDE-INFO") && (
+              <li
+                onClick={() => setToggle(!toggle)}
+                className={`${location.pathname === "/guide-info" && "active"}`}
+              >
+                <Link to="/guide-info">
+                  <i className="fa fa-user" aria-hidden="true"></i>{" "}
+                  <span>Guide Info</span>
+                </Link>
+              </li>
+            )}
+            {permissions.includes("DRIVER-INFO") && (
+              <li
+                onClick={() => setToggle(!toggle)}
+                className={`${
+                  location.pathname === "/driver-info" && "active"
+                }`}
+              >
+                <Link to="/driver-info">
+                  <i className="fa fa-user" aria-hidden="true"></i>{" "}
+                  <span>Driver Info</span>
                 </Link>
               </li>
             )}
@@ -147,7 +196,7 @@ const Header = () => {
                 className={`${location.pathname === "/role" && "active"}`}
               >
                 <Link to="/role">
-                  <i class="fa fa-arrow-right" aria-hidden="true"></i>{" "}
+                  <i className="fa fa-arrow-right" aria-hidden="true"></i>{" "}
                   <span>Role</span>
                 </Link>
               </li>
@@ -158,7 +207,7 @@ const Header = () => {
                 className={`${location.pathname === "/permission" && "active"}`}
               >
                 <Link to="/permission">
-                  <i class="fa fa-key" aria-hidden="true"></i>{" "}
+                  <i className="fa fa-key" aria-hidden="true"></i>{" "}
                   <span>Permission</span>
                 </Link>
               </li>

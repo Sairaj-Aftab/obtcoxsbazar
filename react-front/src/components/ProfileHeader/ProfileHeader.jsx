@@ -18,7 +18,7 @@ import { logoutAuthUser } from "../../features/paribahanAuth/paribahanAuthApiSli
 const ProfileHeader = () => {
   const navigate = useNavigate();
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
-  const pathName = useLocation();
+  const { pathname: pathName } = useLocation();
   const dispatch = useDispatch();
   const { paribahanNotices, error, message } = useSelector(noticeData);
   const [notice, setNotice] = useState("");

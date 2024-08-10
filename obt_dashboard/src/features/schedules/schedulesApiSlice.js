@@ -19,6 +19,24 @@ export const getAllSchedules = createAsyncThunk(
   }
 );
 
+export const getTodaysSchedule = createAsyncThunk(
+  "schedules/getTodaysSchedule",
+  async ({ page, limit, search }) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/schedule/todays`,
+        {
+          params: { page, limit, search },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
 export const deleteSchedule = createAsyncThunk(
   "schedules/deleteSchedule",
   async (id) => {

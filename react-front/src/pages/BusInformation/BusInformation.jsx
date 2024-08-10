@@ -6,6 +6,7 @@ import { busData } from "../../features/bus/busSlice";
 import { noticeData } from "../../features/notice/noticeSlice";
 import { getBusInfoData } from "../../features/bus/busApiSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
+import DataTable from "react-data-table-component";
 
 const BusInformation = () => {
   const params = useParams();
@@ -13,6 +14,55 @@ const BusInformation = () => {
   const { busInfo } = useSelector(busData);
   const { paribahanNotices } = useSelector(noticeData);
   const [paribahanNotice, setParibahanNotice] = useState(null);
+
+  const column = [
+    {
+      name: "#",
+      selector: (data, index) => index + 1,
+      width: "40px",
+    },
+    {
+      name: "Time",
+      selector: (data) => formatDateTime(data.time),
+      sortable: true,
+    },
+    {
+      name: "Type",
+      selector: (data) => data.type,
+      sortable: true,
+    },
+    {
+      name: "Reg No",
+      selector: (data) => data.busNo,
+      sortable: true,
+    },
+    {
+      name: "Guide No",
+      selector: (data) => data.guidePhone,
+      sortable: true,
+    },
+    {
+      name: "Departure Place",
+      selector: (data) => data.leavingPlace,
+      sortable: true,
+    },
+    {
+      name: "Destination",
+      selector: (data) => data.destinationPlace,
+      sortable: true,
+    },
+    {
+      name: "Rent",
+      selector: (data) => `৳ ${data.rent ? data.rent : "--"}`,
+      sortable: true,
+      width: "90px",
+    },
+    {
+      name: "Seat Status",
+      selector: (data) => (data.seatStatus ? "Available" : "Booked"),
+      sortable: true,
+    },
+  ];
 
   useEffect(() => {
     dispatch(getBusInfoData(params.id));
@@ -47,53 +97,42 @@ const BusInformation = () => {
           </marquee>
         </p>
       )}
-      <div className="overflow-x-auto">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Time</th>
-              <th>Reg No.</th>
-              <th>Bus Type</th>
-              <th>Guide No</th>
-              <th>Departure Place</th>
-              <th>Destination</th>
-              <th>Rent</th>
-              <th>Seat Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {busInfo?.busSchedule?.map((data, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{formatDateTime(data.time)}</td>
-                <td>{data.busNo}</td>
-                <td>{data.type}</td>
-                <td>{data.guidePhone}</td>
-                <td>{data.leavingPlace}</td>
-                <td>{data.destinationPlace}</td>
-                <td>৳ {data?.rent}</td>
-                <td className="flex justify-start items-center">
-                  {data.seatStatus ? (
-                    <button className="bg-primary-color text-white px-3 py-1 rounded-lg">
-                      Available
-                    </button>
-                  ) : (
-                    <button className="bg-red text-white px-3 py-1 rounded-lg">
-                      Booked
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {busInfo?.busSchedule?.length < 1 && (
-          <h1 className="text-red text-lg font-medium text-center py-10">
-            No Schedule
-          </h1>
-        )}
-      </div>
+      <DataTable
+        columns={column}
+        data={busInfo?.busSchedule
+          ?.slice()
+          .sort((a, b) => new Date(a.time) - new Date(b.time))}
+        responsive
+        customStyles={{
+          headRow: {
+            style: {
+              backgroundColor: "#f8f9fa",
+            },
+          },
+          headCells: {
+            style: {
+              fontSize: "16px",
+              fontWeight: "bold",
+            },
+          },
+          rows: {
+            style: {
+              fontSize: "16px",
+              fontWeight: "500",
+            },
+          },
+        }}
+        // progressPending={todayLoader}
+        // progressComponent={<Loading />}
+        // pagination
+        // paginationServer
+        // paginationTotalRows={
+        //   authSchedulesCount ? authSchedulesCount : authSearchCount
+        // }
+        // onChangeRowsPerPage={handlePerRowsChange}
+        // onChangePage={handlePageChange}
+        // paginationRowsPerPageOptions={[100, 150, 200]}
+      />
     </div>
   );
 };

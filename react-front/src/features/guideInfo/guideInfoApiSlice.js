@@ -3,13 +3,12 @@ import axios from "axios";
 
 export const getGuideInfo = createAsyncThunk(
   "guideInfo/getGuideInfo",
-  async ({ id, limit }) => {
+  async ({ id, page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/guideinfo/getbyid/${id}?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/guideinfo/getbyid/${id}`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

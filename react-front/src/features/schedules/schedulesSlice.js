@@ -14,7 +14,9 @@ const schedulesSlice = createSlice({
   initialState: {
     schedules: null,
     todaySchedules: null,
-    authSchedules: null,
+    authSchedules: [],
+    authSchedulesCount: 0,
+    authSearchCount: 0,
     leavingPlaces: null,
     destinationPlaces: null,
     message: null,
@@ -47,6 +49,7 @@ const schedulesSlice = createSlice({
     builder
       .addCase(createSchedule.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(createSchedule.pending, (state) => {
         state.loader = true;
@@ -54,11 +57,11 @@ const schedulesSlice = createSlice({
       .addCase(createSchedule.fulfilled, (state, action) => {
         state.loader = false;
         state.schedules = state.schedules ?? [];
-        state.authSchedules = state.authSchedules ?? [];
         state.todaySchedules = state.todaySchedules ?? [];
         state.schedules.push(action.payload.busSchedule);
         state.authSchedules.push(action.payload.busSchedule);
         state.todaySchedules.push(action.payload.busSchedule);
+        state.authSchedulesCount++;
         state.message = action.payload.message;
       })
       .addCase(updateSchedule.rejected, (state, action) => {
@@ -80,6 +83,12 @@ const schedulesSlice = createSlice({
         );
         if (authScheduleIndex !== -1) {
           state.authSchedules[authScheduleIndex] = action.payload.busSchedule;
+        }
+        const todayScheduleIndex = state.todaySchedules.findIndex(
+          (schedule) => schedule.id === action.payload.busSchedule.id
+        );
+        if (todayScheduleIndex !== -1) {
+          state.todaySchedules[todayScheduleIndex] = action.payload.busSchedule;
         }
         state.message = action.payload.message;
       })
@@ -105,6 +114,7 @@ const schedulesSlice = createSlice({
       })
       .addCase(getSchedulesDataByAuthId.rejected, (state, action) => {
         // state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(getSchedulesDataByAuthId.pending, (state) => {
         state.loader = true;
@@ -112,9 +122,12 @@ const schedulesSlice = createSlice({
       .addCase(getSchedulesDataByAuthId.fulfilled, (state, action) => {
         state.loader = false;
         state.authSchedules = action.payload.schedules;
+        state.authSchedulesCount = action.payload.count;
+        state.authSearchCount = action.payload.searchCount;
       })
       .addCase(deleteSchedule.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(deleteSchedule.pending, (state) => {
         state.loader = true;
@@ -127,6 +140,10 @@ const schedulesSlice = createSlice({
         state.authSchedules = state.authSchedules.filter(
           (item) => item.id !== action.payload.schedule.id
         );
+        state.todaySchedules = state.todaySchedules.filter(
+          (item) => item.id !== action.payload.schedule.id
+        );
+        state.authSchedulesCount--;
         state.message = action.payload.message;
       })
       .addCase(getLeavingPlace.rejected, (state, action) => {

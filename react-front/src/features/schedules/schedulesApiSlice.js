@@ -35,11 +35,12 @@ export const updateSchedule = createAsyncThunk(
 
 export const getTodaysSchedules = createAsyncThunk(
   "schedules/getTodaysSchedules",
-  async (limit) => {
+  async ({ page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/schedule/todays?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/schedule/todays`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );
@@ -68,13 +69,12 @@ export const getSchedulesDataByLimit = createAsyncThunk(
 
 export const getSchedulesDataByAuthId = createAsyncThunk(
   "schedules/getSchedulesDataByAuthId",
-  async ({ id, limit }) => {
+  async ({ id, page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/schedule/getbyparibahan/${id}?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/schedule/getbyparibahan/${id}`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

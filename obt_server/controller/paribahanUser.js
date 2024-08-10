@@ -144,10 +144,12 @@ export const getAllParibahanUser = async (req, res, next) => {
         destination: true,
       },
     });
+
+    const count = await prisma.paribahanUser.count();
     if (paribahanUsers.length < 1) {
       return next(createError(400, "Cannot find any Paribahan User!"));
     }
-    return res.status(200).json({ paribahanUsers });
+    return res.status(200).json({ paribahanUsers, count });
   } catch (error) {
     return next(error);
   }

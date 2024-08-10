@@ -13,11 +13,13 @@ import {
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
+import DataTable from "react-data-table-component";
 
 const ProfileDriverInfo = () => {
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const dispatch = useDispatch();
-  const { driverInfo, message, error } = useSelector(driverInfoData);
+  const { driverInfo, totalCount, searchCount, loader, message, error } =
+    useSelector(driverInfoData);
 
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -64,8 +66,88 @@ const ProfileDriverInfo = () => {
       dispatch(updateDriverInfo({ id, data: infoData }));
     }
   };
+
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const handlePageChange = (page) => {
+    setPage(page);
+    dispatch(getDriverInfo({ id: user.id, page, limit: rowPage, search }));
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowPage(newPerPage);
+    dispatch(getDriverInfo({ id: user.id, page, limit: newPerPage, search }));
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    dispatch(
+      getDriverInfo({
+        id: user.id,
+        page,
+        limit: rowPage,
+        search: e.target.value,
+      })
+    ); // Fetch schedules with the search term
+  };
+
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
+  };
+  const column = [
+    {
+      name: "#",
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "40px",
+    },
+    {
+      name: "Name",
+      selector: (data) => data.name,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: (data) => data.phone,
+      sortable: true,
+    },
+    {
+      name: "License",
+      selector: (data) => data.license,
+      sortable: true,
+    },
+    {
+      name: "Address",
+      selector: (data) => data.address,
+      sortable: true,
+    },
+    {
+      name: "Remark",
+      selector: (data) => data.comment,
+      sortable: true,
+    },
+    {
+      name: "Entry Date",
+      selector: (data) => formatDateTime(data.createdAt),
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (data) => (
+        <div className="flex justify-end gap-1">
+          <button
+            onClick={() => handleOpenUpdateForm(data.id)}
+            className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded"
+          >
+            Edit
+          </button>
+        </div>
+      ),
+      right: true, // Align the column to the right
+    },
+  ];
   useEffect(() => {
-    dispatch(getDriverInfo({ id: user?.id, limit: 100 }));
+    dispatch(getDriverInfo({ id: user?.id, page: 1, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({
@@ -75,6 +157,7 @@ const ProfileDriverInfo = () => {
         address: "",
         comment: "",
       });
+      setShowUpdateModal(false);
     }
     if (error) {
       toast.error(error);
@@ -82,7 +165,7 @@ const ProfileDriverInfo = () => {
     return () => {
       dispatch(setDriverInfoMessageEmpty());
     };
-  }, [message, error, dispatch]);
+  }, [message, loader, error, dispatch, user?.id]);
   return (
     <>
       <Toaster />
@@ -125,7 +208,7 @@ const ProfileDriverInfo = () => {
               name="comment"
               value={input.comment}
               onChange={changeInputValue}
-              placeholder="Comment"
+              placeholder="Remark"
             />
             <button
               type="submit"
@@ -175,7 +258,7 @@ const ProfileDriverInfo = () => {
               name="comment"
               value={infoData.comment}
               onChange={changeInfoData}
-              placeholder="Comment"
+              placeholder="Remark"
             />
             <button
               type="submit"
@@ -187,16 +270,53 @@ const ProfileDriverInfo = () => {
         </Modal>
       )}
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start mb-2">
           <h1 className="text-lg font-semibold text-gray-700">Driver Info</h1>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
-          >
-            Add driver info
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 w-40 sm:w-auto">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full sm:w-60"
+              onChange={handleSearchChange}
+            />
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
+            >
+              Add driver info
+            </button>
+          </div>
         </div>
-        <div className="overflow-x-auto">
+        <DataTable
+          columns={column}
+          data={driverInfo
+            ?.slice()
+            .sort((a, b) => a.name.localeCompare(b.name))}
+          responsive
+          // progressPending={todayLoader}
+          // progressComponent={<Loading />}
+          pagination
+          paginationServer
+          paginationTotalRows={totalCount ? totalCount : searchCount}
+          onChangeRowsPerPage={handlePerRowsChange}
+          onChangePage={handlePageChange}
+          paginationRowsPerPageOptions={[100, 150, 200]}
+          customStyles={{
+            headCells: {
+              style: {
+                fontSize: "14px",
+                fontWeight: "bold",
+              },
+            },
+            rows: {
+              style: {
+                fontSize: "14px",
+                fontWeight: "400",
+              },
+            },
+          }}
+        />
+        {/* <div className="overflow-x-auto">
           <table className="mt-5 border border-gray-300 rounded-lg">
             <thead>
               <tr className="text-sm font-semibold bg-primary-color text-white">
@@ -230,18 +350,18 @@ const ProfileDriverInfo = () => {
                       >
                         Edit
                       </button>
-                      {/* <button
+                      <button
                       onClick={() => handleDeleteSchedule(data.id)}
                       className="bg-red py-1 px-2 text-sm font-medium text-white rounded"
                     >
                       Delete
-                    </button> */}
+                    </button>
                     </td>
                   </tr>
                 ))}
             </tbody>
           </table>
-        </div>
+        </div> */}
       </div>
     </>
   );

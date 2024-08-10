@@ -1,8 +1,8 @@
 const ContactUs = () => {
   return (
-    <section className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto sm:my-5">
+    <section className="bg-white p-3 sm:p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto sm:my-5">
       <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
-      <div className="mb-2 flex gap-2 text-base font-semibold ">
+      <div className="mb-2 flex flex-col sm:flex-row gap-2 text-sm sm:text-base font-semibold ">
         <span>
           Phone:{" "}
           <a href="tel:+8801320108413" className="text-primary-color underline">

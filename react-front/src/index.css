@@ -15,16 +15,15 @@ body {
 a {
   text-decoration: none !important;
 }
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  min-width: 1200px;
-  width: 100%;
+.sc-elDIKY.hsGprm.rdt_TableHeadRow {
+  background-color: #008080;
+  color: #ffffff;
+  min-height: fit-content !important;
 }
-
-th,
-td {
-  text-align: left;
+.rdt_TableCol {
+  padding: 8px;
+}
+.rdt_TableCell {
   padding: 8px;
 }
 form {

@@ -155,23 +155,61 @@ export const getAllSchedules = async (req, res, next) => {
 export const getTodaysSchedules = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 500;
+    const limit = parseInt(req.query.limit) || 100;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
 
     // Calculate the start and end of today
-    const now = new Date();
-    const startOfDay = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      0,
+      0,
+      0
     );
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setUTCDate(startOfDay.getUTCDate() + 1); // Set to midnight of the next day
+    const endOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
+
+    // Base filter with time range
+    const baseFilter = {
+      time: {
+        gte: startOfToday.toISOString(),
+        lte: endOfToday.toISOString(),
+      },
+    };
+
+    // Extend filter if searchQuery is provided
+    const searchFilter = searchQuery
+      ? {
+          OR: [
+            { time: { contains: searchQuery, mode: "insensitive" } },
+            { busName: { contains: searchQuery, mode: "insensitive" } },
+            { busNo: { contains: searchQuery, mode: "insensitive" } },
+            {
+              destinationPlace: { contains: searchQuery, mode: "insensitive" },
+            },
+            { leavingPlace: { contains: searchQuery, mode: "insensitive" } },
+            { guideName: { contains: searchQuery, mode: "insensitive" } },
+            { guidePhone: { contains: searchQuery, mode: "insensitive" } },
+            { type: { contains: searchQuery, mode: "insensitive" } },
+          ],
+        }
+      : {};
 
     const schedules = await prisma.busSchedule.findMany({
+      skip: offset,
+      take: limit,
       where: {
-        time: {
-          gte: startOfDay,
-          lt: endOfDay,
-        },
+        AND: [baseFilter, searchFilter],
       },
       include: {
         paribahanUser: true,
@@ -179,26 +217,24 @@ export const getTodaysSchedules = async (req, res, next) => {
       orderBy: {
         time: "desc",
       },
-      skip: offset,
-      take: limit,
     });
 
     const count = await prisma.busSchedule.count({
       where: {
-        time: {
-          gte: startOfDay,
-          lt: endOfDay,
-        },
+        AND: [baseFilter],
+      },
+    });
+    const searchCount = await prisma.busSchedule.count({
+      where: {
+        AND: [baseFilter, searchFilter],
       },
     });
 
     if (schedules.length < 1) {
-      return next(createError(400, "Cannot find any schedule!"));
+      return next(createError(400, "No Schedule!"));
     }
 
-    console.log(schedules);
-
-    return res.status(200).json({ schedules, count });
+    return res.status(200).json({ schedules, count, searchCount });
   } catch (error) {
     return next(error);
   }
@@ -227,38 +263,40 @@ export const getSchedulesByLimit = async (req, res, next) => {
     return next(error);
   }
 };
-export const todaySchedule = async (req, res, next) => {
-  try {
-    const schedules = await prisma.busSchedule.findMany({
-      include: {
-        paribahanUser: true,
-      },
-      orderBy: {
-        time: "asc",
-      },
-    });
-
-    if (schedules.length < 1) {
-      return next(createError(400, "Cannot find any schedule!"));
-    }
-    return res.status(200).json({ schedules });
-  } catch (error) {
-    return next(error);
-  }
-};
 
 export const getSchedulesByParibahanUserId = async (req, res, next) => {
   try {
     const { paribahanUserId } = req.params;
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : undefined;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const whereClause = {
+      paribahanUserId: String(paribahanUserId),
+    };
+
+    if (searchQuery) {
+      whereClause.OR = [
+        { time: { contains: searchQuery, mode: "insensitive" } },
+        { busNo: { contains: searchQuery, mode: "insensitive" } },
+        {
+          destinationPlace: { contains: searchQuery, mode: "insensitive" },
+        },
+        { leavingPlace: { contains: searchQuery, mode: "insensitive" } },
+        { guideName: { contains: searchQuery, mode: "insensitive" } },
+        { guidePhone: { contains: searchQuery, mode: "insensitive" } },
+        { type: { contains: searchQuery, mode: "insensitive" } },
+      ];
+    }
+
     const schedules = await prisma.busSchedule.findMany({
-      where: {
-        paribahanUserId: String(paribahanUserId),
-      },
+      skip: offset,
+      take: limit,
+      where: whereClause,
       orderBy: {
         time: "asc",
       },
-      take: limit,
       include: {
         paribahanUser: true,
       },
@@ -266,7 +304,16 @@ export const getSchedulesByParibahanUserId = async (req, res, next) => {
     if (schedules.length < 1) {
       return next(createError(400, "Cannot find any schedule!"));
     }
-    return res.status(200).json({ schedules });
+
+    const count = await prisma.busSchedule.count({
+      where: {
+        paribahanUserId: String(paribahanUserId),
+      },
+    });
+    const searchCount = await prisma.busSchedule.count({
+      where: whereClause,
+    });
+    return res.status(200).json({ schedules, count, searchCount });
   } catch (error) {
     return next(error);
   }

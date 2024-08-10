@@ -30,7 +30,7 @@ function App() {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
     }
-    dispatch(getTodaysSchedules(500));
+    dispatch(getTodaysSchedules({ page: 1, limit: 500 }));
     dispatch(getSchedulesDataByLimit(500));
     dispatch(getLeavingPlace());
     dispatch(getDestinationPlace());

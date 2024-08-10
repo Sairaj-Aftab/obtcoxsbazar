@@ -1,14 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteSchedule, getAllSchedules } from "./schedulesApiSlice";
+import {
+  deleteSchedule,
+  getAllSchedules,
+  getTodaysSchedule,
+} from "./schedulesApiSlice";
 const schedulesSlice = createSlice({
   name: "schedules",
   initialState: {
     schedules: [],
+    todaySchedule: [],
     totalScheduleCount: 0,
     searchCount: 0,
+    todayTotalCount: 0,
+    todaySearchCount: 0,
     message: null,
     error: null,
     loader: false,
+    todayLoader: false,
   },
   reducers: {
     setMessageEmpty: (state) => {
@@ -30,6 +38,19 @@ const schedulesSlice = createSlice({
         state.totalScheduleCount = action.payload.count;
         state.searchCount = action.payload.searchCount;
         state.schedules = action.payload.schedules;
+      })
+      .addCase(getTodaysSchedule.rejected, (state, action) => {
+        // state.error = action.error.message;
+        state.todayLoader = false;
+      })
+      .addCase(getTodaysSchedule.pending, (state) => {
+        state.todayLoader = true;
+      })
+      .addCase(getTodaysSchedule.fulfilled, (state, action) => {
+        state.todayLoader = false;
+        state.todayTotalCount = action.payload.count;
+        state.todaySearchCount = action.payload.searchCount;
+        state.todaySchedule = action.payload.schedules;
       })
       .addCase(deleteSchedule.rejected, (state, action) => {
         state.error = action.error.message;

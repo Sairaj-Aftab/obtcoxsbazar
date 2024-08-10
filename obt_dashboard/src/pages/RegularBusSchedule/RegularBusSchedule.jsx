@@ -148,26 +148,22 @@ const RegularBusSchedule = () => {
       selector: (data) => formatDateTime(data.createdAt),
       sortable: true,
     },
-  ];
-
-  if (authUser?.role?.name !== "VIEWER") {
-    columns.push({
+    {
       name: "Actions",
       cell: (data) => (
         <div className="text-right actions">
-          <a
-            data-toggle="modal"
-            href="#delete_modal"
+          <button
             className="btn btn-sm bg-danger-light"
             onClick={() => handleDeleteSchedule(data.id)}
+            disabled={authUser?.role?.name === "VIEWER" && true}
           >
             <i className="fe fe-trash"></i> Delete
-          </a>
+          </button>
         </div>
       ),
       right: true, // Align the column to the right
-    });
-  }
+    },
+  ];
 
   return (
     <>

@@ -124,12 +124,24 @@ export const getBusInfo = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 100;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const whereClause = {
+      paribahanUserId: String(id),
+    };
+
+    if (searchQuery) {
+      whereClause.OR = [
+        { regNo: { contains: searchQuery, mode: "insensitive" } },
+        { type: { contains: searchQuery, mode: "insensitive" } },
+        { comment: { contains: searchQuery, mode: "insensitive" } },
+        { report: { contains: searchQuery, mode: "insensitive" } },
+      ];
+    }
     const busInfo = await prisma.busInfo.findMany({
-      where: {
-        paribahanUserId: String(id),
-      },
       skip: offset,
       take: limit,
+      where: whereClause,
       orderBy: {
         regNo: "asc",
       },
@@ -143,12 +155,14 @@ export const getBusInfo = async (req, res, next) => {
         paribahanUserId: String(id),
       },
     });
-    const totalCount = await prisma.busInfo.count();
+    const searchCount = await prisma.busInfo.count({
+      where: whereClause,
+    });
 
     if (busInfo.length < 1) {
       return next(createError(400, "Cannot find any info!"));
     }
-    return res.status(200).json({ busInfo, count, totalCount });
+    return res.status(200).json({ busInfo, count, searchCount });
   } catch (error) {
     return next(error);
   }

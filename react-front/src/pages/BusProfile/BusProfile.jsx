@@ -1,6 +1,8 @@
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import DataTable from "react-data-table-component";
+import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
 import {
   schedulesData,
   setMessageEmpty,
@@ -13,13 +15,13 @@ import {
 } from "../../features/schedules/schedulesApiSlice";
 import { useEffect } from "react";
 import { setNoticeMessageEmpty } from "../../features/notice/noticeSlice";
-import { formatDateTime } from "../../utils/formatDateTime";
 import Modal from "../../components/Modal/Modal";
 import { getGuideInfo } from "../../features/guideInfo/guideInfoApiSlice";
 import { getBusInfo } from "../../features/busInfo/busInfoApiSlice";
 import { guideInfoData } from "../../features/guideInfo/guideInfoSlice";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import { busInfoData } from "../../features/busInfo/busInfoSlice";
+import { formatDateTime } from "../../utils/formatDateTime";
 
 const BusProfile = () => {
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
@@ -29,6 +31,8 @@ const BusProfile = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const {
     authSchedules: schedules,
+    authSchedulesCount,
+    authSearchCount,
     leavingPlaces,
     destinationPlaces,
     message,
@@ -125,12 +129,117 @@ const BusProfile = () => {
     dispatch(deleteSchedule(id));
   };
 
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const handlePageChange = (page) => {
+    setPage(page);
+    dispatch(
+      getSchedulesDataByAuthId({ id: user.id, page, limit: rowPage, search })
+    );
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowPage(newPerPage);
+    dispatch(
+      getSchedulesDataByAuthId({ id: user.id, page, limit: newPerPage, search })
+    );
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    dispatch(
+      getSchedulesDataByAuthId({
+        id: user.id,
+        page,
+        limit: rowPage,
+        search: e.target.value,
+      })
+    ); // Fetch schedules with the search term
+  };
+
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
+  };
+  const column = [
+    {
+      name: "#",
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "40px",
+    },
+    {
+      name: "Time",
+      selector: (data) => formatDateTime(data.time),
+      sortable: true,
+    },
+    {
+      name: "Type",
+      selector: (data) => data.type,
+      sortable: true,
+    },
+    {
+      name: "Reg No",
+      selector: (data) => data.busNo,
+      sortable: true,
+    },
+    {
+      name: "Guide Name",
+      selector: (data) => data.guideName,
+      sortable: true,
+    },
+    {
+      name: "Guide Phone",
+      selector: (data) => data.guidePhone,
+      sortable: true,
+    },
+    {
+      name: "Departure Place",
+      selector: (data) => data.leavingPlace,
+      sortable: true,
+    },
+    {
+      name: "Destination",
+      selector: (data) => data.destinationPlace,
+      sortable: true,
+    },
+    {
+      name: "Rent",
+      selector: (data) => `৳ ${data.rent ? data.rent : "--"}`,
+      sortable: true,
+    },
+    {
+      name: "Seat Status",
+      selector: (data) => (data.seatStatus ? "Available" : "Booked"),
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (data) => (
+        <div className="flex justify-end gap-1">
+          <button
+            onClick={() => handleOpenUpdateForm(data.id)}
+            className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded w-full"
+          >
+            <FaPencilAlt />
+          </button>
+          <button
+            onClick={() => handleDeleteSchedule(data.id)}
+            className="bg-red py-1 px-2 text-sm font-medium text-white rounded w-full"
+          >
+            <FaRegTrashAlt />
+          </button>
+        </div>
+      ),
+      right: true, // Align the column to the right
+    },
+  ];
+
   useEffect(() => {
     if (user) {
-      dispatch(getSchedulesDataByAuthId({ id: user.id, limit: 100 }));
+      dispatch(getSchedulesDataByAuthId({ id: user.id, page: 1, limit: 100 }));
     }
-    dispatch(getBusInfo({ id: user.id, limit: 500 }));
-    dispatch(getGuideInfo({ id: user.id, limit: 500 }));
+    dispatch(getBusInfo({ id: user.id, page: 1, limit: 100 }));
+    dispatch(getGuideInfo({ id: user.id, page: 1, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({
@@ -429,69 +538,54 @@ const BusProfile = () => {
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
         {/* Table Body */}
         <div>
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start mb-2">
             <h1 className="text-lg font-semibold text-gray-700">
               Schedule List
             </h1>
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
-            >
-              Add schedule
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2 w-40 sm:w-auto">
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full sm:w-60"
+                onChange={handleSearchChange}
+              />
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
+              >
+                Add schedule
+              </button>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="mt-5 border border-gray-300 rounded-lg">
-              <thead>
-                <tr className="text-sm font-semibold bg-primary-color text-white">
-                  <th>#</th>
-                  <th>Time</th>
-                  <th>Bus Type</th>
-                  <th>Bus No</th>
-                  <th>Departure Place</th>
-                  <th>Destination</th>
-                  <th>Rent</th>
-                  <th>Guide Name</th>
-                  <th>Guide Mobile No</th>
-                  <th>Seat Status</th>
-                  <th>Entry Date</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {schedules?.map((data, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{formatDateTime(data.time)}</td>
-                    <td>{data.type}</td>
-                    <td>{data.busNo}</td>
-                    <td>{data.leavingPlace}</td>
-                    <td>{data.destinationPlace}</td>
-                    <td>৳ {data.rent}</td>
-                    <td>{data.guideName}</td>
-                    <td>{data.guidePhone}</td>
-
-                    <td>{data.seatStatus ? "Available" : "Booked"}</td>
-                    <td>{formatDateTime(data.createdAt)}</td>
-                    <td className="flex justify-end gap-1">
-                      <button
-                        onClick={() => handleOpenUpdateForm(data.id)}
-                        className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteSchedule(data.id)}
-                        className="bg-red py-1 px-2 text-sm font-medium text-white rounded"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={column}
+            data={schedules}
+            responsive
+            // progressPending={todayLoader}
+            // progressComponent={<Loading />}
+            pagination
+            paginationServer
+            paginationTotalRows={
+              authSchedulesCount ? authSchedulesCount : authSearchCount
+            }
+            onChangeRowsPerPage={handlePerRowsChange}
+            onChangePage={handlePageChange}
+            paginationRowsPerPageOptions={[100, 150, 200]}
+            customStyles={{
+              headCells: {
+                style: {
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "14px",
+                  fontWeight: "400",
+                },
+              },
+            }}
+          />
         </div>
       </div>
     </>

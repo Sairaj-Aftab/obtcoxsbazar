@@ -7,8 +7,9 @@ import {
 const guideInfoSlice = createSlice({
   name: "guideInfo",
   initialState: {
-    guideInfo: null,
-    totalCount: null,
+    guideInfo: [],
+    totalCount: 0,
+    searchCount: 0,
     message: null,
     error: null,
     loader: false,
@@ -17,12 +18,14 @@ const guideInfoSlice = createSlice({
     setGuideInfoMessageEmpty: (state) => {
       state.message = null;
       state.error = null;
+      state.loader = false;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getGuideInfo.rejected, (state, action) => {
         // state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(getGuideInfo.pending, (state) => {
         state.loader = true;
@@ -30,21 +33,25 @@ const guideInfoSlice = createSlice({
       .addCase(getGuideInfo.fulfilled, (state, action) => {
         state.loader = false;
         state.guideInfo = action.payload.guideInfo;
+        state.totalCount = action.payload.count;
+        state.searchCount = action.payload.searchCount;
       })
       .addCase(createGuideInfo.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(createGuideInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(createGuideInfo.fulfilled, (state, action) => {
         state.loader = false;
-        state.guideInfo = state.guideInfo ?? [];
         state.guideInfo.push(action.payload.guideInfo);
+        state.totalCount++;
         state.message = action.payload.message;
       })
       .addCase(updateGuideInfo.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(updateGuideInfo.pending, (state) => {
         state.loader = true;

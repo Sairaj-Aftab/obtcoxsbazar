@@ -3,21 +3,13 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAllData } from "../../features/user/userSlice";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
-import ScheduleTableList from "../../components/ScheduleTableList/ScheduleTableList";
 import { rgSchedulesData } from "../../features/regularSchedule/regularScheduleSlice";
+import TodayScheduleTableList from "../../components/TodayScheduleTableList/TodayScheduleTableList";
 
 const Dashboard = () => {
-  const { schedules, totalScheduleCount } = useSelector(schedulesData);
-  const { paribahanUsers } = useSelector(getAllData);
-  const { rgSchedules, totalCount, message, error } =
-    useSelector(rgSchedulesData);
-  const today = new Date();
-  const formattedToday = today.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-
-  const todaysSchedules = schedules?.filter((schedule) => {
-    const scheduleDate = new Date(schedule.time).toISOString().split("T")[0];
-    return scheduleDate === formattedToday;
-  });
+  const { totalScheduleCount, todayTotalCount } = useSelector(schedulesData);
+  const { totalCount: totalParibahanCount } = useSelector(getAllData);
+  const { totalCount } = useSelector(rgSchedulesData);
 
   return (
     <>
@@ -31,9 +23,7 @@ const Dashboard = () => {
                   <i className="fa fa-calendar" aria-hidden="true"></i>
                 </span>
                 <div className="dash-count">
-                  <h3>
-                    {todaysSchedules?.length > 0 ? todaysSchedules.length : 0}
-                  </h3>
+                  <h3>{todayTotalCount}</h3>
                 </div>
               </div>
               <div className="dash-widget-info">
@@ -88,7 +78,7 @@ const Dashboard = () => {
                   <i className="fa fa-bus" aria-hidden="true"></i>
                 </span>
                 <div className="dash-count">
-                  <h3>{paribahanUsers?.length}</h3>
+                  <h3>{totalParibahanCount}</h3>
                 </div>
               </div>
               <div className="dash-widget-info">
@@ -98,8 +88,7 @@ const Dashboard = () => {
           </div>
         </Link>
       </div>
-      {/* Table Data */}
-      {/* <ScheduleTableList /> */}
+      <TodayScheduleTableList />
     </>
   );
 };

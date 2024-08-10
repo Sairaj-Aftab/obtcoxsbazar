@@ -3,11 +3,12 @@ import axios from "axios";
 
 export const getBusInfo = createAsyncThunk(
   "busInfo/getBusInfo",
-  async ({ id, limit }) => {
+  async ({ id, page, limit, search }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/businfo/${id}?limit=${limit}`,
+        `${import.meta.env.VITE_API_URL}/businfo/${id}`,
         {
+          params: { page, limit, search },
           withCredentials: true,
         }
       );

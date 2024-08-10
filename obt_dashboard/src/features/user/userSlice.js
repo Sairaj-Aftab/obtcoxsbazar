@@ -23,7 +23,8 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     users: null,
-    paribahanUsers: null,
+    paribahanUsers: [],
+    totalCount: 0,
     permissions: null,
     roles: null,
     status: null,
@@ -147,6 +148,7 @@ const userSlice = createSlice({
       })
       .addCase(getParibahanUser.fulfilled, (state, action) => {
         state.paribahanUsers = action.payload.paribahanUsers;
+        state.totalCount = action.payload.count;
       })
       .addCase(createParibahanUser.rejected, (state, action) => {
         state.error = action.error.message;
@@ -154,8 +156,8 @@ const userSlice = createSlice({
       .addCase(createParibahanUser.fulfilled, (state, action) => {
         state.success = true;
         state.message = action.payload.message;
-        state.paribahanUsers = state.paribahanUsers ?? [];
         state.paribahanUsers.push(action.payload.paribahanUser);
+        state.totalCount++;
       })
       .addCase(updateParibahanUser.rejected, (state, action) => {
         state.error = action.error.message;

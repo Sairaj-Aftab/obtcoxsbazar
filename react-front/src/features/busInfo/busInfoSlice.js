@@ -3,8 +3,9 @@ import { createBusInfo, getBusInfo, updateBusInfo } from "./busInfoApiSlice";
 const busInfoSlice = createSlice({
   name: "busInfo",
   initialState: {
-    busInfo: null,
-    totalCount: null,
+    busInfo: [],
+    totalCount: 0,
+    searchCount: 0,
     message: null,
     error: null,
     loader: false,
@@ -13,6 +14,7 @@ const busInfoSlice = createSlice({
     setBusInfoMessageEmpty: (state) => {
       state.message = null;
       state.error = null;
+      state.loader = false;
     },
   },
   extraReducers: (builder) => {
@@ -26,17 +28,20 @@ const busInfoSlice = createSlice({
       .addCase(getBusInfo.fulfilled, (state, action) => {
         state.loader = false;
         state.busInfo = action.payload.busInfo;
+        state.totalCount = action.payload.count;
+        state.searchCount = action.payload.searchCount;
       })
       .addCase(createBusInfo.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(createBusInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(createBusInfo.fulfilled, (state, action) => {
         state.loader = false;
-        state.busInfo = state.busInfo ?? [];
         state.busInfo.push(action.payload.busInfo);
+        state.totalCount++;
         state.message = action.payload.message;
       })
       .addCase(updateBusInfo.rejected, (state, action) => {

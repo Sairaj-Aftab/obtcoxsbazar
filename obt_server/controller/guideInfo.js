@@ -82,12 +82,25 @@ export const getGuideInfo = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 100;
     const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const whereClause = {
+      paribahanUserId: String(id),
+    };
+
+    if (searchQuery) {
+      whereClause.OR = [
+        { name: { contains: searchQuery, mode: "insensitive" } },
+        { phone: { contains: searchQuery, mode: "insensitive" } },
+        { address: { contains: searchQuery, mode: "insensitive" } },
+        { comment: { contains: searchQuery, mode: "insensitive" } },
+        { report: { contains: searchQuery, mode: "insensitive" } },
+      ];
+    }
     const guideInfo = await prisma.guideInfo.findMany({
-      where: {
-        paribahanUserId: String(id),
-      },
       skip: offset,
       take: limit,
+      where: whereClause,
       orderBy: {
         name: "asc",
       },
@@ -101,12 +114,14 @@ export const getGuideInfo = async (req, res, next) => {
         paribahanUserId: String(id),
       },
     });
-    const totalCount = await prisma.guideInfo.count();
+    const searchCount = await prisma.guideInfo.count({
+      where: whereClause,
+    });
 
     if (guideInfo.length < 1) {
       return next(createError(400, "Cannot find any info!"));
     }
-    return res.status(200).json({ guideInfo, count, totalCount });
+    return res.status(200).json({ guideInfo, count, searchCount });
   } catch (error) {
     return next(error);
   }

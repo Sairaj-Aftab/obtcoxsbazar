@@ -96,7 +96,7 @@ const Permission = () => {
                         <th>Slug</th>
                         <th>Created At</th>
                         <th>Status</th>
-                        <th className="text-right">Actions</th>
+                        {/* <th className="text-right">Actions</th> */}
                       </tr>
                     </thead>
                     <tbody>
@@ -127,7 +127,7 @@ const Permission = () => {
                                   </label>
                                 </div>
                               </td>
-                              <td className="text-right">
+                              {/* <td className="text-right">
                                 <button
                                   onClick={() => handleDelete(data.id)}
                                   className="border-0 bg-danger text-light"
@@ -137,7 +137,7 @@ const Permission = () => {
                                 >
                                   <i className="fa fa-trash" />
                                 </button>
-                              </td>
+                              </td> */}
                             </tr>
                           );
                         })}
