@@ -8,7 +8,6 @@ import socket from "./utils/socket";
 import {
   getDestinationPlace,
   getLeavingPlace,
-  getSchedulesDataByLimit,
   getTodaysSchedules,
 } from "./features/schedules/schedulesApiSlice";
 import { getAllBusServices } from "./features/bus/busApiSlice";
@@ -31,7 +30,6 @@ function App() {
       dispatch(getLogedInUser());
     }
     dispatch(getTodaysSchedules({ page: 1, limit: 500 }));
-    dispatch(getSchedulesDataByLimit(500));
     dispatch(getLeavingPlace());
     dispatch(getDestinationPlace());
     dispatch(getAllBusServices());

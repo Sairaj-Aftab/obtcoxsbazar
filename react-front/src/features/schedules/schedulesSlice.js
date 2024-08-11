@@ -5,7 +5,6 @@ import {
   getDestinationPlace,
   getLeavingPlace,
   getSchedulesDataByAuthId,
-  getSchedulesDataByLimit,
   getTodaysSchedules,
   updateSchedule,
 } from "./schedulesApiSlice";
@@ -22,11 +21,17 @@ const schedulesSlice = createSlice({
     message: null,
     error: null,
     loader: false,
+    todayScheduleLoader: false,
+    authScheduleLoader: false,
+    placesLoader: false,
   },
   reducers: {
     setMessageEmpty: (state) => {
       state.message = null;
       state.error = null;
+      state.loader = false;
+      state.todayScheduleLoader = false;
+      state.authScheduleLoader = false;
     },
     addScheduleSocket: (state, action) => {
       state.schedules.push(action.payload);
@@ -94,33 +99,24 @@ const schedulesSlice = createSlice({
       })
       .addCase(getTodaysSchedules.rejected, (state, action) => {
         // state.error = action.error.message;
+        state.todayScheduleLoader = false;
       })
       .addCase(getTodaysSchedules.pending, (state) => {
-        state.loader = true;
+        state.todayScheduleLoader = true;
       })
       .addCase(getTodaysSchedules.fulfilled, (state, action) => {
-        state.loader = false;
+        state.todayScheduleLoader = false;
         state.todaySchedules = action.payload.schedules;
-      })
-      .addCase(getSchedulesDataByLimit.rejected, (state, action) => {
-        // state.error = action.error.message;
-      })
-      .addCase(getSchedulesDataByLimit.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(getSchedulesDataByLimit.fulfilled, (state, action) => {
-        state.loader = false;
-        state.schedules = action.payload.schedules;
       })
       .addCase(getSchedulesDataByAuthId.rejected, (state, action) => {
         // state.error = action.error.message;
-        state.loader = false;
+        state.authScheduleLoader = false;
       })
       .addCase(getSchedulesDataByAuthId.pending, (state) => {
-        state.loader = true;
+        state.authScheduleLoader = true;
       })
       .addCase(getSchedulesDataByAuthId.fulfilled, (state, action) => {
-        state.loader = false;
+        state.authScheduleLoader = false;
         state.authSchedules = action.payload.schedules;
         state.authSchedulesCount = action.payload.count;
         state.authSearchCount = action.payload.searchCount;
@@ -148,22 +144,24 @@ const schedulesSlice = createSlice({
       })
       .addCase(getLeavingPlace.rejected, (state, action) => {
         state.error = action.error.message;
+        state.placesLoader = false;
       })
       .addCase(getLeavingPlace.pending, (state) => {
-        state.loader = true;
+        state.placesLoader = true;
       })
       .addCase(getLeavingPlace.fulfilled, (state, action) => {
-        state.loader = false;
+        state.placesLoader = false;
         state.leavingPlaces = action.payload.places;
       })
       .addCase(getDestinationPlace.rejected, (state, action) => {
         state.error = action.error.message;
+        state.placesLoader = false;
       })
       .addCase(getDestinationPlace.pending, (state) => {
-        state.loader = true;
+        state.placesLoader = true;
       })
       .addCase(getDestinationPlace.fulfilled, (state, action) => {
-        state.loader = false;
+        state.placesLoader = false;
         state.destinationPlaces = action.payload.places;
       });
   },

@@ -50,22 +50,6 @@ export const getTodaysSchedules = createAsyncThunk(
     }
   }
 );
-export const getSchedulesDataByLimit = createAsyncThunk(
-  "schedules/getSchedulesDataByLimit",
-  async (limit) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/schedule/getbylimit?limit=${limit}`,
-        {
-          withCredentials: true,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response.data.message);
-    }
-  }
-);
 
 export const getSchedulesDataByAuthId = createAsyncThunk(
   "schedules/getSchedulesDataByAuthId",

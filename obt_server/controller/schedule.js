@@ -162,28 +162,25 @@ export const getTodaysSchedules = async (req, res, next) => {
     // Calculate the start and end of today
     const today = new Date();
     const startOfToday = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-      0,
-      0,
-      0
+      Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
     );
     const endOfToday = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-      23,
-      59,
-      59,
-      999
+      Date.UTC(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        23,
+        59,
+        59,
+        999
+      )
     );
 
     // Base filter with time range
     const baseFilter = {
       time: {
-        gte: startOfToday.toISOString(),
-        lte: endOfToday.toISOString(),
+        gte: startOfToday.toISOString().slice(0, 16),
+        lte: endOfToday.toISOString().slice(0, 16),
       },
     };
 
@@ -295,7 +292,7 @@ export const getSchedulesByParibahanUserId = async (req, res, next) => {
       take: limit,
       where: whereClause,
       orderBy: {
-        time: "asc",
+        time: "desc",
       },
       include: {
         paribahanUser: true,

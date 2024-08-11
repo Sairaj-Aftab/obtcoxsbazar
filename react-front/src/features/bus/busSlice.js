@@ -3,38 +3,43 @@ import { getAllBusServices, getBusInfoData } from "./busApiSlice";
 const busSlice = createSlice({
   name: "bus",
   initialState: {
-    bus: null,
+    bus: [],
     busInfo: null,
     message: null,
     error: null,
-    loader: false,
+    busLoader: false,
+    busInfoLoader: false,
   },
   reducers: {
     setMessageEmpty: (state) => {
       state.message = null;
       state.error = null;
+      state.busLoader = false;
+      state.busInfoLoader = false;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getAllBusServices.rejected, (state, action) => {
         state.error = action.error.message;
+        state.busLoader = false;
       })
       .addCase(getAllBusServices.pending, (state) => {
-        state.loader = true;
+        state.busLoader = true;
       })
       .addCase(getAllBusServices.fulfilled, (state, action) => {
-        state.loader = false;
+        state.busLoader = false;
         state.bus = action.payload.paribahanUsers;
       })
       .addCase(getBusInfoData.rejected, (state, action) => {
         state.error = action.error.message;
+        state.busInfoLoader = false;
       })
       .addCase(getBusInfoData.pending, (state) => {
-        state.loader = true;
+        state.busInfoLoader = true;
       })
       .addCase(getBusInfoData.fulfilled, (state, action) => {
-        state.loader = false;
+        state.busInfoLoader = false;
         state.busInfo = action.payload.paribahanUser;
       });
   },

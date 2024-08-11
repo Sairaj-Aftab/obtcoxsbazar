@@ -7,11 +7,12 @@ import { noticeData } from "../../features/notice/noticeSlice";
 import { getBusInfoData } from "../../features/bus/busApiSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 import DataTable from "react-data-table-component";
+import Skeleton from "react-loading-skeleton";
 
 const BusInformation = () => {
   const params = useParams();
   const dispatch = useDispatch();
-  const { busInfo } = useSelector(busData);
+  const { busInfo, busInfoLoader } = useSelector(busData);
   const { paribahanNotices } = useSelector(noticeData);
   const [paribahanNotice, setParibahanNotice] = useState(null);
 
@@ -64,6 +65,12 @@ const BusInformation = () => {
     },
   ];
 
+  const [currentDate, setCurrentDate] = useState(new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentDate(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     dispatch(getBusInfoData(params.id));
     const getParibahanNotice = () => {
@@ -79,16 +86,43 @@ const BusInformation = () => {
     <div className="container mx-auto bg-white rounded-lg my-5">
       {/* Heading */}
       <div className="flex flex-col md:flex-row justify-between items-center bg-primary-color rounded-t-lg text-white py-2 px-3">
-        <h1 className="text-xl font-medium">{busInfo?.paribahanName}</h1>
-        <p className="text-sm md:text-base font-medium">
-          টিকেট এর জন্য যোগাযোগ করুন :{" "}
-          <a
-            href={`tel:+88${busInfo?.salesNumber}`}
-            className="font-semibold underline"
-          >
-            {busInfo?.salesNumber}
-          </a>
-        </p>
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 items-center">
+          {busInfoLoader && !busInfo && (
+            <div className="w-full sm:w-96">
+              <Skeleton height={30} baseColor="#008B8B" />
+            </div>
+          )}
+          {!busInfoLoader && busInfo && (
+            <>
+              <h1 className="text-xl font-medium">{busInfo?.paribahanName}</h1>
+              <p className="text-base text-white font-normal">
+                {currentDate.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "2-digit",
+                })}
+              </p>
+            </>
+          )}
+        </div>
+
+        {busInfoLoader && !busInfo && (
+          <div className="w-full sm:w-96">
+            <Skeleton height={30} baseColor="#008B8B" />
+          </div>
+        )}
+        {!busInfoLoader && busInfo && (
+          <p className="text-sm md:text-base font-medium">
+            টিকেট এর জন্য যোগাযোগ করুন :{" "}
+            <a
+              href={`tel:+88${busInfo?.salesNumber}`}
+              className="font-semibold underline"
+            >
+              {busInfo?.salesNumber}
+            </a>
+          </p>
+        )}
       </div>
       {paribahanNotice && (
         <p className="text-base font-medium text-black mb-2">
@@ -97,43 +131,40 @@ const BusInformation = () => {
           </marquee>
         </p>
       )}
-      <DataTable
-        columns={column}
-        data={busInfo?.busSchedule
-          ?.slice()
-          .sort((a, b) => new Date(a.time) - new Date(b.time))}
-        responsive
-        customStyles={{
-          headRow: {
-            style: {
-              backgroundColor: "#f8f9fa !important",
+      {busInfoLoader && !busInfo && (
+        <div className="w-full">
+          <Skeleton height={200} baseColor="#ffffff" highlightColor="#ddd" />
+        </div>
+      )}
+      {!busInfoLoader && busInfo && (
+        <DataTable
+          columns={column}
+          data={busInfo?.busSchedule
+            ?.slice()
+            .sort((a, b) => new Date(a.time) - new Date(b.time))}
+          responsive
+          customStyles={{
+            headRow: {
+              style: {
+                backgroundColor: "#f8f9fa !important",
+              },
             },
-          },
-          headCells: {
-            style: {
-              fontSize: "16px",
-              fontWeight: "bold",
-              color: "black",
+            headCells: {
+              style: {
+                fontSize: "16px",
+                fontWeight: "bold",
+                color: "black",
+              },
             },
-          },
-          rows: {
-            style: {
-              fontSize: "16px",
-              fontWeight: "500",
+            rows: {
+              style: {
+                fontSize: "16px",
+                fontWeight: "500",
+              },
             },
-          },
-        }}
-        // progressPending={todayLoader}
-        // progressComponent={<Loading />}
-        // pagination
-        // paginationServer
-        // paginationTotalRows={
-        //   authSchedulesCount ? authSchedulesCount : authSearchCount
-        // }
-        // onChangeRowsPerPage={handlePerRowsChange}
-        // onChangePage={handlePageChange}
-        // paginationRowsPerPageOptions={[100, 150, 200]}
-      />
+          }}
+        />
+      )}
     </div>
   );
 };

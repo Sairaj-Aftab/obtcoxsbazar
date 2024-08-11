@@ -9,7 +9,7 @@ const AllBusServices = ({ title }) => {
   const [selectedDigits, setSelectedDigits] = useState([]);
 
   // Filter data based on selected digits
-  const filteredData = bus.filter((item) =>
+  const filteredData = bus?.filter((item) =>
     selectedDigits.some((digit) => item.type.toString().includes(digit))
   );
 
@@ -24,7 +24,7 @@ const AllBusServices = ({ title }) => {
   };
 
   // Determine which data to use for mapping
-  const dataToMap = filteredData.length > 0 ? filteredData : bus;
+  const dataToMap = filteredData?.length > 0 ? filteredData : bus;
 
   return (
     <div className="container mx-auto bg-white rounded-lg my-5">

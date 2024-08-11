@@ -3,9 +3,10 @@ import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 import { Link } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
 
 const BusScheduleTable = () => {
-  const { todaySchedules } = useSelector(schedulesData);
+  const { todaySchedules, todayScheduleLoader } = useSelector(schedulesData);
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
   const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -18,44 +19,43 @@ const BusScheduleTable = () => {
   return (
     <section className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
       <h3 className="text-xl font-semibold mb-4">Recent Bus Schedule</h3>
-      <DataTable
-        columns={scheduleColumn}
-        data={filteredSchedules
-          ?.slice(0, 15)
-          .sort((a, b) => new Date(a.time) - new Date(b.time))}
-        responsive
-        customStyles={{
-          headCells: {
-            style: {
-              fontSize: "16px",
-              fontWeight: "bold",
-            },
-          },
-          rows: {
-            style: {
-              fontSize: "16px",
-              fontWeight: "500",
-            },
-          },
-        }}
-        // progressPending={todayLoader}
-        // progressComponent={<Loading />}
-        // pagination
-        // paginationServer
-        // paginationTotalRows={
-        //   authSchedulesCount ? authSchedulesCount : authSearchCount
-        // }
-        // onChangeRowsPerPage={handlePerRowsChange}
-        // onChangePage={handlePageChange}
-        // paginationRowsPerPageOptions={[100, 150, 200]}
-      />
-      {todaySchedules?.length > 15 && (
-        <Link
-          to="/all-bus-schedules"
-          className="block text-end text-sm font-medium text-primary-color"
-        >
-          See more...
-        </Link>
+      {todayScheduleLoader && !todaySchedules && (
+        <div className="w-full">
+          <Skeleton height={150} />
+        </div>
+      )}
+      {!todayScheduleLoader && todaySchedules && (
+        <>
+          <DataTable
+            columns={scheduleColumn}
+            data={filteredSchedules
+              ?.slice(0, 15)
+              .sort((a, b) => new Date(a.time) - new Date(b.time))}
+            responsive
+            customStyles={{
+              headCells: {
+                style: {
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                },
+              },
+              rows: {
+                style: {
+                  fontSize: "16px",
+                  fontWeight: "500",
+                },
+              },
+            }}
+          />
+          {todaySchedules?.length > 15 && (
+            <Link
+              to="/all-bus-schedules"
+              className="block text-end text-sm font-medium text-primary-color"
+            >
+              See more...
+            </Link>
+          )}
+        </>
       )}
     </section>
   );

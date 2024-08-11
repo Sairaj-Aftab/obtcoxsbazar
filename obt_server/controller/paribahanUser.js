@@ -158,12 +158,39 @@ export const getAllParibahanUser = async (req, res, next) => {
 export const getParibahanUser = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    // Calculate the start and end of today
+    const today = new Date();
+    const startOfToday = new Date(
+      Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
+    );
+    const endOfToday = new Date(
+      Date.UTC(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        23,
+        59,
+        59,
+        999
+      )
+    );
+
+    // Base filter with time range
+    const baseFilter = {
+      time: {
+        gte: startOfToday.toISOString().slice(0, 16),
+        lte: endOfToday.toISOString().slice(0, 16),
+      },
+    };
     const paribahanUser = await prisma.paribahanUser.findUnique({
       where: {
         id: String(id),
       },
       include: {
-        busSchedule: true,
+        busSchedule: {
+          where: baseFilter,
+        },
         destination: true,
       },
     });

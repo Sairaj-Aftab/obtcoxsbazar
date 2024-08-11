@@ -22,6 +22,7 @@ import { guideInfoData } from "../../features/guideInfo/guideInfoSlice";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import { busInfoData } from "../../features/busInfo/busInfoSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
+import Skeleton from "react-loading-skeleton";
 
 const BusProfile = () => {
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
@@ -35,6 +36,7 @@ const BusProfile = () => {
     authSearchCount,
     leavingPlaces,
     destinationPlaces,
+    authScheduleLoader,
     message,
     error,
   } = useSelector(schedulesData);
@@ -561,8 +563,12 @@ const BusProfile = () => {
             columns={column}
             data={schedules}
             responsive
-            // progressPending={todayLoader}
-            // progressComponent={<Loading />}
+            progressPending={authScheduleLoader}
+            progressComponent={
+              <div className="w-full">
+                <Skeleton height={200} />
+              </div>
+            }
             pagination
             paginationServer
             paginationTotalRows={
