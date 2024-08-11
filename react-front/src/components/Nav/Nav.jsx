@@ -135,7 +135,7 @@ const Nav = () => {
             </div>
             <nav
               className={`flex flex-col  gap-3
-        md:hidden bg-primary-color fixed w-full top-0 overflow-y-auto bottom-0 ${
+        md:hidden bg-primary-color fixed w-full z-40 top-0 overflow-y-auto bottom-0 ${
           pathName === "/" ? "pt-32" : "pt-16"
         } pb-3 px-4 duration-500 ${open ? "left-0" : "left-[-100%]"}
         `}

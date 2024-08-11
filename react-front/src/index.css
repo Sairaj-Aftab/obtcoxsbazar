@@ -15,8 +15,8 @@ body {
 a {
   text-decoration: none !important;
 }
-.sc-elDIKY.hsGprm.rdt_TableHeadRow {
-  background-color: #008080;
+.rdt_TableHeadRow {
+  background-color: #008080 !important;
   color: #ffffff;
   min-height: fit-content !important;
 }

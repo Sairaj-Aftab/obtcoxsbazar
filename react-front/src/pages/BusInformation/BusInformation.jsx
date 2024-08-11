@@ -106,13 +106,14 @@ const BusInformation = () => {
         customStyles={{
           headRow: {
             style: {
-              backgroundColor: "#f8f9fa",
+              backgroundColor: "#f8f9fa !important",
             },
           },
           headCells: {
             style: {
               fontSize: "16px",
               fontWeight: "bold",
+              color: "black",
             },
           },
           rows: {
