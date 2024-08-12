@@ -25,11 +25,11 @@ import { formatDateTime } from "../../utils/formatDateTime";
 import Skeleton from "react-loading-skeleton";
 
 const BusProfile = () => {
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const dispatch = useDispatch();
-
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
+
   const {
     authSchedules: schedules,
     authSchedulesCount,
@@ -52,7 +52,7 @@ const BusProfile = () => {
     guideName: "",
     guidePhone: "",
     rent: "",
-    seatStatus: "",
+    seatStatus: null,
   });
 
   const changeInputValue = (e) => {
@@ -239,9 +239,9 @@ const BusProfile = () => {
   useEffect(() => {
     if (user) {
       dispatch(getSchedulesDataByAuthId({ id: user.id, page: 1, limit: 100 }));
+      dispatch(getBusInfo({ id: user.id, page: 1, limit: 100 }));
+      dispatch(getGuideInfo({ id: user.id, page: 1, limit: 100 }));
     }
-    dispatch(getBusInfo({ id: user.id, page: 1, limit: 100 }));
-    dispatch(getGuideInfo({ id: user.id, page: 1, limit: 100 }));
     if (message) {
       toast.success(message);
       setInput({

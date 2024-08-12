@@ -77,17 +77,18 @@ const schedulesSlice = createSlice({
       })
       .addCase(updateSchedule.fulfilled, (state, action) => {
         state.loader = false;
-        const scheduleIndex = state.schedules.findIndex(
-          (schedule) => schedule.id === action.payload.busSchedule.id
-        );
-        if (scheduleIndex !== -1) {
-          state.schedules[scheduleIndex] = action.payload.busSchedule;
-        }
+        state.message = action.payload.message;
         const authScheduleIndex = state.authSchedules.findIndex(
           (schedule) => schedule.id === action.payload.busSchedule.id
         );
         if (authScheduleIndex !== -1) {
           state.authSchedules[authScheduleIndex] = action.payload.busSchedule;
+        }
+        const scheduleIndex = state.schedules.findIndex(
+          (schedule) => schedule.id === action.payload.busSchedule.id
+        );
+        if (scheduleIndex !== -1) {
+          state.schedules[scheduleIndex] = action.payload.busSchedule;
         }
         const todayScheduleIndex = state.todaySchedules.findIndex(
           (schedule) => schedule.id === action.payload.busSchedule.id
@@ -95,7 +96,6 @@ const schedulesSlice = createSlice({
         if (todayScheduleIndex !== -1) {
           state.todaySchedules[todayScheduleIndex] = action.payload.busSchedule;
         }
-        state.message = action.payload.message;
       })
       .addCase(getTodaysSchedules.rejected, (state, action) => {
         // state.error = action.error.message;

@@ -68,6 +68,7 @@ export const updateSchedule = async (req, res, next) => {
       rent,
       seatStatus,
     } = req.body;
+
     const busSchedule = await prisma.busSchedule.update({
       where: {
         id: String(id), // Convert id to number
@@ -81,7 +82,7 @@ export const updateSchedule = async (req, res, next) => {
         leavingPlace,
         destinationPlace,
         rent: Number(rent),
-        seatStatus: seatStatus === "true" ? true : false,
+        seatStatus: seatStatus === true ? true : false,
       },
       include: {
         paribahanUser: true,
