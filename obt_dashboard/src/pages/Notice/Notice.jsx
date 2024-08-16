@@ -110,7 +110,7 @@ const Notice = () => {
 
                   <tbody>
                     {authNotices?.map((data, index) => (
-                      <tr key={index}>
+                      <tr key={data.id}>
                         <td>{index + 1}</td>
                         <td className="text-right">
                           <div className="actions">

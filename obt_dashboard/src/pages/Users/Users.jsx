@@ -110,7 +110,7 @@ const Users = () => {
     return () => {
       dispatch(setMessageEmpty());
     };
-  }, [success, message, error]);
+  }, [success, message, error, formReset, dispatch]);
   return (
     <>
       <ModalPopup title="Create User" target="userModalPopup">
@@ -285,7 +285,7 @@ const Users = () => {
                     </thead>
                     <tbody>
                       {users?.map((data, index) => (
-                        <tr key={index}>
+                        <tr key={data.id}>
                           <td>{index + 1}</td>
                           <td>{data.userName}</td>
                           <td>{data.role?.name}</td>

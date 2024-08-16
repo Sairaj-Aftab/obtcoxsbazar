@@ -156,7 +156,10 @@ const userSlice = createSlice({
       .addCase(createParibahanUser.fulfilled, (state, action) => {
         state.success = true;
         state.message = action.payload.message;
-        state.paribahanUsers.push(action.payload.paribahanUser);
+        state.paribahanUsers = [
+          action.payload.paribahanUser,
+          ...state.paribahanUsers,
+        ];
         state.totalCount++;
       })
       .addCase(updateParibahanUser.rejected, (state, action) => {
@@ -177,6 +180,7 @@ const userSlice = createSlice({
         state.paribahanUsers = state.paribahanUsers.filter(
           (data) => data.id !== action.payload.paribahanUser.id
         );
+        state.totalCount--;
       });
   },
 });

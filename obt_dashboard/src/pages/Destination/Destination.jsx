@@ -115,7 +115,7 @@ const Destination = () => {
                     </thead>
                     <tbody>
                       {destinationPlaces?.map((place, index) => (
-                        <tr key={index}>
+                        <tr key={place.id}>
                           <td>{index + 1}</td>
                           <td>{place.placeName}</td>
                           <td className="text-right">
@@ -160,7 +160,7 @@ const Destination = () => {
 
                     <tbody>
                       {leavingPlaces?.map((place, index) => (
-                        <tr key={index}>
+                        <tr key={place.id}>
                           <td>{index + 1}</td>
                           <td>{place.placeName}</td>
                           <td className="text-right">

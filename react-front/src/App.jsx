@@ -21,6 +21,7 @@ import {
   updateScheduleSocket,
 } from "./features/schedules/schedulesSlice";
 import { getLogedInUser } from "./features/paribahanAuth/paribahanAuthApiSlice";
+import { getAllRgSchedules } from "./features/regularBusSchedule/regularBusScheduleApiSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -29,7 +30,8 @@ function App() {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
     }
-    dispatch(getTodaysSchedules({ page: 1, limit: 500 }));
+    dispatch(getTodaysSchedules({ page: 1, limit: 1000 }));
+    dispatch(getAllRgSchedules({ page: 1, limit: 1000 }));
     dispatch(getLeavingPlace());
     dispatch(getDestinationPlace());
     dispatch(getAllBusServices());

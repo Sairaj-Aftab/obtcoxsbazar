@@ -1,9 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  createSchedule,
-  deleteSchedule,
-  getAllRgSchedules,
-} from "./regularScheduleApiSlice";
+import { getAllRgSchedules } from "./regularBusScheduleApiSlice";
 const regularSchedulesSlice = createSlice({
   name: "regularSchedules",
   initialState: {
@@ -23,18 +19,6 @@ const regularSchedulesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createSchedule.rejected, (state, action) => {
-        state.error = action.error.message;
-      })
-      .addCase(createSchedule.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(createSchedule.fulfilled, (state, action) => {
-        state.loader = false;
-        state.rgSchedules.push(action.payload.busSchedule);
-        state.totalCount++;
-        state.message = action.payload.message;
-      })
       .addCase(getAllRgSchedules.rejected, (state, action) => {
         state.loader = false;
         state.error = action.error.message;
@@ -47,20 +31,6 @@ const regularSchedulesSlice = createSlice({
         state.totalCount = action.payload.count;
         state.searchCount = action.payload.searchCount;
         state.rgSchedules = action.payload.schedules;
-      })
-      .addCase(deleteSchedule.rejected, (state, action) => {
-        state.error = action.error.message;
-      })
-      .addCase(deleteSchedule.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(deleteSchedule.fulfilled, (state, action) => {
-        state.loader = false;
-        state.message = action.payload.message;
-        state.rgSchedules = state.rgSchedules.filter(
-          (item) => item.id !== action.payload.schedule.id
-        );
-        state.totalCount--;
       });
   },
 });

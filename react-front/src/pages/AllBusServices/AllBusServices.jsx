@@ -4,6 +4,7 @@ import { busData } from "../../features/bus/busSlice";
 import { Link } from "react-router-dom";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 import { useState } from "react";
+// eslint-disable-next-line react/prop-types
 const AllBusServices = ({ title }) => {
   const { bus } = useSelector(busData);
   const [selectedDigits, setSelectedDigits] = useState([]);
@@ -90,6 +91,19 @@ const AllBusServices = ({ title }) => {
               onChange={handleCheckboxChange}
             />
             <span className="text-sm">Double Decker</span>
+          </label>
+          <label
+            htmlFor="suite-class"
+            className="flex items-center space-x-2 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              id="suite-class"
+              value={"5"}
+              className="accent-blue-600 h-4 w-4 rounded-sm"
+              onChange={handleCheckboxChange}
+            />
+            <span className="text-sm">Suite Class</span>
           </label>
         </div>
       </div>

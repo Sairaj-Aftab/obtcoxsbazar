@@ -225,7 +225,7 @@ const Role = () => {
                     <tbody>
                       {[...roles].reverse().map((data, index) => {
                         return (
-                          <tr key={index}>
+                          <tr key={data.id}>
                             <td>{index + 1}</td>
                             <td>{data.name}</td>
                             <td>{data.slug}</td>

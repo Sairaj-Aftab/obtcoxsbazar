@@ -8,6 +8,7 @@ import ContactUs from "../pages/ContactUs/ContactUs";
 import Display from "../pages/Display/Display";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
+import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 
 const publicRoutes = [
   {
@@ -32,6 +33,10 @@ const publicRoutes = [
       {
         path: "/all-bus-schedules",
         element: <AllSchedules />,
+      },
+      {
+        path: "/all-regular-schedules",
+        element: <RegularBusSchedule />,
       },
       {
         path: "/about",

@@ -250,7 +250,7 @@ const ParibahanUsers = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                gridTemplateColumns: "1fr 1fr 1fr",
               }}
             >
               <label>
@@ -292,6 +292,16 @@ const ParibahanUsers = () => {
                   checked={type.includes("4")}
                 />{" "}
                 Double-decker
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={5}
+                  onChange={handleChangeType}
+                  checked={type.includes("5")}
+                />{" "}
+                Suite Class
               </label>
             </div>
           </div>
@@ -423,7 +433,7 @@ const ParibahanUsers = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                gridTemplateColumns: "1fr 1fr 1fr",
               }}
             >
               <label>
@@ -465,6 +475,16 @@ const ParibahanUsers = () => {
                   checked={type.includes("4")}
                 />{" "}
                 Double-decker
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={5}
+                  onChange={handleChangeType}
+                  checked={type.includes("5")}
+                />{" "}
+                Suite Class
               </label>
             </div>
           </div>
@@ -534,7 +554,7 @@ const ParibahanUsers = () => {
                   <tbody>
                     {paribahanUsers &&
                       paribahanUsers?.map((data, index) => (
-                        <tr key={index}>
+                        <tr key={data.id}>
                           <td>{index + 1}</td>
                           <td>{data.paribahanName}</td>
                           <th>{data?.contactPerson}</th>
@@ -573,7 +593,7 @@ const ParibahanUsers = () => {
                               >
                                 <i className="fe fe-pencil"></i>
                               </a>
-                              {/* <button
+                              <button
                                 onClick={() =>
                                   handleDeleteParibahanUser(data.id)
                                 }
@@ -583,7 +603,7 @@ const ParibahanUsers = () => {
                                 }
                               >
                                 <i className="fe fe-trash"></i>
-                              </button> */}
+                              </button>
                             </div>
                           </td>
                         </tr>
