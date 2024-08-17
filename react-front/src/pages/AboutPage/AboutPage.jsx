@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 const AboutPage = () => {
   return (
     <>
@@ -165,10 +166,10 @@ const AboutPage = () => {
           traffic management system as well as the way people plan and book bus
           travel, enhancing convenience, efficiency, and user experience while
           posing new challenges in terms of comfort, reliability, and security
-          in Cox’s Bazar.
+          in Cox&apos;s Bazar.
         </p>
-        <div className="md:flex justify-between mt-6">
-          <div className="text-center bg-gray-200 p-4 rounded-lg">
+        <div className="md:flex justify-between gap-10 mt-6">
+          <div className="w-full md:w-1/2 text-center bg-gray-200 p-4 rounded-lg">
             <h3 className="text-base font-bold text-black mb-3">
               Planning & Direction
             </h3>
@@ -179,13 +180,39 @@ const AboutPage = () => {
               Police Super, Cox&apos;s Bazar
             </h3>
           </div>
-          <div className="mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
+          <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
             <h3 className="text-base font-bold text-black mb-3">Execution</h3>
             <h3 className="text-base font-bold text-black">
               Md. Jashim Uddin Chy, PPM
             </h3>
             <h3 className="text-base font-bold text-black">
               Addl SP (Traffic) Cox&apos;s Bazar
+            </h3>
+          </div>
+        </div>
+        <div className="md:flex justify-between gap-10 mt-2 sm:mt-3">
+          <Link
+            target="_blank"
+            to="https://sairaj-aftab.vercel.app/"
+            className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg"
+          >
+            <h3 className="text-base font-bold text-black mb-3">
+              Developed by
+            </h3>
+            <h3 className="text-base font-bold text-black">
+              <Link target="_blank" to="https://sairaj-aftab.vercel.app/">
+                Sairaj Aftab
+              </Link>
+            </h3>
+            <h3 className="text-base font-bold text-black">
+              sairajaftab@gmail.com
+            </h3>
+          </Link>
+          <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
+            <h3 className="text-base font-bold text-black mb-3">Operated by</h3>
+            <h3 className="text-base font-bold text-black">Traffic Division</h3>
+            <h3 className="text-base font-bold text-black">
+              Cox&apos;s Bazar District Police
             </h3>
           </div>
         </div>
