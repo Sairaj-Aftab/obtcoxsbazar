@@ -191,11 +191,7 @@ const AboutPage = () => {
           </div>
         </div>
         <div className="md:flex justify-between gap-10 mt-2 sm:mt-3">
-          <Link
-            target="_blank"
-            to="https://sairaj-aftab.vercel.app/"
-            className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg"
-          >
+          <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
             <h3 className="text-base font-bold text-black mb-3">
               Developed by
             </h3>
@@ -207,7 +203,7 @@ const AboutPage = () => {
             <h3 className="text-base font-bold text-black">
               sairajaftab@gmail.com
             </h3>
-          </Link>
+          </div>
           <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
             <h3 className="text-base font-bold text-black mb-3">Operated by</h3>
             <h3 className="text-base font-bold text-black">Traffic Division</h3>

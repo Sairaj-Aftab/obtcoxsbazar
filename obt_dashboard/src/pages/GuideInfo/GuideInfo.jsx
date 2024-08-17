@@ -132,7 +132,7 @@ const GuideInfo = () => {
     {
       name: "#",
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
-      width: "50px",
+      width: "60px",
     },
     {
       name: "Paribahan",
