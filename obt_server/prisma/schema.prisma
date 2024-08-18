@@ -98,6 +98,7 @@ model BusInfo {
     type String
     comment String?
     report String?
+    fcExpire String?
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
     paribahanUserId String @db.ObjectId
     status Boolean @default(true)

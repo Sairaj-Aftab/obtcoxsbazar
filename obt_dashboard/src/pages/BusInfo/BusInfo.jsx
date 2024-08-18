@@ -34,6 +34,7 @@ const BusInfo = () => {
     type: "",
     comment: "",
     report: "",
+    fcExpire: "",
   });
   const changeInputValue = (e) => {
     const { name, value } = e.target;
@@ -172,6 +173,11 @@ const BusInfo = () => {
       sortable: true,
     },
     {
+      name: "FC Expire",
+      selector: (data) => data.fcExpire,
+      sortable: true,
+    },
+    {
       name: "Entry Date",
       selector: (data) => formatDate(data.createdAt),
       sortable: true,
@@ -293,6 +299,17 @@ const BusInfo = () => {
               placeholder="Report"
             />
           </div>
+          <div className="form-group">
+            <label htmlFor="fcExpire">Fitness Certificate Expire</label>
+            <input
+              type="date"
+              id="fcExpire"
+              name="fcExpire"
+              value={input.fcExpire}
+              onChange={changeInputValue}
+              className="form-control"
+            />
+          </div>
           <button type="submit" className="btn btn-primary">
             Create
           </button>
@@ -374,6 +391,17 @@ const BusInfo = () => {
               onChange={changeInfoData}
               className="form-control"
               placeholder="Report"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="fcExpire">Fitness Certificate Expire</label>
+            <input
+              type="date"
+              id="fcExpire"
+              name="fcExpire"
+              value={infoData?.fcExpire}
+              onChange={changeInfoData}
+              className="form-control"
             />
           </div>
           <button type="submit" className="btn btn-primary">

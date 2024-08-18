@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export const createBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { paribahanName, regNo, type, comment, report } = req.body;
+    const { paribahanName, regNo, type, comment, report, fcExpire } = req.body;
 
     const existingInfo = await prisma.busInfo.findUnique({
       where: {
@@ -26,6 +26,7 @@ export const createBusInfo = async (req, res, next) => {
         type,
         comment,
         report,
+        fcExpire,
         paribahanUserId: String(id),
       },
       include: {
@@ -42,7 +43,7 @@ export const createBusInfo = async (req, res, next) => {
 export const updateBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { regNo, type, comment, report } = req.body;
+    const { regNo, type, comment, report, fcExpire } = req.body;
     const existingInfo = await prisma.busInfo.findFirst({
       where: {
         regNo,
@@ -63,6 +64,7 @@ export const updateBusInfo = async (req, res, next) => {
         type,
         comment,
         report,
+        fcExpire,
       },
       include: {
         paribahanUser: true,
