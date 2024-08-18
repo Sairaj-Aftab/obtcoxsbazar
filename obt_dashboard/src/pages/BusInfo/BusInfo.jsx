@@ -65,6 +65,7 @@ const BusInfo = () => {
   };
   const [id, setId] = useState();
   const [infoData, setInfoData] = useState();
+
   const changeInfoData = (e) => {
     const { name, value } = e.target;
     if (name === "paribahanName") {
@@ -176,6 +177,22 @@ const BusInfo = () => {
       name: "FC Expire",
       selector: (data) => data.fcExpire,
       sortable: true,
+      cell: (data) => {
+        const currentDate = new Date();
+        const fcExpireDate = new Date(data?.fcExpire);
+        const isExpired = fcExpireDate < currentDate;
+
+        return (
+          <span
+            style={{
+              color: isExpired ? "red" : "inherit",
+              textDecoration: isExpired ? "line-through" : "none",
+            }}
+          >
+            {data.fcExpire}
+          </span>
+        );
+      },
     },
     {
       name: "Entry Date",
@@ -310,8 +327,8 @@ const BusInfo = () => {
               className="form-control"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
-            Create
+          <button type="submit" className="btn btn-primary" disabled={loader}>
+            {loader ? "Creating..." : "Create"}
           </button>
         </form>
       </ModalPopup>
@@ -399,13 +416,13 @@ const BusInfo = () => {
               type="date"
               id="fcExpire"
               name="fcExpire"
-              value={infoData?.fcExpire}
+              value={infoData?.fcExpire ? infoData?.fcExpire : ""}
               onChange={changeInfoData}
               className="form-control"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
-            Edit
+          <button type="submit" className="btn btn-primary" disabled={loader}>
+            {loader ? "Editing..." : "Edit"}
           </button>
         </form>
       </ModalPopup>
