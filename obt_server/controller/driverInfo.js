@@ -146,9 +146,6 @@ export const getDriverInfo = async (req, res, next) => {
       where: whereClause,
     });
 
-    if (driverInfo.length < 1) {
-      return next(createError(400, "Cannot find any info!"));
-    }
     return res.status(200).json({ driverInfo, count, searchCount });
   } catch (error) {
     return next(error);

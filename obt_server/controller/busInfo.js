@@ -161,9 +161,6 @@ export const getBusInfo = async (req, res, next) => {
       where: whereClause,
     });
 
-    if (busInfo.length < 1) {
-      return next(createError(400, "Cannot find any info!"));
-    }
     return res.status(200).json({ busInfo, count, searchCount });
   } catch (error) {
     return next(error);

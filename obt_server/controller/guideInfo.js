@@ -118,9 +118,6 @@ export const getGuideInfo = async (req, res, next) => {
       where: whereClause,
     });
 
-    if (guideInfo.length < 1) {
-      return next(createError(400, "Cannot find any info!"));
-    }
     return res.status(200).json({ guideInfo, count, searchCount });
   } catch (error) {
     return next(error);

@@ -299,9 +299,6 @@ export const getSchedulesByParibahanUserId = async (req, res, next) => {
         paribahanUser: true,
       },
     });
-    if (schedules.length < 1) {
-      return next(createError(400, "Cannot find any schedule!"));
-    }
 
     const count = await prisma.busSchedule.count({
       where: {
