@@ -8,6 +8,7 @@ import { getBusInfoData } from "../../features/bus/busApiSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 import DataTable from "react-data-table-component";
 import Skeleton from "react-loading-skeleton";
+import TodayDate from "../../components/TodayDate";
 
 const BusInformation = () => {
   const params = useParams();
@@ -65,12 +66,6 @@ const BusInformation = () => {
     },
   ];
 
-  const [currentDate, setCurrentDate] = useState(new Date());
-  useEffect(() => {
-    const interval = setInterval(() => setCurrentDate(new Date()), 60000);
-    return () => clearInterval(interval);
-  }, []);
-
   useEffect(() => {
     dispatch(getBusInfoData(params.id));
     const getParibahanNotice = () => {
@@ -95,14 +90,7 @@ const BusInformation = () => {
           {!busInfoLoader && busInfo && (
             <>
               <h1 className="text-xl font-medium">{busInfo?.paribahanName}</h1>
-              <p className="text-base text-white font-normal">
-                {currentDate.toLocaleDateString("en-US", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "2-digit",
-                })}
-              </p>
+              <TodayDate className="text-base text-white font-normal" />
             </>
           )}
         </div>

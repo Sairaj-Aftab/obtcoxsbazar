@@ -20,7 +20,7 @@ const ProfileHeader = () => {
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const { pathname: pathName } = useLocation();
   const dispatch = useDispatch();
-  const { paribahanNotices, error, message } = useSelector(noticeData);
+  const { paribahanNotices, loader, error, message } = useSelector(noticeData);
   const [notice, setNotice] = useState("");
   const handleSubmitNotice = (e) => {
     e.preventDefault();
@@ -63,9 +63,9 @@ const ProfileHeader = () => {
     if (!user) {
       navigate("/login");
     }
-    return () => {
+    if (error || message) {
       dispatch(setNoticeMessageEmpty());
-    };
+    }
   }, [user, dispatch, error, message, navigate]);
 
   return (
@@ -91,13 +91,13 @@ const ProfileHeader = () => {
           </button>
         </div>
 
-        <div className="text-base font-semibold pb-5 flex gap-1">
-          <p className="w-full">Notice from Traffic Police :</p>
-          <p className="w-full">
+        <div className="text-base font-semibold pb-5 sm:flex gap-1">
+          <p className="sm:basis-4/12 lg:basis-2/12">
+            Notice from Traffic Police :
+          </p>
+          <p className="sm:basis-8/12 lg:basis-10/12">
             <NoticeFromAdmin status="Paribahan" />
           </p>
-          {/* {adminNotice && (
-      )} */}
         </div>
         <div className="pt-5 border-t border-gray  mb-2">
           {paribahanNotice ? (
@@ -125,8 +125,9 @@ const ProfileHeader = () => {
               <button
                 type="submit"
                 className="bg-primary-color py-1 px-2 rounded text-white text-base font-medium"
+                disabled={loader}
               >
-                Submit
+                {loader ? "Submiting..." : "Submit"}
               </button>
             </form>
           )}

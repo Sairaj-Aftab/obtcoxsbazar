@@ -34,18 +34,18 @@ const schedulesSlice = createSlice({
       state.authScheduleLoader = false;
     },
     addScheduleSocket: (state, action) => {
-      state.schedules.push(action.payload);
+      state.todaySchedules.push(action.payload);
     },
     updateScheduleSocket: (state, action) => {
-      const scheduleIndex = state.schedules.findIndex(
+      const scheduleIndex = state.todaySchedules.findIndex(
         (schedule) => schedule.id === action.payload.id
       );
       if (scheduleIndex !== -1) {
-        state.schedules[scheduleIndex] = action.payload;
+        state.todaySchedules[scheduleIndex] = action.payload;
       }
     },
     deleteScheduleSocket: (state, action) => {
-      state.schedules = state.schedules.filter(
+      state.todaySchedules = state.todaySchedules.filter(
         (item) => item.id !== action.payload
       );
     },

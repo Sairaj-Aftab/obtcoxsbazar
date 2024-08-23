@@ -23,13 +23,6 @@ const guideInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getGuideInfo.rejected, (state, action) => {
-        // state.error = action.error.message;
-        state.loader = false;
-      })
-      .addCase(getGuideInfo.pending, (state) => {
-        state.loader = true;
-      })
       .addCase(getGuideInfo.fulfilled, (state, action) => {
         state.loader = false;
         state.guideInfo = action.payload.guideInfo;

@@ -14,7 +14,6 @@ import {
   updateSchedule,
 } from "../../features/schedules/schedulesApiSlice";
 import { useEffect } from "react";
-import { setNoticeMessageEmpty } from "../../features/notice/noticeSlice";
 import Modal from "../../components/Modal/Modal";
 import { getGuideInfo } from "../../features/guideInfo/guideInfoApiSlice";
 import { getBusInfo } from "../../features/busInfo/busInfoApiSlice";
@@ -23,12 +22,14 @@ import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSli
 import { busInfoData } from "../../features/busInfo/busInfoSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 import Skeleton from "react-loading-skeleton";
+import PageLoader from "../../components/Loader/PageLoader";
 
 const BusProfile = () => {
   const dispatch = useDispatch();
+  // const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
+  const { paribahanAuth: user, loader } = useSelector(paribahanAuthData);
 
   const {
     authSchedules: schedules,
@@ -261,15 +262,15 @@ const BusProfile = () => {
     if (error) {
       toast.error(error);
     }
-    return () => {
+    if (message || error) {
       dispatch(setMessageEmpty());
-      dispatch(setNoticeMessageEmpty());
-    };
+    }
   }, [dispatch, message, error, user]);
 
   return (
     <>
       <Toaster />
+      {loader && <PageLoader />}
       {showModal && (
         <Modal title="Add Schedule" close={() => setShowModal(false)}>
           <form
@@ -392,8 +393,9 @@ const BusProfile = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
+              disabled={authScheduleLoader}
             >
-              Submit
+              {authScheduleLoader ? "Adding" : "Submit"}
             </button>
           </form>
         </Modal>

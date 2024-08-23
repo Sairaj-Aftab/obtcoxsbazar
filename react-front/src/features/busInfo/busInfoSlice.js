@@ -19,14 +19,8 @@ const busInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getBusInfo.rejected, (state, action) => {
-        // state.error = action.error.message;
-      })
-      .addCase(getBusInfo.pending, (state) => {
-        state.loader = true;
-      })
+
       .addCase(getBusInfo.fulfilled, (state, action) => {
-        state.loader = false;
         state.busInfo = action.payload.busInfo;
         state.totalCount = action.payload.count;
         state.searchCount = action.payload.searchCount;
@@ -46,6 +40,7 @@ const busInfoSlice = createSlice({
       })
       .addCase(updateBusInfo.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(updateBusInfo.pending, (state) => {
         state.loader = true;

@@ -12,7 +12,8 @@ import logo from "../../assets/image/red_yellow.png";
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { paribahanAuth, error, message } = useSelector(paribahanAuthData);
+  const { paribahanAuth, loader, error, message } =
+    useSelector(paribahanAuthData);
   const [paribahanName, setParibahanName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,9 +38,9 @@ const LoginForm = () => {
     if (paribahanAuth) {
       navigate("/profile");
     }
-    return () => {
+    if (error || message || paribahanAuth) {
       dispatch(setParibahanAuthMessageEmpty());
-    };
+    }
   }, [dispatch, error, message, navigate, paribahanAuth]);
   return (
     <>
@@ -93,7 +94,7 @@ const LoginForm = () => {
                 className="bg-primary-color hover:bg-secondary-color text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 type="submit"
               >
-                Sign In
+                {loader ? "Signing..." : "Sign In"}
               </button>
             </div>
           </form>

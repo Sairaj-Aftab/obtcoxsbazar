@@ -2,12 +2,16 @@ import { useSelector } from "react-redux";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
 import DataTable from "react-data-table-component";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
+import TodayDate from "../../components/TodayDate";
 
 const AllSchedules = () => {
   const { todaySchedules } = useSelector(schedulesData);
   return (
     <div className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
-      <h3 className="text-xl font-semibold mb-4">All Schedule</h3>
+      <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 items-center mb-4">
+        <h3 className="text-xl font-semibold">All Schedule</h3>
+        <TodayDate className="text-base text-primary font-normal" />
+      </div>
       <DataTable
         columns={scheduleColumn}
         data={todaySchedules

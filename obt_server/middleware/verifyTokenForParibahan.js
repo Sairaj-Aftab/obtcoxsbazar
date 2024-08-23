@@ -22,6 +22,17 @@ const verifyTokenForParibahan = async (req, res, next) => {
         where: {
           paribahanName: decode.paribahanName,
         },
+        select: {
+          id: true,
+          paribahanName: true,
+          slug: true,
+          contactPerson: true,
+          contactNumber: true,
+          salesPerson: true,
+          salesNumber: true,
+          type: true,
+          destination: true,
+        },
       });
       req.me = me;
       next();

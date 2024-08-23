@@ -213,8 +213,9 @@ const ProfileDriverInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
+              disabled={loader}
             >
-              Submit
+              {loader ? "Adding..." : "Add"}
             </button>
           </form>
         </Modal>
@@ -264,7 +265,7 @@ const ProfileDriverInfo = () => {
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
             >
-              Submit
+              {loader ? "Editing..." : "Edit"}
             </button>
           </form>
         </Modal>

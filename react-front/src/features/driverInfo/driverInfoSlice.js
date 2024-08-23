@@ -23,13 +23,7 @@ const driverInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getDriverInfo.rejected, (state, action) => {
-        // state.error = action.error.message;
-        state.loader = false;
-      })
-      .addCase(getDriverInfo.pending, (state) => {
-        state.loader = true;
-      })
+
       .addCase(getDriverInfo.fulfilled, (state, action) => {
         state.loader = false;
         state.driverInfo = action.payload.driverInfo;
@@ -37,6 +31,7 @@ const driverInfoSlice = createSlice({
         state.searchCount = action.payload.searchCount;
       })
       .addCase(createDriverInfo.rejected, (state, action) => {
+        state.loader = false;
         state.error = action.error.message;
       })
       .addCase(createDriverInfo.pending, (state) => {
@@ -50,6 +45,7 @@ const driverInfoSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(updateDriverInfo.rejected, (state, action) => {
+        state.loader = false;
         state.error = action.error.message;
       })
       .addCase(updateDriverInfo.pending, (state) => {

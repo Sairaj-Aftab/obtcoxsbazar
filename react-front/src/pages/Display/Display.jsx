@@ -41,20 +41,43 @@ const Display = () => {
 
     return () => stopScrollLoop();
   }, []);
-  const now = new Date();
-  const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
-  // const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-  // const twoHourLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-  const fiveHourLater = new Date(now.getTime() + 15 * 60 * 60 * 1000);
+  const [disSchedules, setDisSchedules] = useState([]);
 
-  const [disSchedules, setDisSchedules] = useState(null);
   useEffect(() => {
-    const filteredSchedules = todaySchedules?.filter((data) => {
-      const scheduleTime = new Date(data.time);
-      return scheduleTime >= fifteenMinutesAgo && scheduleTime <= fiveHourLater;
-    });
-    setDisSchedules(filteredSchedules);
-  }, [fifteenMinutesAgo, fiveHourLater, todaySchedules]);
+    const updateSchedules = () => {
+      const now = new Date();
+      const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+
+      // Function to find schedules within a given range
+      const findSchedulesInRange = (startTime, endTime) => {
+        return todaySchedules?.filter((data) => {
+          const scheduleTime = new Date(data.time);
+          return scheduleTime >= startTime && scheduleTime < endTime;
+        });
+      };
+
+      let nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+      let filteredSchedules = findSchedulesInRange(fifteenMinutesAgo, nextHour);
+
+      // If no schedules are found in the previous 15 minutes, check the next 24 hours
+      if (filteredSchedules?.length < 15) {
+        for (let i = 0; i < 24; i++) {
+          nextHour = new Date(nextHour.getTime() + 60 * 60 * 1000);
+          filteredSchedules = findSchedulesInRange(fifteenMinutesAgo, nextHour);
+
+          if (filteredSchedules?.length >= 15) break; // Stop if schedules are found
+        }
+      }
+
+      setDisSchedules(filteredSchedules?.slice(0, 15)); // Limit to 15 schedules
+    };
+
+    updateSchedules(); // Initial update
+    const intervalId = setInterval(updateSchedules, 60 * 1000); // Update every second
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [todaySchedules]);
 
   // Filter schedules within the next hour
 
@@ -90,7 +113,7 @@ const Display = () => {
 
         <div className="block">
           <div className="flex border-b border-white text-white bg-primary-color">
-            <span className="basis-1/4">Time</span>
+            <span className="basis-1/6">Time</span>
             <span className="basis-1/4 border-x border-white">Paribahan</span>
             <span className="basis-1/4">Reg No</span>
             <span className="basis-1/4 border-x border-white">
@@ -108,7 +131,7 @@ const Display = () => {
                     key={index}
                     className="flex border-b border-white text-yellow"
                   >
-                    <span className="basis-1/4">
+                    <span className="basis-1/6">
                       {formatDateTime(data.time)}
                     </span>
                     <span className="basis-1/4 border-x border-white">

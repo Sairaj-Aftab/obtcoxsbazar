@@ -35,9 +35,6 @@ const noticeSlice = createSlice({
         state.paribahanNotices = action.payload.notices;
         state.loader = false;
       })
-      .addCase(getNoticeFromAdmin.pending, (state, action) => {
-        state.loader = true;
-      })
       .addCase(getNoticeFromAdmin.rejected, (state, action) => {
         //   state.error = action.error.message;
         state.loader = false;
