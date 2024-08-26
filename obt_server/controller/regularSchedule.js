@@ -88,9 +88,6 @@ export const getAllSchedules = async (req, res, next) => {
       where,
     });
 
-    if (schedules.length < 1) {
-      return next(createError(400, "Cannot find any schedule!"));
-    }
     return res.status(200).json({ schedules, count, searchCount });
   } catch (error) {
     return next(error);

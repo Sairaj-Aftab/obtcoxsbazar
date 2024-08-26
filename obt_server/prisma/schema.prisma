@@ -102,11 +102,35 @@ model BusInfo {
     qrCode String?
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
     paribahanUserId String @db.ObjectId
+    reviews BusReview[]
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+model BusReview {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    paribahanName String
+    regNo String
+    type String
+    rating Int
+    name String
+    comment String?
+    phoneNumber String?
+    destination String?
+    tripTime        String?
+    ipAddress String?
+    phoneName String?
+    phoneModel String?
+    busInfo BusInfo @relation(fields: [busInfoId], references: [id])
+    busInfoId String @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 model GuideInfo {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     paribahanName String

@@ -12,6 +12,7 @@ import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 import BusInfo from "../pages/BusInfo/BusInfo";
 import GuideInfo from "../pages/GuideInfo/GuideInfo";
 import DriverInfo from "../pages/DriverInfo/DriverInfo";
+import Review from "../pages/Review/Review";
 
 const privateRoutes = [
   {
@@ -67,6 +68,10 @@ const privateRoutes = [
           {
             path: "/destination",
             element: <Destination />,
+          },
+          {
+            path: "/review",
+            element: <Review />,
           },
         ],
       },

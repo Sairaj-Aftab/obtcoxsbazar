@@ -170,9 +170,7 @@ const AboutPage = () => {
         </p>
         <div className="md:flex justify-between gap-10 mt-6">
           <div className="w-full md:w-1/2 text-center bg-gray-200 p-4 rounded-lg">
-            <h3 className="text-base font-bold text-black mb-3">
-              Planning & Direction
-            </h3>
+            <h3 className="text-base font-bold text-black mb-3">Direction</h3>
             <h3 className="text-base font-bold text-black">
               Md. Mahfuzul Islam, BPM, PPM(Bar)
             </h3>

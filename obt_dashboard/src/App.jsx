@@ -28,6 +28,7 @@ import { getAllBusInfo } from "./features/busInfo/busInfoApiSlice";
 import { getAllGuideInfo } from "./features/guideInfo/guideInfoApiSlice";
 import { getAllDriverInfo } from "./features/driverInfo/driverInfoApiSlice";
 import { getAllRgSchedules } from "./features/regularSchedule/regularScheduleApiSlice";
+import { getAllReview } from "./features/review/reviewApiSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ function App() {
     dispatch(getAllBusInfo({ page: 1, limit: 10 }));
     dispatch(getAllGuideInfo({ page: 1, limit: 10 }));
     dispatch(getAllDriverInfo({ page: 1, limit: 10 }));
+    dispatch(getAllReview({ page: 1, limit: 10 }));
   }, [dispatch]);
   return (
     <>

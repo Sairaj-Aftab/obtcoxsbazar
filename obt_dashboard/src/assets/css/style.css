@@ -1695,6 +1695,8 @@ html.menu-opened body {
 -----------------------*/
 
 .sidebar {
+  height: calc(100vh - 60px);
+  overflow: auto;
   background-color: #1b5a90;
   /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
   bottom: 0;

@@ -160,9 +160,6 @@ export const getAllGuideInfo = async (req, res, next) => {
       where,
     });
 
-    if (guideInfo.length < 1) {
-      return next(createError(400, "Cannot find any info!"));
-    }
     return res.status(200).json({ guideInfo, totalCount, searchCount });
   } catch (error) {
     return next(error);

@@ -140,9 +140,6 @@ export const getAllBusInfo = async (req, res, next) => {
       where,
     });
 
-    if (busInfo.length < 1) {
-      return next(createError(400, "Cannot find any info!"));
-    }
     return res.status(200).json({ busInfo, totalCount, searchCount });
   } catch (error) {
     return next(error);

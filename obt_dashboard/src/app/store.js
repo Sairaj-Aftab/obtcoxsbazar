@@ -8,6 +8,7 @@ import busInfoSlice from "../features/busInfo/busInfoSlice";
 import guideInfoSlice from "../features/guideInfo/guideInfoSlice";
 import driverInfoSlice from "../features/driverInfo/driverInfoSlice";
 import regularScheduleSlice from "../features/regularSchedule/regularScheduleSlice";
+import reviewSlice from "../features/review/reviewSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     busInfo: busInfoSlice,
     guideInfo: guideInfoSlice,
     driverInfo: driverInfoSlice,
+    review: reviewSlice,
     place: placeSlice,
     notice: noticeSlice,
   },

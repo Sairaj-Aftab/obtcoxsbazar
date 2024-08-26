@@ -178,6 +178,17 @@ const Header = () => {
                 </Link>
               </li>
             )}
+            {permissions.includes("REVIEWS") && (
+              <li
+                onClick={() => setToggle(!toggle)}
+                className={`${location.pathname === "/review" && "active"}`}
+              >
+                <Link to="/review">
+                  <i className="fa fa-star" aria-hidden="true"></i>{" "}
+                  <span>Reviews</span>
+                </Link>
+              </li>
+            )}
 
             {permissions.includes("USERS") && (
               <li
