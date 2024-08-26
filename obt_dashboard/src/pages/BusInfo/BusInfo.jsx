@@ -174,6 +174,14 @@ const BusInfo = () => {
       sortable: true,
     },
     {
+      name: "QR Code",
+      selector: (data) => data,
+      cell: (data) => {
+        return <img src={data.qrCode} alt="" style={{ width: "100px" }} />;
+      },
+      width: "110px",
+    },
+    {
       name: "FC Expire",
       selector: (data) => data.fcExpire,
       sortable: true,

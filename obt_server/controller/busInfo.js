@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import createError from "../utils/createError.js";
 import { createSlug } from "../utils/slug.js";
+import qr from "qrcode";
 const prisma = new PrismaClient();
 
 export const createBusInfo = async (req, res, next) => {
@@ -34,7 +35,23 @@ export const createBusInfo = async (req, res, next) => {
       },
     });
 
-    return res.status(200).json({ busInfo, message: "Created successfully" });
+    const qrCodeDataURL = await qr.toDataURL(
+      `https://obtcoxsbazar.com/bus/info/${busInfo.slug}/${busInfo.id}`,
+      {
+        width: 250,
+        margin: 2,
+      }
+    );
+
+    // Save the QR code data URL in the database
+    const updatedBusInfo = await prisma.busInfo.update({
+      where: { id: busInfo.id },
+      data: { qrCode: qrCodeDataURL },
+    });
+
+    return res
+      .status(200)
+      .json({ busInfo: updatedBusInfo, message: "Created successfully" });
   } catch (error) {
     return next(error);
   }
@@ -70,6 +87,17 @@ export const updateBusInfo = async (req, res, next) => {
         paribahanUser: true,
       },
     });
+
+    // Generate QR code with unique ID
+    // const qrData = JSON.stringify({ id: busInfo.id }); // Only include unique ID
+    // const qrCodeDataURL = await qr.toDataURL(qrData);
+
+    // // Save QR code data URL in database
+    // await prisma.busInfo.update({
+    //   where: { id: busInfo.id },
+    //   data: { qrCode: qrCodeDataURL },
+    // });
+
     return res.status(200).json({ busInfo, message: "Updated successfully" });
   } catch (error) {
     return next(error);
@@ -167,6 +195,33 @@ export const getBusInfo = async (req, res, next) => {
   }
 };
 
+// Get Bus Info By Id for QR code
+export const getBusInfoById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const busInfo = await prisma.busInfo.findUnique({
+      where: {
+        id: String(id),
+      },
+      select: {
+        id: true,
+        paribahanName: true,
+        regNo: true,
+        type: true,
+      },
+    });
+
+    if (!busInfo) {
+      return next(createError(404, "Bus info not found!"));
+    }
+
+    return res.status(200).json({ busInfo });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const deleteBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -180,3 +235,41 @@ export const deleteBusInfo = async (req, res, next) => {
     return next(error);
   }
 };
+
+// export const updateMultipleBusInfoQR = async (req, res, next) => {
+//   try {
+//     // Retrieve bus information records
+//     const busInfos = await prisma.busInfo.findMany();
+
+//     if (busInfos.length === 0) {
+//       return next(createError(404, "No bus info found for the provided IDs"));
+//     }
+
+//     const qrCodeOptions = {
+//       width: 250, // Standard size in pixels for most use cases
+//       margin: 2, // Optional: Small margin around the QR code
+//     };
+
+//     // Generate and update QR codes for each bus info
+//     const updatedBusInfos = await Promise.all(
+//       busInfos.map(async (busInfo) => {
+//         const qrCodeDataURL = await qr.toDataURL(
+//           `https://obtcoxsbazar.com/bus/info/${busInfo.slug}/${busInfo.id}`,
+//           qrCodeOptions
+//         );
+
+//         // Update the QR code in the database and return the updated record
+//         return prisma.busInfo.update({
+//           where: { id: busInfo.id },
+//           data: { qrCode: qrCodeDataURL },
+//         });
+//       })
+//     );
+
+//     return res
+//       .status(200)
+//       .json({ updatedBusInfos, message: "QR codes updated successfully" });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };

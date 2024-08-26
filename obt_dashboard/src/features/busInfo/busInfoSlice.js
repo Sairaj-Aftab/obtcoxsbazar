@@ -65,7 +65,7 @@ const busInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
         state.message = action.payload.message;
-        state.busInfo.push(action.payload.busInfo);
+        state.busInfo.unshift(action.payload.busInfo);
         state.totalCount++;
       })
       .addCase(updateBusInfo.rejected, (state, action) => {
