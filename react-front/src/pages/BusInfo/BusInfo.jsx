@@ -8,8 +8,6 @@ import PageLoader from "../../components/Loader/PageLoader";
 
 const BusInfo = () => {
   const { id } = useParams();
-  const parser = new UAParser();
-  const result = parser.getResult();
   const [busInfo, setBusInfo] = useState(null);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -24,8 +22,8 @@ const BusInfo = () => {
     comment: "",
     tripTime: "",
     destination: "",
-    phoneName: result.device.vendor,
-    phoneModel: result.device.model,
+    phoneName: "",
+    phoneModel: "",
     ipAddress: "",
   });
 
@@ -36,7 +34,23 @@ const BusInfo = () => {
       [name]: value,
     }));
   };
-  console.log(input);
+
+  useEffect(() => {
+    const fetchDeviceInfo = () => {
+      const userAgentString = navigator.userAgent;
+      const parser = new UAParser();
+      parser.setUA(userAgentString);
+      const result = parser.getResult();
+
+      setInput((prevInput) => ({
+        ...prevInput,
+        phoneName: result.device.vendor || "Unknown Vendor",
+        phoneModel: result.device.model || "Unknown Model",
+      }));
+    };
+
+    fetchDeviceInfo();
+  }, []);
 
   useEffect(() => {
     const fetchBusInfo = async () => {
