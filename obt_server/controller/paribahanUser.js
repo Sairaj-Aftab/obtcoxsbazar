@@ -194,7 +194,31 @@ export const getParibahanUser = async (req, res, next) => {
         destination: true,
       },
     });
-    return res.status(200).json({ paribahanUser });
+
+    // Aggregate review stats
+    const reviewStats = await prisma.busReview.aggregate({
+      _count: true,
+      _avg: {
+        rating: true,
+      },
+      where: {
+        busInfo: {
+          paribahanUserId: String(id),
+        },
+      },
+    });
+
+    // Extract the aggregated data
+    const totalReviewCount = reviewStats._count;
+    const averageRating = reviewStats._avg.rating;
+
+    if (!paribahanUser) {
+      return next(createError(404, "Not found!"));
+    }
+
+    return res
+      .status(200)
+      .json({ paribahanUser, totalReviewCount, averageRating });
   } catch (error) {
     return next(error);
   }

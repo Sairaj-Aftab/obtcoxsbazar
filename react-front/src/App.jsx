@@ -1,6 +1,7 @@
 import { RouterProvider } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import router from "./routes/router";
+import { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import "./App.css";
 import { useEffect } from "react";
@@ -102,6 +103,7 @@ function App() {
           content="https://obtcoxsbazar.com/assets/red_yellow-BeM2oZga.png"
         />
       </Helmet>
+      <Toaster />
       <RouterProvider router={router} />
     </>
   );

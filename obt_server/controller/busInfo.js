@@ -203,17 +203,34 @@ export const getBusInfoById = async (req, res, next) => {
       },
       select: {
         id: true,
+        paribahanUserId: true,
         paribahanName: true,
         regNo: true,
         type: true,
       },
     });
 
+    const reviewStats = await prisma.busReview.aggregate({
+      _count: true,
+      _avg: {
+        rating: true,
+      },
+      where: {
+        busInfo: {
+          paribahanUserId: String(busInfo.paribahanUserId),
+        },
+      },
+    });
+
+    // Extract the aggregated data
+    const totalReviewCount = reviewStats._count;
+    const averageRating = reviewStats._avg.rating;
+
     if (!busInfo) {
       return next(createError(404, "Bus info not found!"));
     }
 
-    return res.status(200).json({ busInfo });
+    return res.status(200).json({ busInfo, totalReviewCount, averageRating });
   } catch (error) {
     return next(error);
   }

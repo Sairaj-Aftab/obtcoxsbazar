@@ -30,7 +30,7 @@ form {
   width: 100%;
 }
 input {
-  outline: none;
+  outline-color: #008080;
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 2px 5px;

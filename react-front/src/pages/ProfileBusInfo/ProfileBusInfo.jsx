@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createBusInfo,
@@ -154,7 +154,6 @@ const ProfileBusInfo = () => {
   }, [dispatch, message, loader, error, user?.id]);
   return (
     <>
-      <Toaster />
       {showModal && (
         <Modal title="Add Bus Info" close={() => setShowModal(false)}>
           <form
