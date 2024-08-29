@@ -39,7 +39,7 @@ const schedulesSlice = createSlice({
         state.searchCount = action.payload.searchCount;
         state.schedules = action.payload.schedules;
       })
-      .addCase(getTodaysSchedule.rejected, (state, action) => {
+      .addCase(getTodaysSchedule.rejected, (state) => {
         // state.error = action.error.message;
         state.todayLoader = false;
       })

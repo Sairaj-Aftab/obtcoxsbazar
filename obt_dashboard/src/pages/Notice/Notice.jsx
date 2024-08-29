@@ -109,63 +109,31 @@ const Notice = () => {
                   </thead>
 
                   <tbody>
-                    {authNotices?.map((data, index) => (
-                      <tr key={data.id}>
-                        <td>{index + 1}</td>
-                        <td className="text-right">
-                          <div className="actions">
-                            {/* <button
-                                className="btn btn-sm bg-success-light mr-2"
-                                data-toggle="modal"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-pencil"></i>
-                              </button> */}
-                            <button
-                              data-toggle="modal"
-                              className="btn btn-sm bg-danger-light"
-                              disabled={
-                                authUser?.role?.name === "VIEWER" && true
-                              }
-                              onClick={() => handleDeleteNotice(data.id)}
-                            >
-                              <i className="fe fe-trash"></i>
-                            </button>
-                          </div>
-                        </td>
-                        <td>
-                          {data?.authUser?.userName} To{" "}
-                          <span className="badge badge-success">
-                            {data.status}
-                          </span>
-                        </td>
-                        <td>
-                          {data.title} <br />
-                        </td>
-                      </tr>
-                    ))}
-                    {paribahanNotices &&
-                      paribahanNotices.length > 0 &&
-                      paribahanNotices.map((data, index) => (
-                        <tr key={index}>
+                    {(authNotices || [])
+                      .concat(paribahanNotices || [])
+                      .map((data, index) => (
+                        <tr key={data.id || index}>
                           <td>{index + 1}</td>
                           <td className="text-right">
                             <div className="actions">
                               <button
                                 data-toggle="modal"
                                 className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
+                                disabled={authUser?.role?.name === "VIEWER"}
                                 onClick={() => handleDeleteNotice(data.id)}
                               >
                                 <i className="fe fe-trash"></i>
                               </button>
                             </div>
                           </td>
-                          <td>{data?.paribahanUser?.paribahanName}</td>
+                          <td>
+                            {data?.authUser?.userName ||
+                              data?.paribahanUser?.paribahanName}
+                            {data?.authUser && " To "}
+                            <span className="badge badge-success">
+                              {data.status}
+                            </span>
+                          </td>
                           <td>
                             {data.title} <br />
                           </td>

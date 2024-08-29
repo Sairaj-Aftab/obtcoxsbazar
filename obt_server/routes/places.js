@@ -5,11 +5,13 @@ import {
   getDestinationsPlaces,
   getLeavingPlaces,
   getPlaces,
+  updatePlace,
 } from "../controller/places.js";
 
 const router = express.Router();
 
 router.post("/", createPlace);
+router.put("/update/:id", updatePlace);
 router.get("/", getPlaces);
 router.get("/leave", getLeavingPlaces);
 router.get("/destination", getDestinationsPlaces);

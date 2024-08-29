@@ -38,7 +38,7 @@ const guideInfoSlice = createSlice({
       })
       .addCase(createGuideInfo.fulfilled, (state, action) => {
         state.loader = false;
-        state.guideInfo.push(action.payload.guideInfo);
+        state.guideInfo.unshift(action.payload.guideInfo);
         state.totalCount++;
         state.message = action.payload.message;
       })

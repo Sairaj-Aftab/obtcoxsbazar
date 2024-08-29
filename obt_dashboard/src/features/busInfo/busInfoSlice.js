@@ -20,7 +20,7 @@ const busInfoSlice = createSlice({
     loader: false,
   },
   reducers: {
-    setBusInfoMessageEmpty: (state, action) => {
+    setBusInfoMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
@@ -28,7 +28,7 @@ const busInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllBusInfo.pending, (state, action) => {
+      .addCase(getAllBusInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(getAllBusInfo.rejected, (state, action) => {
@@ -42,10 +42,10 @@ const busInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(getBusInfo.pending, (state, action) => {
+      .addCase(getBusInfo.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getBusInfo.rejected, (state, action) => {
+      .addCase(getBusInfo.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -54,7 +54,7 @@ const busInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(createBusInfo.pending, (state, action) => {
+      .addCase(createBusInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(createBusInfo.rejected, (state, action) => {
@@ -84,7 +84,7 @@ const busInfoSlice = createSlice({
         }
         state.message = action.payload.message;
       })
-      .addCase(deleteBusInfo.pending, (state, action) => {
+      .addCase(deleteBusInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(deleteBusInfo.rejected, (state, action) => {

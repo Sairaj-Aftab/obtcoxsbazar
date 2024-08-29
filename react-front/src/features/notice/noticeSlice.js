@@ -16,7 +16,7 @@ const noticeSlice = createSlice({
     loader: false,
   },
   reducers: {
-    setNoticeMessageEmpty: (state, action) => {
+    setNoticeMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.loader = false;
@@ -24,10 +24,10 @@ const noticeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllParibahanNotice.pending, (state, action) => {
+      .addCase(getAllParibahanNotice.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getAllParibahanNotice.rejected, (state, action) => {
+      .addCase(getAllParibahanNotice.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -35,7 +35,7 @@ const noticeSlice = createSlice({
         state.paribahanNotices = action.payload.notices;
         state.loader = false;
       })
-      .addCase(getNoticeFromAdmin.rejected, (state, action) => {
+      .addCase(getNoticeFromAdmin.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -43,7 +43,7 @@ const noticeSlice = createSlice({
         state.adminNotices = action.payload.notices;
         state.loader = false;
       })
-      .addCase(createParibahanNotice.pending, (state, action) => {
+      .addCase(createParibahanNotice.pending, (state) => {
         state.loader = true;
       })
       .addCase(createParibahanNotice.rejected, (state, action) => {
@@ -55,9 +55,9 @@ const noticeSlice = createSlice({
         state.message = action.payload.message;
 
         state.paribahanNotices = state.paribahanNotices ?? [];
-        state.paribahanNotices.push(action.payload.notice);
+        state.paribahanNotices.unshift(action.payload.notice);
       })
-      .addCase(deleteNotice.pending, (state, action) => {
+      .addCase(deleteNotice.pending, (state) => {
         state.loader = true;
       })
       .addCase(deleteNotice.rejected, (state, action) => {

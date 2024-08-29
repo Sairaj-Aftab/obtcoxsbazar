@@ -40,7 +40,7 @@ const driverInfoSlice = createSlice({
       .addCase(createDriverInfo.fulfilled, (state, action) => {
         state.loader = false;
         state.driverInfo = state.driverInfo ?? [];
-        state.driverInfo.push(action.payload.driverInfo);
+        state.driverInfo.unshift(action.payload.driverInfo);
         state.totalCount++;
         state.message = action.payload.message;
       })

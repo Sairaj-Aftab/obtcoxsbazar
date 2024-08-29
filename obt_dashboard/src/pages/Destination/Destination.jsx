@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import toast from "react-hot-toast";
 import swal from "sweetalert";
@@ -7,13 +7,17 @@ import {
   setPlaceMessageEmpty,
 } from "../../features/place/placeSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { createPlace, deletePlace } from "../../features/place/placeApiSlice";
+import {
+  createPlace,
+  deletePlace,
+  updatePlace,
+} from "../../features/place/placeApiSlice";
 import { authData } from "../../features/auth/authSlice";
 
 const Destination = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
-  const { leavingPlaces, destinationPlaces, message, success, error } =
+  const { places, leavingPlaces, destinationPlaces, message, success, error } =
     useSelector(placeData);
   const [placeName, setPlaceName] = useState("");
   const [placeStatus, setPlaceStatus] = useState("");
@@ -25,6 +29,23 @@ const Destination = () => {
     } else {
       dispatch(createPlace({ placeName, status: placeStatus }));
       dispatch(setPlaceMessageEmpty());
+    }
+  };
+
+  const [id, setId] = useState("");
+  const [plName, setPlName] = useState("");
+  const handleShowPlaceName = (id) => {
+    setId(id);
+    const place = places.find((pl) => pl.id === id);
+    setPlName(place.placeName);
+  };
+
+  const handleUpdate = (id) => {
+    if (!plName) {
+      toast.error("Place is required!");
+    } else {
+      dispatch(updatePlace({ id, placeName: plName }));
+      setId("");
     }
   };
   const handleDeletePlace = (id) => {
@@ -61,7 +82,7 @@ const Destination = () => {
     return () => {
       dispatch(setPlaceMessageEmpty());
     };
-  }, [dispatch, message, error]);
+  }, [dispatch, message, error, success]);
   return (
     <>
       <PageHeader title="Arrival & Destination Places" />
@@ -117,9 +138,43 @@ const Destination = () => {
                       {destinationPlaces?.map((place, index) => (
                         <tr key={place.id}>
                           <td>{index + 1}</td>
-                          <td>{place.placeName}</td>
+                          {id === place?.id ? (
+                            <td>
+                              <input
+                                type="text"
+                                value={plName}
+                                onChange={(e) => setPlName(e.target.value)}
+                                className="form-control"
+                              />
+                            </td>
+                          ) : (
+                            <td>{place.placeName}</td>
+                          )}
+
                           <td className="text-right">
                             <div className="actions">
+                              {id === place?.id ? (
+                                <button
+                                  onClick={() => handleUpdate(place?.id)}
+                                  className="btn btn-sm bg-primary-light mr-1"
+                                  disabled={
+                                    authUser?.role?.name === "VIEWER" && true
+                                  }
+                                >
+                                  <i className="fa fa-check-square-o"></i>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleShowPlaceName(place?.id)}
+                                  className="btn btn-sm bg-primary-light mr-1"
+                                  disabled={
+                                    authUser?.role?.name === "VIEWER" && true
+                                  }
+                                >
+                                  <i className="fa fa-pencil-square-o"></i>
+                                </button>
+                              )}
+
                               <button
                                 onClick={() => handleDeletePlace(place.id)}
                                 className="btn btn-sm bg-danger-light"
@@ -162,9 +217,41 @@ const Destination = () => {
                       {leavingPlaces?.map((place, index) => (
                         <tr key={place.id}>
                           <td>{index + 1}</td>
-                          <td>{place.placeName}</td>
+                          {id === place?.id ? (
+                            <td>
+                              <input
+                                type="text"
+                                value={plName}
+                                onChange={(e) => setPlName(e.target.value)}
+                                className="form-control"
+                              />
+                            </td>
+                          ) : (
+                            <td>{place.placeName}</td>
+                          )}
                           <td className="text-right">
                             <div className="actions">
+                              {id === place?.id ? (
+                                <button
+                                  onClick={() => handleUpdate(place?.id)}
+                                  className="btn btn-sm bg-primary-light mr-1"
+                                  disabled={
+                                    authUser?.role?.name === "VIEWER" && true
+                                  }
+                                >
+                                  <i className="fa fa-check-square-o"></i>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleShowPlaceName(place?.id)}
+                                  className="btn btn-sm bg-primary-light mr-1"
+                                  disabled={
+                                    authUser?.role?.name === "VIEWER" && true
+                                  }
+                                >
+                                  <i className="fa fa-pencil-square-o"></i>
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleDeletePlace(place.id)}
                                 className="btn btn-sm bg-danger-light"

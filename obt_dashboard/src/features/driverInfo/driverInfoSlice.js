@@ -20,7 +20,7 @@ const driverInfoSlice = createSlice({
     loader: false,
   },
   reducers: {
-    setDriverInfoMessageEmpty: (state, action) => {
+    setDriverInfoMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
@@ -28,10 +28,10 @@ const driverInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllDriverInfo.pending, (state, action) => {
+      .addCase(getAllDriverInfo.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getAllDriverInfo.rejected, (state, action) => {
+      .addCase(getAllDriverInfo.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -42,10 +42,10 @@ const driverInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(getDriverInfo.pending, (state, action) => {
+      .addCase(getDriverInfo.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getDriverInfo.rejected, (state, action) => {
+      .addCase(getDriverInfo.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -54,7 +54,7 @@ const driverInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(createDriverInfo.pending, (state, action) => {
+      .addCase(createDriverInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(createDriverInfo.rejected, (state, action) => {
@@ -65,7 +65,7 @@ const driverInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
         state.message = action.payload.message;
-        state.driverInfo.push(action.payload.driverInfo);
+        state.driverInfo.unshift(action.payload.driverInfo);
         state.totalCount++;
       })
       .addCase(updateDriverInfo.rejected, (state, action) => {
@@ -84,7 +84,7 @@ const driverInfoSlice = createSlice({
         }
         state.message = action.payload.message;
       })
-      .addCase(deleteDriverInfo.pending, (state, action) => {
+      .addCase(deleteDriverInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(deleteDriverInfo.rejected, (state, action) => {

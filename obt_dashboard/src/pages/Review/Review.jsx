@@ -131,21 +131,21 @@ const Review = () => {
     },
     {
       name: "Trip time",
-      selector: (data) => data.tripTime,
+      selector: (data) => formatDateTime(data.tripTime),
     },
-    {
-      name: "Device with model",
-      selector: (data) => data,
-      cell: (data) => {
-        return (
-          <p>
-            {data.phoneName}
-            {"."}
-            {data.phoneModel}
-          </p>
-        );
-      },
-    },
+    // {
+    //   name: "Device with model",
+    //   selector: (data) => data,
+    //   cell: (data) => {
+    //     return (
+    //       <p>
+    //         {data.phoneName}
+    //         {"."}
+    //         {data.phoneModel}
+    //       </p>
+    //     );
+    //   },
+    // },
     {
       name: "IP Address",
       selector: (data) => data.ipAddress,

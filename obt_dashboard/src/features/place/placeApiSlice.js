@@ -17,6 +17,22 @@ export const createPlace = createAsyncThunk(
   }
 );
 
+export const updatePlace = createAsyncThunk(
+  "place/updatePlace",
+  async ({ id, placeName }) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/place/update/${id}`,
+        { placeName },
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
 export const getAllPlace = createAsyncThunk("place/getAllPlace", async () => {
   try {
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/place`, {

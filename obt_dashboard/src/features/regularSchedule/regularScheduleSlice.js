@@ -31,7 +31,7 @@ const regularSchedulesSlice = createSlice({
       })
       .addCase(createSchedule.fulfilled, (state, action) => {
         state.loader = false;
-        state.rgSchedules.push(action.payload.busSchedule);
+        state.rgSchedules.unshift(action.payload.busSchedule);
         state.totalCount++;
         state.message = action.payload.message;
       })

@@ -11,11 +11,11 @@ const authSlice = createSlice({
     error: null,
   },
   reducers: {
-    setMessageEmpty: (state, action) => {
+    setMessageEmpty: (state) => {
       state.message = null;
       state.error = null;
     },
-    setLogoutUser: (state, action) => {
+    setLogoutUser: (state) => {
       state.message = null;
       state.error = null;
       state.authUser = null;
@@ -31,7 +31,7 @@ const authSlice = createSlice({
         state.authUser = action.payload.user;
         localStorage.setItem("authUser", JSON.stringify(action.payload.user));
       })
-      .addCase(getLogedInUser.rejected, (state, action) => {
+      .addCase(getLogedInUser.rejected, (state) => {
         state.authUser = null;
       })
       .addCase(getLogedInUser.fulfilled, (state, action) => {
@@ -40,7 +40,7 @@ const authSlice = createSlice({
       .addCase(logoutAuthUser.rejected, (state, action) => {
         state.error = action.error.message;
       })
-      .addCase(logoutAuthUser.fulfilled, (state, action) => {
+      .addCase(logoutAuthUser.fulfilled, (state) => {
         state.authUser = null;
         localStorage.removeItem("authUser");
       });

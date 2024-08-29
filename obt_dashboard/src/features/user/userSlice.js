@@ -33,7 +33,7 @@ const userSlice = createSlice({
     success: false,
   },
   reducers: {
-    setMessageEmpty: (state, action) => {
+    setMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
@@ -124,7 +124,7 @@ const userSlice = createSlice({
         state.success = true;
         state.message = action.payload.message;
         state.users = state.users ?? [];
-        state.users.push(action.payload.user);
+        state.users.unshift(action.payload.user);
       })
       .addCase(updateAuthUser.rejected, (state, action) => {
         state.error = action.error.message;

@@ -83,6 +83,20 @@ export const updateParibahanUser = async (req, res, next) => {
       type,
       destinationId,
     } = req.body;
+
+    // Check if paribahanName already exists
+    const existingUser = await prisma.paribahanUser.findFirst({
+      where: {
+        paribahanName,
+        id: {
+          not: String(id),
+        },
+      },
+    });
+    if (existingUser) {
+      return next(createError(400, "Paribahan Name already exists"));
+    }
+
     const hashedPassword = await bcrypt.hash(String(plainPassword), 10);
     const paribahanUser = await prisma.paribahanUser.update({
       where: {

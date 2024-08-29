@@ -99,6 +99,9 @@ export const getAllReview = async (req, res, next) => {
       skip: offset,
       take: limit,
       where,
+      orderBy: {
+        id: "desc",
+      },
     });
 
     const count = await prisma.busReview.count();

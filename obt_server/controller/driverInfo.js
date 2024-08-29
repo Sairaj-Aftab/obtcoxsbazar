@@ -9,22 +9,31 @@ export const createDriverInfo = async (req, res, next) => {
     const { paribahanName, name, phone, license, address, comment, report } =
       req.body;
 
-    const existingPhone = await prisma.driverInfo.findFirst({
-      where: {
-        phone,
-      },
-    });
-    if (existingPhone) {
-      return next(createError(400, "Phone number already exist!"));
+    let queryConditions = [];
+
+    if (phone && phone.trim() !== "") {
+      queryConditions.push({ phone });
     }
 
-    const existingDL = await prisma.driverInfo.findFirst({
-      where: {
-        license,
-      },
-    });
-    if (existingDL) {
-      return next(createError(400, "License No already exist!"));
+    if (license && license.trim() !== "") {
+      queryConditions.push({ license });
+    }
+
+    if (queryConditions.length > 0) {
+      const existingDriver = await prisma.driverInfo.findFirst({
+        where: {
+          OR: queryConditions,
+        },
+      });
+
+      if (existingDriver) {
+        if (existingDriver.phone === phone) {
+          return next(createError(400, "Phone number already exists!"));
+        }
+        if (existingDriver.license === license) {
+          return next(createError(400, "License No already exists!"));
+        }
+      }
     }
 
     // Create

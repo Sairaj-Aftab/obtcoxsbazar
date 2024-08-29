@@ -34,7 +34,7 @@ const busInfoSlice = createSlice({
       })
       .addCase(createBusInfo.fulfilled, (state, action) => {
         state.loader = false;
-        state.busInfo.push(action.payload.busInfo);
+        state.busInfo.unshift(action.payload.busInfo);
         state.totalCount++;
         state.message = action.payload.message;
       })

@@ -63,9 +63,9 @@ const schedulesSlice = createSlice({
         state.loader = false;
         state.schedules = state.schedules ?? [];
         state.todaySchedules = state.todaySchedules ?? [];
-        state.schedules.push(action.payload.busSchedule);
-        state.authSchedules.push(action.payload.busSchedule);
-        state.todaySchedules.push(action.payload.busSchedule);
+        state.schedules.unshift(action.payload.busSchedule);
+        state.authSchedules.unshift(action.payload.busSchedule);
+        state.todaySchedules.unshift(action.payload.busSchedule);
         state.authSchedulesCount++;
         state.message = action.payload.message;
       })
@@ -97,7 +97,7 @@ const schedulesSlice = createSlice({
           state.todaySchedules[todayScheduleIndex] = action.payload.busSchedule;
         }
       })
-      .addCase(getTodaysSchedules.rejected, (state, action) => {
+      .addCase(getTodaysSchedules.rejected, (state) => {
         // state.error = action.error.message;
         state.todayScheduleLoader = false;
       })
@@ -108,7 +108,7 @@ const schedulesSlice = createSlice({
         state.todayScheduleLoader = false;
         state.todaySchedules = action.payload.schedules;
       })
-      .addCase(getSchedulesDataByAuthId.rejected, (state, action) => {
+      .addCase(getSchedulesDataByAuthId.rejected, (state) => {
         // state.error = action.error.message;
         state.authScheduleLoader = false;
       })

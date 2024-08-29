@@ -17,7 +17,7 @@ const noticeSlice = createSlice({
     loader: false,
   },
   reducers: {
-    setNoticeMessageEmpty: (state, action) => {
+    setNoticeMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
@@ -25,10 +25,10 @@ const noticeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllParibahanNotice.pending, (state, action) => {
-        state.loader = true;
+      .addCase(getAllParibahanNotice.pending, (state) => {
+        state.loader;
       })
-      .addCase(getAllParibahanNotice.rejected, (state, action) => {
+      .addCase(getAllParibahanNotice.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -37,10 +37,10 @@ const noticeSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(getAuthNotice.pending, (state, action) => {
+      .addCase(getAuthNotice.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getAuthNotice.rejected, (state, action) => {
+      .addCase(getAuthNotice.rejected, (state) => {
         //   state.error = action.error.message;
         state.loader = false;
       })
@@ -49,7 +49,7 @@ const noticeSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(createAuthNotice.pending, (state, action) => {
+      .addCase(createAuthNotice.pending, (state) => {
         state.loader = true;
       })
       .addCase(createAuthNotice.rejected, (state, action) => {
@@ -62,9 +62,9 @@ const noticeSlice = createSlice({
         state.message = action.payload.message;
 
         state.authNotices = state.authNotices ?? [];
-        state.authNotices.push(action.payload.notice);
+        state.authNotices.unshift(action.payload.notice);
       })
-      .addCase(deleteAuthNotice.pending, (state, action) => {
+      .addCase(deleteAuthNotice.pending, (state) => {
         state.loader = true;
       })
       .addCase(deleteAuthNotice.rejected, (state, action) => {

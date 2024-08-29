@@ -5,6 +5,7 @@ import {
   getAllPlace,
   getDestinationPlaces,
   getLeavingPlaces,
+  updatePlace,
 } from "./placeApiSlice";
 
 const placeSlice = createSlice({
@@ -19,7 +20,7 @@ const placeSlice = createSlice({
     loader: false,
   },
   reducers: {
-    setPlaceMessageEmpty: (state, action) => {
+    setPlaceMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
@@ -27,7 +28,7 @@ const placeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllPlace.pending, (state, action) => {
+      .addCase(getAllPlace.pending, (state) => {
         state.loader = true;
       })
       .addCase(getAllPlace.rejected, (state, action) => {
@@ -39,7 +40,7 @@ const placeSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(getLeavingPlaces.pending, (state, action) => {
+      .addCase(getLeavingPlaces.pending, (state) => {
         state.loader = true;
       })
       .addCase(getLeavingPlaces.rejected, (state, action) => {
@@ -51,7 +52,7 @@ const placeSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(getDestinationPlaces.pending, (state, action) => {
+      .addCase(getDestinationPlaces.pending, (state) => {
         state.loader = true;
       })
       .addCase(getDestinationPlaces.rejected, (state, action) => {
@@ -63,7 +64,7 @@ const placeSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(createPlace.pending, (state, action) => {
+      .addCase(createPlace.pending, (state) => {
         state.loader = true;
       })
       .addCase(createPlace.rejected, (state, action) => {
@@ -76,17 +77,46 @@ const placeSlice = createSlice({
         state.message = action.payload.message;
 
         state.places = state.places ?? [];
-        state.places.push(action.payload.place);
+        state.places.unshift(action.payload.place);
         if (action.payload.place.status === "leave") {
           state.leavingPlaces = state.leavingPlaces ?? [];
-          state.leavingPlaces.push(action.payload.place);
+          state.leavingPlaces.unshift(action.payload.place);
         }
         if (action.payload.place.status === "destination") {
           state.destinationPlaces = state.destinationPlaces ?? [];
-          state.destinationPlaces.push(action.payload.place);
+          state.destinationPlaces.unshift(action.payload.place);
         }
       })
-      .addCase(deletePlace.pending, (state, action) => {
+      .addCase(updatePlace.rejected, (state, action) => {
+        state.error = action.error.message;
+      })
+      .addCase(updatePlace.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(updatePlace.fulfilled, (state, action) => {
+        state.success = true;
+        state.loader = false;
+        const placeIndex = state.places.findIndex(
+          (info) => info.id === action.payload.place.id
+        );
+        if (placeIndex !== -1) {
+          state.places[placeIndex] = action.payload.place;
+        }
+        const levIndex = state.leavingPlaces.findIndex(
+          (info) => info.id === action.payload.place.id
+        );
+        if (levIndex !== -1) {
+          state.leavingPlaces[levIndex] = action.payload.place;
+        }
+        const desIndex = state.destinationPlaces.findIndex(
+          (info) => info.id === action.payload.place.id
+        );
+        if (desIndex !== -1) {
+          state.destinationPlaces[desIndex] = action.payload.place;
+        }
+        state.message = action.payload.message;
+      })
+      .addCase(deletePlace.pending, (state) => {
         state.loader = true;
       })
       .addCase(deletePlace.rejected, (state, action) => {

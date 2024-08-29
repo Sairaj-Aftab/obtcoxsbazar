@@ -20,7 +20,7 @@ const guideInfoSlice = createSlice({
     loader: false,
   },
   reducers: {
-    setGuideInfoMessageEmpty: (state, action) => {
+    setGuideInfoMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
@@ -28,7 +28,7 @@ const guideInfoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getAllGuideInfo.pending, (state, action) => {
+      .addCase(getAllGuideInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(getAllGuideInfo.rejected, (state, action) => {
@@ -42,10 +42,10 @@ const guideInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(getGuideInfo.pending, (state, action) => {
+      .addCase(getGuideInfo.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getGuideInfo.rejected, (state, action) => {
+      .addCase(getGuideInfo.rejected, (state) => {
         // state.error = action.error.message;
         state.loader = false;
       })
@@ -54,7 +54,7 @@ const guideInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
       })
-      .addCase(createGuideInfo.pending, (state, action) => {
+      .addCase(createGuideInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(createGuideInfo.rejected, (state, action) => {
@@ -65,7 +65,7 @@ const guideInfoSlice = createSlice({
         state.success = true;
         state.loader = false;
         state.message = action.payload.message;
-        state.guideInfo.push(action.payload.guideInfo);
+        state.guideInfo.unshift(action.payload.guideInfo);
         state.totalCount++;
       })
       .addCase(updateGuideInfo.rejected, (state, action) => {
@@ -84,7 +84,7 @@ const guideInfoSlice = createSlice({
         }
         state.message = action.payload.message;
       })
-      .addCase(deleteGuideInfo.pending, (state, action) => {
+      .addCase(deleteGuideInfo.pending, (state) => {
         state.loader = true;
       })
       .addCase(deleteGuideInfo.rejected, (state, action) => {
