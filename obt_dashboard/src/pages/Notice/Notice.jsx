@@ -11,13 +11,17 @@ import toast from "react-hot-toast";
 import {
   createAuthNotice,
   deleteAuthNotice,
+  deleteParibahanNotice,
+  updateAdminNotice,
+  updateParibahanNotice,
 } from "../../features/notice/noticeApiSlice";
 import swal from "sweetalert";
+import ModalPopup from "../../components/ModalPopup/ModalPopup";
 
 const Notice = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
-  const { authNotices, paribahanNotices, message, error } =
+  const { authNotices, paribahanNotices, loader, message, error } =
     useSelector(noticeData);
 
   const [title, setTitle] = useState("");
@@ -32,7 +36,43 @@ const Notice = () => {
     }
   };
 
-  const handleDeleteNotice = (id) => {
+  const [editNotice, setEditNotice] = useState({
+    id: "",
+    title: "",
+    status: "",
+  });
+  const handleEditShowModal = (id) => {
+    const noticeToEdit = (authNotices || [])
+      .concat(paribahanNotices || [])
+      .find((notice) => notice.id === id);
+    if (noticeToEdit) {
+      setEditNotice({
+        id: noticeToEdit.id,
+        title: noticeToEdit.title,
+        status: noticeToEdit.status,
+      });
+    }
+  };
+
+  const handleEditNoticecSubmit = (e) => {
+    e.preventDefault();
+    const { id, title, status } = editNotice;
+
+    if (!title) {
+      toast.warning("Field is required!");
+      return;
+    }
+
+    const validStatuses = ["Passenger", "Display", "Paribahan"];
+
+    if (validStatuses.includes(status)) {
+      dispatch(updateAdminNotice({ id, title }));
+    } else {
+      dispatch(updateParibahanNotice({ id, title }));
+    }
+  };
+
+  const handleDelete = (id) => {
     swal({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this imaginary file!",
@@ -41,10 +81,15 @@ const Notice = () => {
       dangerMode: true,
     }).then((willDelete) => {
       if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
+        swal("Poof! Successfully deleted", {
           icon: "success",
         });
-        dispatch(deleteAuthNotice(id));
+        // Check in both notices and dispatch the corresponding delete action
+        const noticeToDelete = authNotices.find((notice) => notice.id === id)
+          ? deleteAuthNotice
+          : deleteParibahanNotice;
+
+        dispatch(noticeToDelete(id));
       }
     });
   };
@@ -92,6 +137,26 @@ const Notice = () => {
           Submit
         </button>
       </form>
+      <ModalPopup title="Edit Notice" target="noticeEditPopup">
+        <form onSubmit={handleEditNoticecSubmit}>
+          <textarea
+            id="editTitle"
+            rows={5}
+            className="form-control mb-3"
+            value={editNotice?.title}
+            onChange={(e) =>
+              setEditNotice({ ...editNotice, title: e.target.value })
+            }
+          ></textarea>
+          <button
+            disabled={authUser?.role?.name === "VIEWER" && true}
+            type="submit"
+            className="btn btn-primary"
+          >
+            {loader ? "Editing..." : "Edit"}
+          </button>
+        </form>
+      </ModalPopup>
 
       <div className="row">
         <div className="col-sm-12">
@@ -118,9 +183,18 @@ const Notice = () => {
                             <div className="actions">
                               <button
                                 data-toggle="modal"
+                                data-target="#noticeEditPopup"
+                                className="btn btn-sm bg-primary-light mr-1"
+                                disabled={authUser?.role?.name === "VIEWER"}
+                                onClick={() => handleEditShowModal(data.id)}
+                              >
+                                <i className="fe fe-pencil"></i>
+                              </button>
+                              <button
+                                data-toggle="modal"
                                 className="btn btn-sm bg-danger-light"
                                 disabled={authUser?.role?.name === "VIEWER"}
-                                onClick={() => handleDeleteNotice(data.id)}
+                                onClick={() => handleDelete(data.id)}
                               >
                                 <i className="fe fe-trash"></i>
                               </button>

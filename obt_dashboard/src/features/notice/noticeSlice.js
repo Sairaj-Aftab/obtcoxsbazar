@@ -2,8 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   createAuthNotice,
   deleteAuthNotice,
+  deleteParibahanNotice,
   getAllParibahanNotice,
   getAuthNotice,
+  updateAdminNotice,
+  updateParibahanNotice,
 } from "./noticeApiSlice";
 
 const noticeSlice = createSlice({
@@ -64,6 +67,41 @@ const noticeSlice = createSlice({
         state.authNotices = state.authNotices ?? [];
         state.authNotices.unshift(action.payload.notice);
       })
+      .addCase(updateAdminNotice.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(updateAdminNotice.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(updateAdminNotice.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        const index = state.authNotices.findIndex(
+          (info) => info.id === action.payload.notice.id
+        );
+        if (index !== -1) {
+          state.authNotices[index] = action.payload.notice;
+        }
+        state.loader = false;
+      })
+      .addCase(updateParibahanNotice.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(updateParibahanNotice.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(updateParibahanNotice.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+
+        const index = state.paribahanNotices.findIndex(
+          (info) => info.id === action.payload.notice.id
+        );
+        if (index !== -1) {
+          state.paribahanNotices[index] = action.payload.notice;
+        }
+        state.loader = false;
+      })
       .addCase(deleteAuthNotice.pending, (state) => {
         state.loader = true;
       })
@@ -74,6 +112,21 @@ const noticeSlice = createSlice({
       .addCase(deleteAuthNotice.fulfilled, (state, action) => {
         state.message = action.payload.message;
         state.authNotices = state.authNotices.filter(
+          (item) => item.id !== action.payload.notice.id
+        );
+
+        state.loader = false;
+      })
+      .addCase(deleteParibahanNotice.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(deleteParibahanNotice.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(deleteParibahanNotice.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.paribahanNotices = state.paribahanNotices.filter(
           (item) => item.id !== action.payload.notice.id
         );
 

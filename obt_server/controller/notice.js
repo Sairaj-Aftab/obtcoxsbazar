@@ -5,8 +5,22 @@ const prisma = new PrismaClient();
 export const getAllParibahanNotice = async (req, res, next) => {
   try {
     const notices = await prisma.noticeFromBus.findMany({
-      include: {
-        paribahanUser: true,
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        status: true,
+        paribahanUser: {
+          select: {
+            id: true,
+            paribahanName: true,
+          },
+        },
+      },
+      orderBy: {
+        paribahanUser: {
+          paribahanName: "asc",
+        },
       },
     });
     if (notices.length < 1) {
@@ -133,6 +147,7 @@ export const createAdminNotice = async (req, res, next) => {
 export const deleteParibahanNotice = async (req, res, next) => {
   try {
     const { id } = req.params;
+
     const notice = await prisma.noticeFromBus.delete({
       where: {
         id: String(id),
@@ -169,13 +184,15 @@ export const updateParibahanNotice = async (req, res, next) => {
         title,
       },
     });
-    return res.status(200).json({ notice });
+    return res.status(200).json({ notice, message: "Successfully updated" });
   } catch (error) {
     return next(error);
   }
 };
 export const updateAdminNotice = async (req, res, next) => {
   try {
+    const { id: adminId } = req.me;
+
     const { id } = req.params;
     const { title } = req.body;
     const notice = await prisma.noticeFromAdmin.update({
@@ -184,9 +201,14 @@ export const updateAdminNotice = async (req, res, next) => {
       },
       data: {
         title,
+        authUser: {
+          connect: {
+            id: String(adminId),
+          },
+        },
       },
     });
-    return res.status(200).json({ notice });
+    return res.status(200).json({ notice, message: "Successfully updated" });
   } catch (error) {
     return next(error);
   }

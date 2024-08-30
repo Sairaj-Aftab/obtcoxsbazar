@@ -17,12 +17,58 @@ export const createAuthNotice = createAsyncThunk(
   }
 );
 
+export const getAllParibahanNotice = createAsyncThunk(
+  "notice/getAllParibahanNotice",
+  async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/notice/getallparibahan`,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
 export const getAuthNotice = createAsyncThunk(
   "notice/getAuthNotice",
   async () => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/notice/getalladmin`,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
+export const updateAdminNotice = createAsyncThunk(
+  "notice/updateAdminNotice",
+  async ({ id, title }) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/notice/updateadminnotice/${id}`,
+        { title },
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+export const updateParibahanNotice = createAsyncThunk(
+  "notice/updateParibahanNotice",
+  async ({ id, title }) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/notice/updateparibahannotice/${id}`,
+        { title },
         { withCredentials: true }
       );
       return response.data;
@@ -46,12 +92,12 @@ export const deleteAuthNotice = createAsyncThunk(
   }
 );
 
-export const getAllParibahanNotice = createAsyncThunk(
-  "notice/getAllParibahanNotice",
-  async () => {
+export const deleteParibahanNotice = createAsyncThunk(
+  "notice/deleteParibahanNotice",
+  async (id) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/notice/getallparibahan`,
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/notice/deleteparibahan/${id}`,
         { withCredentials: true }
       );
       return response.data;
