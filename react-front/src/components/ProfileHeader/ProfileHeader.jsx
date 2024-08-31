@@ -133,7 +133,7 @@ const ProfileHeader = () => {
           )}
         </div>
         {/* Menu */}
-        <ul className="flex md:gap-3 justify-between md:justify-center mt-3 md:mt-0">
+        <ul className="flex gap-3 justify-between md:justify-center flex-wrap mt-3">
           <li>
             <Link
               to="/profile"
@@ -180,6 +180,18 @@ const ProfileHeader = () => {
               } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
             >
               Driver Info
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/profile/reviews"
+              className={`${
+                pathName === "/profile/reviews"
+                  ? "bg-primary-color text-white"
+                  : "bg-gray-200 text-primary-color"
+              } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
+            >
+              Reviews
             </Link>
           </li>
         </ul>

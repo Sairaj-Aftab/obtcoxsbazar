@@ -21,25 +21,23 @@ import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 const server = createServer(app);
+// dotenv config
+env.config();
+const PORT = process.env.PORT || 5000;
 const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "https://admin.obtcoxsbazar.com",
-      "https://www.admin.obtcoxsbazar.com",
-      "https://obtcoxsbazar.com",
-      "https://www.obtcoxsbazar.com",
-      "http://obtcoxsbazar.com",
-      "http://www.obtcoxsbazar.com",
+      process.env.LOCAL_DOMAIN1,
+      process.env.LOCAL_DOMAIN2,
+      process.env.LOCAL_DOMAIN3,
+      process.env.ADMIN_DOMAIN1,
+      process.env.ADMIN_DOMAIN2,
+      process.env.MAIN_DOMAIN1,
+      process.env.MAIN_DOMAIN2,
     ],
     credentials: true,
   },
 });
-// dotenv config
-env.config();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
@@ -48,15 +46,13 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "https://admin.obtcoxsbazar.com",
-      "https://www.admin.obtcoxsbazar.com",
-      "https://obtcoxsbazar.com",
-      "https://www.obtcoxsbazar.com",
-      "http://obtcoxsbazar.com",
-      "http://www.obtcoxsbazar.com",
+      process.env.LOCAL_DOMAIN1,
+      process.env.LOCAL_DOMAIN2,
+      process.env.LOCAL_DOMAIN3,
+      process.env.ADMIN_DOMAIN1,
+      process.env.ADMIN_DOMAIN2,
+      process.env.MAIN_DOMAIN1,
+      process.env.MAIN_DOMAIN2,
     ],
     credentials: true,
   })

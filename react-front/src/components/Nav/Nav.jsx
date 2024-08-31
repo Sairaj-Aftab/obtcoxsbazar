@@ -98,6 +98,7 @@ const Nav = () => {
                         "/profile/bus-info",
                         "/profile/guide-info",
                         "/profile/driver-info",
+                        "/profile/reviews",
                       ].includes(pathName) && "border-white"
                     } hover:border-white py-1 px-2 rounded-sm`}
                   >

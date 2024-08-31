@@ -4,6 +4,7 @@ import BusProfile from "../pages/BusProfile/BusProfile";
 import ProfileBusInfo from "../pages/ProfileBusInfo/ProfileBusInfo";
 import ProfileDriverInfo from "../pages/ProfileDriverInfo/ProfileDriverInfo";
 import ProfileGuideInfo from "../pages/ProfileGuideInfo/ProfileGuideInfo";
+import ProfileReview from "../pages/ProfileReview/ProfileReview";
 import PrivateRouteGird from "./PrivateRouteGrid";
 
 const privateRoutes = [
@@ -31,6 +32,10 @@ const privateRoutes = [
               {
                 path: "/profile/driver-info",
                 element: <ProfileDriverInfo />,
+              },
+              {
+                path: "/profile/reviews",
+                element: <ProfileReview />,
               },
             ],
           },

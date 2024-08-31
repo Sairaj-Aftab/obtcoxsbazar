@@ -114,6 +114,57 @@ export const getAllReview = async (req, res, next) => {
   }
 };
 
+export const getReviewsByParibahanUserId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const whereClause = {
+      busInfo: {
+        paribahanUserId: String(id),
+      },
+    };
+
+    if (searchQuery) {
+      whereClause.OR = [
+        { regNo: { contains: searchQuery, mode: "insensitive" } },
+        { name: { contains: searchQuery, mode: "insensitive" } },
+        { phoneNumber: { contains: searchQuery, mode: "insensitive" } },
+        {
+          destination: { contains: searchQuery, mode: "insensitive" },
+        },
+        { tripTime: { contains: searchQuery, mode: "insensitive" } },
+      ];
+    }
+
+    const reviews = await prisma.busReview.findMany({
+      skip: offset,
+      take: limit,
+      where: whereClause,
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    const count = await prisma.busReview.count({
+      where: {
+        busInfo: {
+          paribahanUserId: String(id),
+        },
+      },
+    });
+    const searchCount = await prisma.busReview.count({
+      where: whereClause,
+    });
+    return res.status(200).json({ reviews, count, searchCount });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const deleteReview = async (req, res, next) => {
   try {
     const { id } = req.params;

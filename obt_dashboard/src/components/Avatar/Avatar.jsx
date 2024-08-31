@@ -1,4 +1,4 @@
-import avatarProfile from "../../../public/profileavatar.png";
+import avatarProfile from "/profileavatar.png";
 
 const Avatar = ({ src, classList, alt, width }) => {
   return (
