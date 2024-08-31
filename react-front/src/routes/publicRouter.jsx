@@ -8,6 +8,7 @@ import BusInformation from "../pages/BusInformation/BusInformation";
 import BusServicesByPlace from "../pages/BusServicesByPlace/BusServicesByPlace";
 import ContactUs from "../pages/ContactUs/ContactUs";
 import Display from "../pages/Display/Display";
+import ErrorPage from "../pages/ErrorPage/ErrorPage";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
 import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
@@ -15,6 +16,7 @@ import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 const publicRoutes = [
   {
     element: <Nav />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
