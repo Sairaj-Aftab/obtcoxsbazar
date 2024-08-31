@@ -123,9 +123,10 @@ export const getReviewsByParibahanUserId = async (req, res, next) => {
     const searchQuery = req.query.search;
 
     const whereClause = {
-      busInfo: {
-        paribahanUserId: String(id),
-      },
+      OR: [
+        { busInfo: { paribahanUserId: String(id) } },
+        { paribahanUserId: String(id) },
+      ],
     };
 
     if (searchQuery) {
@@ -151,9 +152,10 @@ export const getReviewsByParibahanUserId = async (req, res, next) => {
 
     const count = await prisma.busReview.count({
       where: {
-        busInfo: {
-          paribahanUserId: String(id),
-        },
+        OR: [
+          { busInfo: { paribahanUserId: String(id) } },
+          { paribahanUserId: String(id) },
+        ],
       },
     });
     const searchCount = await prisma.busReview.count({
