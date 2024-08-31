@@ -75,7 +75,7 @@ const ProfileReview = () => {
             <FaStar
               key={index}
               className={`${
-                index < row.rating ? "text-primary-color" : "text-gray-300"
+                index < row.rating ? "text-yellow_500" : "text-gray-300"
               }`}
             />
           ))}

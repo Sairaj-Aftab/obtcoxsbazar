@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import qr from "qrcode";
 import createError from "../utils/createError.js";
 import { createSlug } from "../utils/slug.js";
 import { createToken } from "../utils/token.js";
@@ -62,9 +63,25 @@ export const createParibahanUserAccount = async (req, res, next) => {
         destination: true,
       },
     });
-    return res
-      .status(200)
-      .json({ paribahanUser, message: "Created successfully" });
+
+    const qrCodeDataURL = await qr.toDataURL(
+      `https://obtcoxsbazar.com/bus/comp/${paribahanUser.slug}/${paribahanUser.id}`,
+      {
+        width: 250,
+        margin: 2,
+      }
+    );
+
+    // Save the QR code data URL in the database
+    const updatedParibahanUser = await prisma.paribahanUser.update({
+      where: { id: paribahanUser.id },
+      data: { qrCode: qrCodeDataURL },
+    });
+
+    return res.status(200).json({
+      paribahanUser: updatedParibahanUser,
+      message: "Created successfully",
+    });
   } catch (error) {
     return next(error);
   }
@@ -216,9 +233,52 @@ export const getParibahanUser = async (req, res, next) => {
         rating: true,
       },
       where: {
-        busInfo: {
-          paribahanUserId: String(id),
-        },
+        OR: [
+          { busInfo: { paribahanUserId: String(id) } },
+          { paribahanUserId: String(id) },
+        ],
+      },
+    });
+
+    // Extract the aggregated data
+    const totalReviewCount = reviewStats._count;
+    const averageRating = reviewStats._avg.rating;
+
+    if (!paribahanUser) {
+      return next(createError(404, "Not found!"));
+    }
+
+    return res
+      .status(200)
+      .json({ paribahanUser, totalReviewCount, averageRating });
+  } catch (error) {
+    return next(error);
+  }
+};
+export const getParibahanUserGetReviewByQR = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const paribahanUser = await prisma.paribahanUser.findUnique({
+      where: {
+        id: String(id),
+      },
+      include: {
+        destination: true,
+      },
+    });
+
+    // Aggregate review stats
+    const reviewStats = await prisma.busReview.aggregate({
+      _count: true,
+      _avg: {
+        rating: true,
+      },
+      where: {
+        OR: [
+          { busInfo: { paribahanUserId: String(id) } },
+          { paribahanUserId: String(id) },
+        ],
       },
     });
 

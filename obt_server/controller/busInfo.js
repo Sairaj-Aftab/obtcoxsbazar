@@ -216,9 +216,18 @@ export const getBusInfoById = async (req, res, next) => {
         rating: true,
       },
       where: {
-        busInfo: {
-          paribahanUserId: String(busInfo.paribahanUserId),
-        },
+        OR: [
+          {
+            busInfo: {
+              paribahanUserId: String(busInfo.paribahanUserId),
+            },
+          },
+          {
+            paribahanUser: {
+              id: String(busInfo.paribahanUserId),
+            },
+          },
+        ],
       },
     });
 

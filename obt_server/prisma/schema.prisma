@@ -75,6 +75,7 @@ model ParibahanUser {
     password String
     plainPassword String
     type Int?
+    qrCode String?
     destination LeaveDestinationPlace[] @relation(fields: [destinationId], references: [id])
     destinationId String[] @db.ObjectId
     authUser AuthUser @relation(fields: [authUserId], references: [id])
@@ -84,6 +85,7 @@ model ParibahanUser {
     busInfo BusInfo[]
     guideInfo GuideInfo[]
     driverInfo DriverInfo[]
+    reviews BusReview[]
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
@@ -112,8 +114,8 @@ model BusInfo {
 model BusReview {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     paribahanName String
-    regNo String
-    type String
+    regNo String?
+    type String?
     rating Int
     name String
     comment String?
@@ -123,8 +125,10 @@ model BusReview {
     ipAddress String?
     phoneName String?
     phoneModel String?
-    busInfo BusInfo @relation(fields: [busInfoId], references: [id])
-    busInfoId String @db.ObjectId
+    busInfo BusInfo? @relation(fields: [busInfoId], references: [id])
+    busInfoId String? @db.ObjectId
+    paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String? @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())

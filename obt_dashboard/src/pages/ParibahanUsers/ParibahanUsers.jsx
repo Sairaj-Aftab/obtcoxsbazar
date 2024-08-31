@@ -546,6 +546,7 @@ const ParibahanUsers = () => {
                       <th>Sales No.</th>
                       <th>Destinations</th>
                       <th>Password</th>
+                      <th>QR Code</th>
                       <th>Created by</th>
                       <th>Created At</th>
                       <th className="text-right">Actions</th>
@@ -578,7 +579,14 @@ const ParibahanUsers = () => {
                           </td>
                           <td>{data?.plainPassword}</td>
                           <td>
-                            {data.authUser.userName} .{" "}
+                            <img
+                              src={data?.qrCode}
+                              alt={data?.paribahanName}
+                              style={{ width: "100px" }}
+                            />
+                          </td>
+                          <td>
+                            {data.authUser?.userName} .{" "}
                             {data?.authUser?.role?.name}
                           </td>
                           <td>{formatDate(data.createdAt)}</td>

@@ -4,6 +4,7 @@ import {
   deleteParibahanUser,
   getAllParibahanUser,
   getParibahanUser,
+  getParibahanUserGetReviewByQR,
   logedInUser,
   login,
   logout,
@@ -17,6 +18,7 @@ router.post("/register/:authUserId", createParibahanUserAccount);
 router.put("/update/:id", updateParibahanUser);
 router.get("/", getAllParibahanUser);
 router.get("/getsingle/:id", getParibahanUser);
+router.get("/getreviewbyqr/:id", getParibahanUserGetReviewByQR);
 router.delete("/:id", deleteParibahanUser);
 
 // Authentication

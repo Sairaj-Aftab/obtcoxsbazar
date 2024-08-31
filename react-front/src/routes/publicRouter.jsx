@@ -2,6 +2,7 @@ import Nav from "../components/Nav/Nav";
 import AboutPage from "../pages/AboutPage/AboutPage";
 import AllBusServices from "../pages/AllBusServices/AllBusServices";
 import AllSchedules from "../pages/AllSchedules/AllSchedules";
+import BusComReviewByQR from "../pages/BusComReviewByQR/BusComReviewByQR";
 import BusInfo from "../pages/BusInfo/BusInfo";
 import BusInformation from "../pages/BusInformation/BusInformation";
 import BusServicesByPlace from "../pages/BusServicesByPlace/BusServicesByPlace";
@@ -58,6 +59,10 @@ const publicRoutes = [
       {
         path: "/bus/info/:slug/:id",
         element: <BusInfo />,
+      },
+      {
+        path: "/bus/comp/:slug/:id",
+        element: <BusComReviewByQR />,
       },
     ],
   },
