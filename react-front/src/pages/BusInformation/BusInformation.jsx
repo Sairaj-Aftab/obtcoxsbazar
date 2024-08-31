@@ -21,7 +21,7 @@ const BusInformation = () => {
     {
       name: "#",
       selector: (data, index) => index + 1,
-      width: "40px",
+      width: "60px",
     },
     {
       name: "Time",

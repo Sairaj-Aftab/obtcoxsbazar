@@ -66,28 +66,44 @@ export const updateDriverInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, phone, license, address, comment, report } = req.body;
-    const existingDL = await prisma.driverInfo.findFirst({
-      where: {
-        license,
-        id: {
-          not: String(id),
-        },
-      },
-    });
-    if (existingDL) {
-      return next(createError(400, "License already exist!"));
-    }
-    const existingPhone = await prisma.driverInfo.findFirst({
-      where: {
+
+    let queryConditions = [];
+
+    if (phone && phone.trim() !== "") {
+      queryConditions.push({
         phone,
         id: {
           not: String(id),
         },
-      },
-    });
-    if (existingPhone) {
-      return next(createError(400, "Phone number already exist!"));
+      });
     }
+
+    if (license && license.trim() !== "") {
+      queryConditions.push({
+        license,
+        id: {
+          not: String(id),
+        },
+      });
+    }
+
+    if (queryConditions.length > 0) {
+      const existingDriver = await prisma.driverInfo.findFirst({
+        where: {
+          OR: queryConditions,
+        },
+      });
+
+      if (existingDriver) {
+        if (existingDriver.phone === phone) {
+          return next(createError(400, "Phone number already exists!"));
+        }
+        if (existingDriver.license === license) {
+          return next(createError(400, "License No already exists!"));
+        }
+      }
+    }
+
     const driverInfo = await prisma.driverInfo.update({
       where: {
         id: String(id),
@@ -104,6 +120,7 @@ export const updateDriverInfo = async (req, res, next) => {
         paribahanUser: true,
       },
     });
+
     return res
       .status(200)
       .json({ driverInfo, message: "Updated successfully" });

@@ -96,7 +96,7 @@ const ProfileBusInfo = () => {
     {
       name: "#",
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
-      width: "40px",
+      width: "60px",
     },
     {
       name: "Bus Reg No",
