@@ -77,8 +77,17 @@ app.use(errorHandler);
 // Socket Connection
 io.on("connection", (socket) => {
   console.log("a user connected");
+  // Handle location updates from the client
+  // Handle location updates from the client
+  socket.on("locationUpdate", (location) => {
+    // Emit the updated location back to the same client
+    console.log(location);
+
+    socket.emit("locationUpdate", location);
+  });
+
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("A user disconnected:", socket.id);
   });
 });
 

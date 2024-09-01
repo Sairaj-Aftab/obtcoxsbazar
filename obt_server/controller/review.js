@@ -151,16 +151,11 @@ export const getReviewsByParibahanUserId = async (req, res, next) => {
     });
 
     const count = await prisma.busReview.count({
-      where: {
-        OR: [
-          { busInfo: { paribahanUserId: String(id) } },
-          { paribahanUserId: String(id) },
-        ],
-      },
+      where: whereClause.OR[0],
     });
-    const searchCount = await prisma.busReview.count({
-      where: whereClause,
-    });
+    const searchCount = searchQuery
+      ? await prisma.busReview.count({ where: whereClause })
+      : count;
     return res.status(200).json({ reviews, count, searchCount });
   } catch (error) {
     return next(error);

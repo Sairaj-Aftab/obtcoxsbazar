@@ -43,3 +43,8 @@ form select {
   padding: 2px 5px;
   width: 100%;
 }
+
+/* For maping */
+.leaflet-routing-container.leaflet-bar.leaflet-control {
+  display: none;
+}
