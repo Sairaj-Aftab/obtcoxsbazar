@@ -12,6 +12,7 @@ import {
   createSchedule,
   deleteSchedule,
   getAllRgSchedules,
+  updateSchedule,
 } from "../../features/regularSchedule/regularScheduleApiSlice";
 import { formatDateTime } from "../../utils/timeAgo";
 import { placeData } from "../../features/place/placeSlice";
@@ -28,6 +29,7 @@ const RegularBusSchedule = () => {
     useSelector(rgSchedulesData);
   const { leavingPlaces, destinationPlaces } = useSelector(placeData);
 
+  const [paribahanId, setParibahanId] = useState(null);
   const [input, setInput] = useState({
     busName: "",
     time: "",
@@ -46,6 +48,7 @@ const RegularBusSchedule = () => {
   const handleCreateSchedule = (e) => {
     e.preventDefault();
     if (
+      !paribahanId ||
       !input.busName ||
       !input.time ||
       !input.type ||
@@ -54,8 +57,36 @@ const RegularBusSchedule = () => {
     ) {
       toast.error("All fields are required");
     } else {
-      dispatch(createSchedule({ data: input }));
+      dispatch(createSchedule({ id: paribahanId, data: input }));
     }
+  };
+
+  const [findSchedule, setFindSchedule] = useState({});
+
+  const handleChangeEditValue = (e) => {
+    setFindSchedule((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleEditShowSchedule = (id) => {
+    const schedule = rgSchedules.find((data) => data.id == id);
+    setFindSchedule(schedule);
+  };
+
+  const handleEditScheduleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(
+      updateSchedule({
+        id: findSchedule.id,
+        data: {
+          time: findSchedule.time,
+          type: findSchedule.type,
+          leavingPlace: findSchedule.leavingPlace,
+          destinationPlace: findSchedule.destinationPlace,
+          rent: findSchedule.rent,
+        },
+      })
+    );
+    dispatch(setRgScheduleMessageEmpty());
   };
 
   const handleDeleteSchedule = (id) => {
@@ -107,10 +138,19 @@ const RegularBusSchedule = () => {
     }
     if (message) {
       toast.success(message);
+      setInput({
+        busName: "",
+        time: "",
+        type: "",
+        leavingPlace: "",
+        destinationPlace: "",
+        rent: "",
+      });
     }
-    return () => {
+    if (error || message) {
       dispatch(setRgScheduleMessageEmpty());
-    };
+      setParibahanId(null);
+    }
   }, [dispatch, message, error]);
 
   const columns = [
@@ -153,17 +193,26 @@ const RegularBusSchedule = () => {
       cell: (data) => (
         <div className="text-right actions">
           <button
+            className="btn btn-sm mr-1 bg-primary-light"
+            data-target="#editRgScheduleModal"
+            data-toggle="modal"
+            onClick={() => handleEditShowSchedule(data.id)}
+          >
+            <i className="fa fa-pencil-square-o"></i>
+          </button>
+          <button
             className="btn btn-sm bg-danger-light"
             onClick={() => handleDeleteSchedule(data.id)}
             disabled={authUser?.role?.name === "VIEWER" && true}
           >
-            <i className="fe fe-trash"></i> Delete
+            <i className="fe fe-trash"></i>
           </button>
         </div>
       ),
       right: true, // Align the column to the right
     },
   ];
+  console.log(paribahanId);
 
   return (
     <>
@@ -171,15 +220,21 @@ const RegularBusSchedule = () => {
         <form onSubmit={handleCreateSchedule}>
           <div className="form-group mb-2">
             <select
-              name="busName"
               id="busName"
-              value={input.busName}
-              onChange={changeInputValue}
+              name="busName"
+              onChange={(e) => {
+                const selectedParibahan = paribahanUsers?.find(
+                  (user) => user.paribahanName === e.target.value
+                );
+                setParibahanId(selectedParibahan?.id || ""); // Set the selected paribahan ID.
+                changeInputValue(e); // Update the input value for busName.
+              }}
+              value={input.busName} // Bind the selected value to busName in the form state.
               className="form-control"
             >
               <option value="">Paribahan Name</option>
-              {paribahanUsers?.map((data, index) => (
-                <option key={index} value={data.paribahanName}>
+              {paribahanUsers?.map((data) => (
+                <option key={data.id} value={data.paribahanName}>
                   {data.paribahanName}
                 </option>
               ))}
@@ -210,6 +265,8 @@ const RegularBusSchedule = () => {
               <option value="AC">AC</option>
               <option value="Non-AC">Non-AC</option>
               <option value="Sleeper Coach">Sleeper Coach</option>
+              <option value="Double Decker">Double Decker</option>
+              <option value="Suite Class">Suite Class</option>
             </select>
           </div>
           <div className="form-group mb-2">
@@ -245,7 +302,79 @@ const RegularBusSchedule = () => {
             </select>
           </div>
           <button type="submit" className="btn btn-primary">
-            Create
+            {loader ? "Creating" : "Create"}
+          </button>
+        </form>
+      </ModalPopup>
+      <ModalPopup title="Edit Regular Schedule" target="editRgScheduleModal">
+        <form onSubmit={handleEditScheduleSubmit}>
+          <div className="form-group mb-2">
+            <label htmlFor="time">Starting Time</label>
+            <input
+              id="time"
+              type="time"
+              name="time"
+              value={findSchedule.time}
+              min={new Date().toISOString().slice(0, 16)}
+              onChange={handleChangeEditValue}
+              placeholder="Starting Time"
+              className="form-control"
+            />
+          </div>
+          <div className="form-group mb-2">
+            <select
+              name="type"
+              id="type"
+              value={findSchedule.type}
+              onChange={handleChangeEditValue}
+              className="form-control"
+            >
+              <option value="">Bus Type</option>
+              <option value="AC">AC</option>
+              <option value="Non-AC">Non-AC</option>
+              <option value="Sleeper Coach">Sleeper Coach</option>
+              <option value="Double Decker">Double Decker</option>
+              <option value="Suite Class">Suite Class</option>
+            </select>
+          </div>
+          <div className="form-group mb-2">
+            <select
+              name="leavingPlace"
+              id="leavingPlace"
+              value={findSchedule.leavingPlace}
+              onChange={handleChangeEditValue}
+              className="form-control"
+            >
+              <option value="">Departure Place</option>
+              {leavingPlaces?.map((place, index) => (
+                <option key={index} value={place?.placeName}>
+                  {place?.placeName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group mb-2">
+            <select
+              name="destinationPlace"
+              id="destinationPlace"
+              value={findSchedule.destinationPlace}
+              onChange={handleChangeEditValue}
+              className="form-control"
+            >
+              <option value="">Destination</option>
+              {destinationPlaces?.map((place, index) => (
+                <option key={index} value={place?.placeName}>
+                  {place?.placeName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="submit"
+            disabled={authUser?.role?.name === "VIEWER" && true}
+            className="btn btn-primary"
+          >
+            {loader ? "Editing" : "Edit"}
           </button>
         </form>
       </ModalPopup>

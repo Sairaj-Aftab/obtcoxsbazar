@@ -81,6 +81,7 @@ model ParibahanUser {
     authUser AuthUser @relation(fields: [authUserId], references: [id])
     authUserId String @db.ObjectId
     busSchedule BusSchedule[]
+    regSchedule RegularBusSchedule[]
     notice NoticeFromBus?
     busInfo BusInfo[]
     guideInfo GuideInfo[]
@@ -209,9 +210,11 @@ model RegularBusSchedule {
     slug String
     type String
     time String
-    leavingPlace String
+    leavingPlace String?
     destinationPlace String
     rent Int?
+    paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String? @db.ObjectId
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())

@@ -95,6 +95,7 @@ const Nav = () => {
                     className={`text-base font-medium text-white border border-transparent ${
                       [
                         "/profile",
+                        "/profile/regular-schedules",
                         "/profile/bus-info",
                         "/profile/guide-info",
                         "/profile/driver-info",

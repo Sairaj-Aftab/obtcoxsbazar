@@ -148,6 +148,18 @@ const ProfileHeader = () => {
           </li>
           <li>
             <Link
+              to="/profile/regular-schedules"
+              className={`${
+                pathName === "/profile/regular-schedules"
+                  ? "bg-primary-color text-white"
+                  : "bg-gray-200 text-primary-color"
+              } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
+            >
+              Reg. Schedule
+            </Link>
+          </li>
+          <li>
+            <Link
               to="/profile/bus-info"
               className={`${
                 pathName === "/profile/bus-info"

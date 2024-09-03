@@ -4,6 +4,7 @@ import BusProfile from "../pages/BusProfile/BusProfile";
 import ProfileBusInfo from "../pages/ProfileBusInfo/ProfileBusInfo";
 import ProfileDriverInfo from "../pages/ProfileDriverInfo/ProfileDriverInfo";
 import ProfileGuideInfo from "../pages/ProfileGuideInfo/ProfileGuideInfo";
+import ProfileRegSchedule from "../pages/ProfileRegSchedule/ProfileRegSchedule";
 import ProfileReview from "../pages/ProfileReview/ProfileReview";
 import PrivateRouteGird from "./PrivateRouteGrid";
 
@@ -20,6 +21,10 @@ const privateRoutes = [
               {
                 path: "/profile",
                 element: <BusProfile />,
+              },
+              {
+                path: "/profile/regular-schedules",
+                element: <ProfileRegSchedule />,
               },
               {
                 path: "/profile/bus-info",

@@ -3,6 +3,7 @@ import {
   createSchedule,
   deleteSchedule,
   getAllSchedules,
+  getSchedulesByParibahanId,
   getSchedulesByPlace,
   updateSchedule,
 } from "../controller/regularSchedule.js";
@@ -10,8 +11,9 @@ import {
 const router = express.Router();
 
 router.get("/", getAllSchedules);
+router.get("/getbyparibahanid/:id", getSchedulesByParibahanId);
 router.get("/getbydestination/:destination", getSchedulesByPlace);
-router.post("/create", createSchedule);
+router.post("/create/:id", createSchedule);
 router.put("/update/:id", updateSchedule);
 
 router.delete("/delete/:id", deleteSchedule);

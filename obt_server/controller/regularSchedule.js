@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 export const createSchedule = async (req, res, next) => {
   try {
+    const { id } = req.params;
     const { busName, type, time, leavingPlace, destinationPlace, rent } =
       req.body;
 
@@ -18,6 +19,7 @@ export const createSchedule = async (req, res, next) => {
         leavingPlace,
         destinationPlace,
         rent: Number(rent),
+        paribahanUserId: String(id),
       },
     });
 
@@ -33,9 +35,10 @@ export const updateSchedule = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { type, time, leavingPlace, destinationPlace, rent } = req.body;
+
     const busSchedule = await prisma.regularBusSchedule.update({
       where: {
-        id: String(id), // Convert id to number
+        id: String(id),
       },
       data: {
         type,
@@ -94,6 +97,47 @@ export const getAllSchedules = async (req, res, next) => {
   }
 };
 
+export const getSchedulesByParibahanId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+    const searchQuery = req.query.search;
+
+    const whereClause = {
+      OR: [{ paribahanUserId: String(id) }],
+    };
+
+    if (searchQuery) {
+      whereClause.OR = [
+        { busName: { contains: searchQuery, mode: "insensitive" } },
+        { time: { contains: searchQuery, mode: "insensitive" } },
+        { type: { contains: searchQuery, mode: "insensitive" } },
+        { destinationPlace: { contains: searchQuery, mode: "insensitive" } },
+      ];
+    }
+
+    const schedules = await prisma.regularBusSchedule.findMany({
+      skip: offset,
+      take: limit,
+      where: whereClause,
+      orderBy: {
+        time: "asc",
+      },
+    });
+
+    const count = await prisma.regularBusSchedule.count({
+      where: whereClause.OR[0],
+    });
+    const searchCount = searchQuery
+      ? await prisma.regularBusSchedule.count({ where: whereClause })
+      : count;
+    return res.status(200).json({ schedules, count, searchCount });
+  } catch (error) {
+    return next(error);
+  }
+};
 export const getSchedulesByPlace = async (req, res, next) => {
   try {
     const { destination } = req.params;

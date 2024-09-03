@@ -3,10 +3,26 @@ import axios from "axios";
 
 export const createSchedule = createAsyncThunk(
   "schedules/createSchedule",
-  async ({ data }) => {
+  async ({ id, data }) => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/rgschedule/create`,
+        `${import.meta.env.VITE_API_URL}/rgschedule/create/${id}`,
+        data,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
+export const updateSchedule = createAsyncThunk(
+  "schedules/updateSchedule",
+  async ({ id, data }) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/rgschedule/update/${id}`,
         data,
         { withCredentials: true }
       );

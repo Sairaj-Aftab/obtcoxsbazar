@@ -37,6 +37,7 @@ export const createReview = async (req, res, next) => {
         phoneName,
         phoneModel,
         busInfoId: String(id),
+        paribahanUserId: String(id),
       },
     });
 

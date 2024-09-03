@@ -3,6 +3,7 @@ import {
   createSchedule,
   deleteSchedule,
   getAllRgSchedules,
+  updateSchedule,
 } from "./regularScheduleApiSlice";
 const regularSchedulesSlice = createSlice({
   name: "regularSchedules",
@@ -18,13 +19,13 @@ const regularSchedulesSlice = createSlice({
     setRgScheduleMessageEmpty: (state) => {
       state.message = null;
       state.error = null;
-      state.loader = false;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(createSchedule.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(createSchedule.pending, (state) => {
         state.loader = true;
@@ -34,6 +35,22 @@ const regularSchedulesSlice = createSlice({
         state.rgSchedules.unshift(action.payload.busSchedule);
         state.totalCount++;
         state.message = action.payload.message;
+      })
+      .addCase(updateSchedule.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(updateSchedule.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(updateSchedule.fulfilled, (state, action) => {
+        state.rgSchedules[
+          state.rgSchedules.findIndex(
+            (data) => data.id == action.payload.busSchedule.id
+          )
+        ] = action.payload.busSchedule;
+        state.message = action.payload.message;
+        state.loader = false;
       })
       .addCase(getAllRgSchedules.rejected, (state, action) => {
         state.loader = false;

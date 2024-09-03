@@ -1,5 +1,5 @@
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
@@ -269,7 +269,6 @@ const BusProfile = () => {
 
   return (
     <>
-      <Toaster />
       {loader && <PageLoader />}
       {showModal && (
         <Modal title="Add Schedule" close={() => setShowModal(false)}>

@@ -18,3 +18,21 @@ export const getAllRgSchedules = createAsyncThunk(
     }
   }
 );
+
+export const getSchedulesByParibahanId = createAsyncThunk(
+  "regularSchedules/getSchedulesByParibahanId",
+  async ({ id, page, limit, search }) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/rgschedule/getbyparibahanid/${id}`,
+        {
+          params: { page, limit, search },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
