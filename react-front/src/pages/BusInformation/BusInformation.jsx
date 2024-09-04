@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { busData } from "../../features/bus/busSlice";
 import { noticeData } from "../../features/notice/noticeSlice";
 import { getBusInfoData } from "../../features/bus/busApiSlice";
@@ -56,17 +56,22 @@ const BusInformation = () => {
           </a>
         );
       },
+      width: "140px",
     },
     {
       name: "Departure Place",
-      selector: (data) => data.leavingPlace,
+      // selector: (data) => data.leavingPlace,
       cell: (data) => {
         return (
-          <a href={data.mapLink} className="underline text-primary-color">
+          <a
+            href={`${data.leavingMapLink}`}
+            className="underline text-primary-color"
+          >
             {data.leavingPlace}
           </a>
         );
       },
+      width: "180px",
       sortable: true,
     },
     {

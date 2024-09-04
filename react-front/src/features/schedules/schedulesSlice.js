@@ -78,19 +78,25 @@ const schedulesSlice = createSlice({
       .addCase(updateSchedule.fulfilled, (state, action) => {
         state.loader = false;
         state.message = action.payload.message;
-        const authScheduleIndex = state.authSchedules.findIndex(
+        const authSchedulesArray = state.authSchedules || [];
+        const schedulesArray = state.schedules || [];
+        const todaySchedulesArray = state.todaySchedules || [];
+
+        const authScheduleIndex = authSchedulesArray.findIndex(
           (schedule) => schedule.id === action.payload.busSchedule.id
         );
         if (authScheduleIndex !== -1) {
           state.authSchedules[authScheduleIndex] = action.payload.busSchedule;
         }
-        const scheduleIndex = state.schedules.findIndex(
+
+        const scheduleIndex = schedulesArray.findIndex(
           (schedule) => schedule.id === action.payload.busSchedule.id
         );
         if (scheduleIndex !== -1) {
           state.schedules[scheduleIndex] = action.payload.busSchedule;
         }
-        const todayScheduleIndex = state.todaySchedules.findIndex(
+
+        const todayScheduleIndex = todaySchedulesArray.findIndex(
           (schedule) => schedule.id === action.payload.busSchedule.id
         );
         if (todayScheduleIndex !== -1) {

@@ -49,12 +49,15 @@ const BusProfile = () => {
     busNo: "",
     type: "",
     leavingPlace: "",
+    leavingMapLink: "",
     destinationPlace: "",
+    destinationMapLink: "",
     guideName: "",
     guidePhone: "",
     rent: "",
     seatStatus: null,
   });
+  console.log(input);
 
   const changeInputValue = (e) => {
     const { name, value } = e.target;
@@ -70,6 +73,15 @@ const BusProfile = () => {
       } else {
         setInput({ ...input, guideName: value, guidePhone: "" });
       }
+    } else if (name === "leavingPlace") {
+      const selectedPlace = leavingPlaces.find(
+        (place) => place.placeName === value
+      );
+      setInput({
+        ...input,
+        leavingPlace: value,
+        leavingMapLink: selectedPlace ? selectedPlace.mapLink : "",
+      });
     } else {
       setInput({ ...input, [name]: value });
     }
@@ -99,8 +111,21 @@ const BusProfile = () => {
   const [updateInput, setUpdateInput] = useState();
   const changeUpdateInputValue = (e) => {
     const { name, value } = e.target;
-    setUpdateInput({ ...updateInput, [name]: value });
+
+    if (name === "leavingPlace") {
+      const selectedPlace = leavingPlaces.find(
+        (place) => place.placeName === value
+      );
+      setUpdateInput({
+        ...updateInput,
+        leavingPlace: value,
+        leavingMapLink: selectedPlace ? selectedPlace.mapLink : "",
+      });
+    } else {
+      setUpdateInput({ ...updateInput, [name]: value });
+    }
   };
+
   const handleOpenUpdateForm = (id) => {
     const data = schedules.find((schedule) => schedule.id === id);
     setId(data.id);
@@ -197,8 +222,10 @@ const BusProfile = () => {
     },
     {
       name: "Departure Place",
-      selector: (data) => data.leavingPlace,
-      sortable: true,
+      // selector: (data) => data,
+      cell: (data) => {
+        return <a href={data.leavingMapLink}>{data.leavingPlace}</a>;
+      },
     },
     {
       name: "Destination",
@@ -251,7 +278,9 @@ const BusProfile = () => {
         busNo: "",
         type: "",
         leavingPlace: "",
+        leavingMapLink: "",
         destinationPlace: "",
+        destinationMapLink: "",
         guideName: "",
         guidePhone: "",
         rent: "",
@@ -345,6 +374,8 @@ const BusProfile = () => {
               <option value="AC">AC</option>
               <option value="Non-AC">Non-AC</option>
               <option value="Sleeper Coach">Sleeper Coach</option>
+              <option value="Double Decker">Double Decker</option>
+              <option value="Suite Class">Suite Class</option>
             </select>
             <select
               name="leavingPlace"
@@ -356,6 +387,20 @@ const BusProfile = () => {
               {leavingPlaces?.map((place, index) => (
                 <option key={index} value={place?.placeName}>
                   {place?.placeName}
+                </option>
+              ))}
+            </select>
+            <select
+              name="leavingMapLink"
+              id="leavingPlace"
+              value={input.leavingMapLink}
+              onChange={changeInputValue}
+              className="hidden"
+            >
+              <option value="">Leaving Map Link</option>
+              {leavingPlaces?.map((place, index) => (
+                <option key={index} value={place?.mapLink}>
+                  {place?.mapLink}
                 </option>
               ))}
             </select>
@@ -441,6 +486,8 @@ const BusProfile = () => {
                   <option value="AC">AC</option>
                   <option value="Non-AC">Non-AC</option>
                   <option value="Sleeper Coach">Sleeper Coach</option>
+                  <option value="Double Decker">Double Decker</option>
+                  <option value="Suite Class">Suite Class</option>
                 </select>
               </div>
             </div>
@@ -481,6 +528,20 @@ const BusProfile = () => {
                   {leavingPlaces?.map((place, index) => (
                     <option key={index} value={place?.placeName}>
                       {place?.placeName}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="leavingMapLink"
+                  id="leavingMapLink"
+                  value={updateInput.leavingMapLink}
+                  onChange={changeUpdateInputValue}
+                  className="hidden"
+                >
+                  <option value="">Leaving Map Link</option>
+                  {leavingPlaces?.map((place, index) => (
+                    <option key={index} value={place?.mapLink}>
+                      {place?.mapLink}
                     </option>
                   ))}
                 </select>

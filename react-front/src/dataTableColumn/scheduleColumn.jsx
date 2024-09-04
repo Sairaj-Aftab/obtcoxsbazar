@@ -15,6 +15,7 @@ const scheduleColumn = [
     name: "Paribahan",
     selector: (data) => data.busName,
     sortable: true,
+    width: "210px",
   },
   {
     name: "Type",
@@ -25,6 +26,7 @@ const scheduleColumn = [
     name: "Reg No",
     selector: (data) => data.busNo,
     sortable: true,
+    width: "150px",
   },
   {
     name: "Guide No",
@@ -39,17 +41,19 @@ const scheduleColumn = [
         </a>
       );
     },
+    width: "140px",
   },
   {
     name: "Departure Place",
-    selector: (data) => data.leavingPlace,
+    // selector: (data) => data.leavingPlace,
     cell: (data) => {
       return (
-        <a href={data.mapLink} className="underline text-primary-color">
+        <a href={data.leavingMapLink} className="underline text-primary-color">
           {data.leavingPlace}
         </a>
       );
     },
+    width: "180px",
     sortable: true,
   },
   {

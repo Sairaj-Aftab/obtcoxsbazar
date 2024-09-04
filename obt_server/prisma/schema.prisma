@@ -193,7 +193,9 @@ model BusSchedule {
     guideName String
     guidePhone String
     leavingPlace String
+    leavingMapLink String?
     destinationPlace String
+    destinationMapLink String?
     rent Int?
     seatStatus Boolean
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
