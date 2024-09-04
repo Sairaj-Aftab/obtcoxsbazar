@@ -21,9 +21,9 @@ const ProfileRegSchedule = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const {
-    paribahanRgSchedules,
-    totalParCount,
-    searchParCount,
+    authParibahanRgSchedules,
+    totalAuthParCount,
+    searchAuthParCount,
     loader,
     message,
     error,
@@ -156,7 +156,7 @@ const ProfileRegSchedule = () => {
           </div>
           <DataTable
             columns={column}
-            data={paribahanRgSchedules}
+            data={authParibahanRgSchedules}
             responsive
             // progressPending={loader}
             // progressComponent={
@@ -166,7 +166,9 @@ const ProfileRegSchedule = () => {
             // }
             pagination
             paginationServer
-            paginationTotalRows={totalParCount ? totalParCount : searchParCount}
+            paginationTotalRows={
+              totalAuthParCount ? totalAuthParCount : searchAuthParCount
+            }
             onChangeRowsPerPage={handlePerRowsChange}
             onChangePage={handlePageChange}
             paginationRowsPerPageOptions={[100, 150, 200]}

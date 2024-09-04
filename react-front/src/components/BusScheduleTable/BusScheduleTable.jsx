@@ -1,10 +1,10 @@
 import { schedulesData } from "../../features/schedules/schedulesSlice";
 import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
-import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import TodayDate from "../TodayDate";
+import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 
 const BusScheduleTable = () => {
   const { todaySchedules, todayScheduleLoader } = useSelector(schedulesData);

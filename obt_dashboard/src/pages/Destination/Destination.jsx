@@ -20,6 +20,7 @@ const Destination = () => {
   const { places, leavingPlaces, destinationPlaces, message, success, error } =
     useSelector(placeData);
   const [placeName, setPlaceName] = useState("");
+  const [mapLink, setMapLink] = useState("");
   const [placeStatus, setPlaceStatus] = useState("");
 
   const handleSubmit = (e) => {
@@ -34,17 +35,19 @@ const Destination = () => {
 
   const [id, setId] = useState("");
   const [plName, setPlName] = useState("");
+  const [map, setMap] = useState("");
   const handleShowPlaceName = (id) => {
     setId(id);
     const place = places.find((pl) => pl.id === id);
     setPlName(place.placeName);
+    setMap(place?.mapLink);
   };
 
   const handleUpdate = (id) => {
     if (!plName) {
       toast.error("Place is required!");
     } else {
-      dispatch(updatePlace({ id, placeName: plName }));
+      dispatch(updatePlace({ id, data: { placeName: plName, mapLink: map } }));
       setId("");
     }
   };
@@ -208,7 +211,7 @@ const Destination = () => {
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Place Name</th>
+                        <th>Place & Map</th>
                         <th className="text-right">Actions</th>
                       </tr>
                     </thead>
@@ -218,16 +221,27 @@ const Destination = () => {
                         <tr key={place.id}>
                           <td>{index + 1}</td>
                           {id === place?.id ? (
-                            <td>
+                            <td className="d-flex flex-column">
                               <input
                                 type="text"
                                 value={plName}
                                 onChange={(e) => setPlName(e.target.value)}
                                 className="form-control"
                               />
+                              <input
+                                type="text"
+                                value={map}
+                                onChange={(e) => setMap(e.target.value)}
+                                className="form-control"
+                              />
                             </td>
                           ) : (
-                            <td>{place.placeName}</td>
+                            <td className="d-flex flex-column">
+                              <span>{place.placeName}</span>
+                              <a target="_blank" href={place?.mapLink}>
+                                {place?.mapLink}
+                              </a>
+                            </td>
                           )}
                           <td className="text-right">
                             <div className="actions">

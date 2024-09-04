@@ -8,10 +8,11 @@ const regularSchedulesSlice = createSlice({
   initialState: {
     rgSchedules: [],
     paribahanRgSchedules: [],
+    authParibahanRgSchedules: [],
     totalCount: 0,
     searchCount: 0,
-    totalParCount: 0,
-    searchParCount: 0,
+    totalAuthParCount: 0,
+    searchAuthParCount: 0,
     message: null,
     error: null,
     loader: false,
@@ -23,6 +24,11 @@ const regularSchedulesSlice = createSlice({
       state.error = null;
       state.loader = false;
       state.parLoader = false;
+    },
+    getParibahanRgSchedules: (state, action) => {
+      state.paribahanRgSchedules = state.rgSchedules.filter(
+        (item) => item.paribahanUserId === action.payload
+      );
     },
   },
   extraReducers: (builder) => {
@@ -49,9 +55,9 @@ const regularSchedulesSlice = createSlice({
       })
       .addCase(getSchedulesByParibahanId.fulfilled, (state, action) => {
         state.parLoader = false;
-        state.totalParCount = action.payload.count;
-        state.searchParCount = action.payload.searchCount;
-        state.paribahanRgSchedules = action.payload.schedules;
+        state.totalAuthParCount = action.payload.count;
+        state.searchAuthParCount = action.payload.searchCount;
+        state.authParibahanRgSchedules = action.payload.schedules;
       });
   },
 });
@@ -60,7 +66,8 @@ const regularSchedulesSlice = createSlice({
 export const rgSchedulesData = (state) => state.rgSchedules;
 
 // Actions
-export const { setRgScheduleMessageEmpty } = regularSchedulesSlice.actions;
+export const { getParibahanRgSchedules, setRgScheduleMessageEmpty } =
+  regularSchedulesSlice.actions;
 
 // exports
 export default regularSchedulesSlice.reducer;

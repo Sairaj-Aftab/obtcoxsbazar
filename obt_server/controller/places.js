@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const createPlace = async (req, res, next) => {
   try {
-    const { placeName, status } = req.body;
+    const { placeName, status, mapLink } = req.body;
     const existingPlace = await prisma.leaveDestinationPlace.findUnique({
       where: {
         placeName,
@@ -19,6 +19,7 @@ export const createPlace = async (req, res, next) => {
         placeName,
         slug: createSlug(placeName),
         status,
+        mapLink,
       },
     });
     return res.status(200).json({ place, message: "Successfully created" });
@@ -30,7 +31,7 @@ export const createPlace = async (req, res, next) => {
 export const updatePlace = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { placeName } = req.body;
+    const { placeName, mapLink } = req.body;
 
     const existingPlace = await prisma.leaveDestinationPlace.findFirst({
       where: {
@@ -50,6 +51,7 @@ export const updatePlace = async (req, res, next) => {
       data: {
         placeName,
         slug: createSlug(placeName),
+        mapLink,
       },
     });
     return res.status(200).json({ place, message: "Successfully updated" });

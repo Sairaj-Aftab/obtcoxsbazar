@@ -49,27 +49,37 @@ const Display = () => {
       const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
 
       // Function to find schedules within a given range
-      const findSchedulesInRange = (startTime, endTime) => {
+      // const findSchedulesInRange = (startTime, endTime) => {
+      //   return todaySchedules?.filter((data) => {
+      //     const scheduleTime = new Date(data.time);
+      //     return scheduleTime >= startTime && scheduleTime < endTime;
+      //   });
+      // };
+      // Function to find schedules within the past 15 minutes and onward
+      const findSchedulesInRange = (startTime) => {
         return todaySchedules?.filter((data) => {
           const scheduleTime = new Date(data.time);
-          return scheduleTime >= startTime && scheduleTime < endTime;
+          return scheduleTime >= startTime;
         });
       };
 
-      let nextHour = new Date(now.getTime() + 60 * 60 * 1000);
-      let filteredSchedules = findSchedulesInRange(fifteenMinutesAgo, nextHour);
+      // let nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+      // let filteredSchedules = findSchedulesInRange(fifteenMinutesAgo, nextHour);
+
+      // Get schedules from fifteen minutes ago onward
+      const filteredSchedules = findSchedulesInRange(fifteenMinutesAgo);
 
       // If no schedules are found in the previous 15 minutes, check the next 24 hours
-      if (filteredSchedules?.length < 15) {
-        for (let i = 0; i < 24; i++) {
-          nextHour = new Date(nextHour.getTime() + 60 * 60 * 1000);
-          filteredSchedules = findSchedulesInRange(fifteenMinutesAgo, nextHour);
+      // if (filteredSchedules?.length < 15) {
+      //   for (let i = 0; i < 24; i++) {
+      //     nextHour = new Date(nextHour.getTime() + 60 * 60 * 1000);
+      //     filteredSchedules = findSchedulesInRange(fifteenMinutesAgo, nextHour);
 
-          if (filteredSchedules?.length >= 15) break; // Stop if schedules are found
-        }
-      }
+      //     if (filteredSchedules?.length >= 15) break; // Stop if schedules are found
+      //   }
+      // }
 
-      setDisSchedules(filteredSchedules?.slice(0, 15)); // Limit to 15 schedules
+      setDisSchedules(filteredSchedules?.slice()); // Limit to 15 schedules
     };
 
     updateSchedules(); // Initial update
@@ -84,7 +94,7 @@ const Display = () => {
   return (
     <div className="display bg-black h-screen w-full flex items-center justify-center fixed -z-10">
       <div className="w-full flex flex-col gap-8">
-        <div className="flex justify-between items-center w-[90%] mx-auto">
+        <div className="flex justify-between items-center w-[95%] mx-auto">
           <div className="w-40 text-white">
             <img src={logoImg2} alt="OBT" sizes="100vw" className="w-48" />
           </div>
@@ -153,7 +163,7 @@ const Display = () => {
             )}
           </div>
         </div>
-        <div className="text-white w-[90%] mx-auto text-3xl font-semibold">
+        <div className="text-white w-[95%] mx-auto text-3xl font-semibold">
           <NoticeFromAdmin status="Display" />
         </div>
       </div>

@@ -19,11 +19,11 @@ export const createPlace = createAsyncThunk(
 
 export const updatePlace = createAsyncThunk(
   "place/updatePlace",
-  async ({ id, placeName }) => {
+  async ({ id, data }) => {
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/place/update/${id}`,
-        { placeName },
+        data,
         { withCredentials: true }
       );
       return response.data;

@@ -29,11 +29,27 @@ const scheduleColumn = [
   {
     name: "Guide No",
     selector: (data) => data.guidePhone,
-    sortable: true,
+    cell: (data) => {
+      return (
+        <a
+          href={`tel:+88${data.guidePhone}`}
+          className="underline text-primary-color"
+        >
+          {data.guidePhone}
+        </a>
+      );
+    },
   },
   {
     name: "Departure Place",
     selector: (data) => data.leavingPlace,
+    cell: (data) => {
+      return (
+        <a href={data.mapLink} className="underline text-primary-color">
+          {data.leavingPlace}
+        </a>
+      );
+    },
     sortable: true,
   },
   {
