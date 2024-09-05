@@ -11,7 +11,6 @@ import Display from "../pages/Display/Display";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
-import Map from "../pages/Map/Map";
 import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 
 const publicRoutes = [
@@ -66,10 +65,6 @@ const publicRoutes = [
       {
         path: "/bus/comp/:slug/:id",
         element: <BusComReviewByQR />,
-      },
-      {
-        path: "/map/:placeName",
-        element: <Map />,
       },
     ],
   },

@@ -164,16 +164,6 @@ const BusInfo = () => {
       sortable: true,
     },
     {
-      name: "Remark",
-      selector: (data) => data.comment,
-      sortable: true,
-    },
-    {
-      name: "Report",
-      selector: (data) => data.report,
-      sortable: true,
-    },
-    {
       name: "QR Code",
       selector: (data) => data,
       cell: (data) => {
@@ -202,6 +192,17 @@ const BusInfo = () => {
         );
       },
     },
+    {
+      name: "Remark",
+      selector: (data) => data.comment,
+      sortable: true,
+    },
+    {
+      name: "Report",
+      selector: (data) => data.report,
+      sortable: true,
+    },
+
     {
       name: "Entry Date",
       selector: (data) => formatDate(data.createdAt),

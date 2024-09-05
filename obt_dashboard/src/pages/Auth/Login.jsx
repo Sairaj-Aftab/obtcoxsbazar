@@ -76,7 +76,7 @@ const Login = () => {
                   <div className="form-group">
                     <input
                       className="form-control"
-                      type="text"
+                      type="password"
                       name="password"
                       placeholder="Password"
                       value={input.password}
