@@ -83,7 +83,7 @@ const DriverInfo = () => {
     if (!infoData.name) {
       toast.error("Name is required");
     } else {
-      dispatch(updateDriverInfo({ id: Number(id), data: infoData }));
+      dispatch(updateDriverInfo({ id: String(id), data: infoData }));
     }
   };
   const handleDeleteInfo = (id) => {
@@ -182,7 +182,7 @@ const DriverInfo = () => {
         <div className="actions">
           <a
             className="btn btn-sm bg-success-light mr-2"
-            data-target="#guideInfoEditPopup"
+            data-target="#driverInfoEditPopup"
             data-toggle="modal"
             href="#edit_specialities_details"
             onClick={() => handleOpenUpdateForm(data.id)}
@@ -219,10 +219,10 @@ const DriverInfo = () => {
     if (error) {
       toast.error(error);
     }
-    return () => {
+    if (message || error) {
       dispatch(setDriverInfoMessageEmpty());
-    };
-  }, [message, loader, error, dispatch]);
+    }
+  }, [message, error, dispatch]);
   return (
     <>
       {/* Create  Bus Info */}
@@ -318,8 +318,14 @@ const DriverInfo = () => {
               placeholder="Report"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
-            Create
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              authUser?.role?.name === "VIEWER" || loader ? true : false
+            }
+          >
+            {loader ? <i className="fa fa-spinner fa-spin"></i> : "Submit"}
           </button>
         </form>
       </ModalPopup>
@@ -416,8 +422,14 @@ const DriverInfo = () => {
               placeholder="Report"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
-            Edit
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              authUser?.role?.name === "VIEWER" || loader ? true : false
+            }
+          >
+            {loader ? <i className="fa fa-spinner fa-spin"></i> : "Update"}
           </button>
         </form>
       </ModalPopup>
