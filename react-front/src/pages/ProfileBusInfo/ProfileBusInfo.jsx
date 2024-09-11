@@ -109,7 +109,7 @@ const ProfileBusInfo = () => {
       sortable: true,
     },
     {
-      name: "Remark",
+      name: "Road Permit",
       selector: (data) => data.comment,
       sortable: true,
     },
@@ -118,20 +118,20 @@ const ProfileBusInfo = () => {
       selector: (data) => formatDateTime(data.createdAt),
       sortable: true,
     },
-    {
-      name: "Actions",
-      cell: (data) => (
-        <div className="flex justify-end gap-1">
-          <button
-            onClick={() => handleOpenUpdateForm(data.id)}
-            className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded"
-          >
-            Edit
-          </button>
-        </div>
-      ),
-      right: true, // Align the column to the right
-    },
+    // {
+    //   name: "Actions",
+    //   cell: (data) => (
+    //     <div className="flex justify-end gap-1">
+    //       <button
+    //         onClick={() => handleOpenUpdateForm(data.id)}
+    //         className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded"
+    //       >
+    //         Edit
+    //       </button>
+    //     </div>
+    //   ),
+    //   right: true, // Align the column to the right
+    // },
   ];
 
   useEffect(() => {

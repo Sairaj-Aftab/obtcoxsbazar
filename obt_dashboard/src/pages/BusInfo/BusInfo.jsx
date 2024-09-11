@@ -193,7 +193,7 @@ const BusInfo = () => {
       },
     },
     {
-      name: "Remark",
+      name: "R. Permit",
       selector: (data) => data.comment,
       sortable: true,
     },

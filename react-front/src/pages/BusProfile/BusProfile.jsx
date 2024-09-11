@@ -55,9 +55,9 @@ const BusProfile = () => {
     guideName: "",
     guidePhone: "",
     rent: "",
+    discountRent: "",
     seatStatus: null,
   });
-  console.log(input);
 
   const changeInputValue = (e) => {
     const { name, value } = e.target;
@@ -233,13 +233,25 @@ const BusProfile = () => {
       sortable: true,
     },
     {
-      name: "Rent",
-      selector: (data) => `৳ ${data.rent ? data.rent : "--"}`,
+      name: "Fare",
+      cell: (data) => (
+        <p className="w-full flex flex-col text-center">
+          <span>{`৳ ${
+            data.discountRent ? data.discountRent : data.rent
+          }`}</span>
+          {data.discountRent > 0 && (
+            <div className="text-red -mt-2">
+              ৳ <span className="line-through text-xs">{data.rent}</span>
+            </div>
+          )}
+        </p>
+      ),
       sortable: true,
     },
     {
       name: "Seat Status",
       selector: (data) => (data.seatStatus ? "Available" : "Booked"),
+
       sortable: true,
     },
     {
@@ -284,6 +296,7 @@ const BusProfile = () => {
         guideName: "",
         guidePhone: "",
         rent: "",
+        discountRent: "",
         seatStatus: "",
       });
       setShowUpdateModal(false);
@@ -417,13 +430,40 @@ const BusProfile = () => {
                 </option>
               ))}
             </select>
-            <input
-              type="number"
-              name="rent"
-              value={input.rent}
-              onChange={changeInputValue}
-              placeholder="Rent ৳"
-            />
+            {/* For desktop view */}
+            <div className="hidden sm:flex gap-2">
+              <input
+                type="number"
+                name="rent"
+                value={input.rent}
+                onChange={changeInputValue}
+                placeholder="৳ Regular Price"
+              />
+              <input
+                type="number"
+                name="discountRent"
+                value={input.discountRent}
+                onChange={changeInputValue}
+                placeholder="৳ Discount Price (Optional)"
+              />
+            </div>
+            {/* For Mobile view */}
+            <div className="flex sm:hidden gap-2">
+              <input
+                type="number"
+                name="rent"
+                value={input.rent}
+                onChange={changeInputValue}
+                placeholder="৳ Reg. Price"
+              />
+              <input
+                type="number"
+                name="discountRent"
+                value={input.discountRent}
+                onChange={changeInputValue}
+                placeholder="৳ Dis. Price (Optional)"
+              />
+            </div>
             <select
               name="seatStatus"
               id="seatStatus"
@@ -566,13 +606,33 @@ const BusProfile = () => {
 
             <div className="flex gap-3 justify-between items-center">
               <div className="w-1/2">
-                <label htmlFor="rent">৳ Rent</label>
+                <label htmlFor="rent" className="hidden sm:block">
+                  ৳ Regular Price
+                </label>
+                <label htmlFor="rent" className="sm:hidden">
+                  ৳ Reg. Price
+                </label>
                 <input
                   type="number"
                   name="rent"
                   value={updateInput.rent}
                   onChange={changeUpdateInputValue}
-                  placeholder="Rent ৳"
+                  placeholder="৳ Regular Price"
+                />
+              </div>
+              <div className="w-1/2">
+                <label htmlFor="rent" className="hidden sm:block">
+                  ৳ Discount Price
+                </label>
+                <label htmlFor="rent" className="sm:hidden">
+                  ৳ Dis. Price
+                </label>
+                <input
+                  type="number"
+                  name="discountRent"
+                  value={updateInput.discountRent}
+                  onChange={changeUpdateInputValue}
+                  placeholder="৳ Discount Price (Optional)"
                 />
               </div>
               <div className="w-1/2">

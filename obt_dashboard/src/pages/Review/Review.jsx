@@ -15,12 +15,22 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { formatDateTime } from "../../utils/timeAgo";
 import Loading from "../../components/Loading/Loading";
+import ModalPopup from "../../components/ModalPopup/ModalPopup";
 
 const Review = () => {
   const dispatch = useDispatch();
   const { reviews, totalCount, searchCount, loader, message, error } =
     useSelector(reviewsData);
   const { authUser } = useSelector(authData);
+
+  const [review, setReview] = useState({});
+
+  const handleShowReview = (id) => {
+    const selectedReview = reviews.find((review) => review.id === id);
+    if (selectedReview) {
+      setReview(selectedReview);
+    }
+  };
 
   const handleDeleteSchedule = (id) => {
     swal({
@@ -79,6 +89,25 @@ const Review = () => {
     {
       name: "#",
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "60px",
+    },
+    {
+      name: "View",
+      cell: (data) => (
+        <a
+          data-target="#showreview"
+          data-toggle="modal"
+          href="#edit_specialities_details"
+          rel="noreferrer"
+          onClick={() => handleShowReview(data.id)}
+        >
+          <i
+            className="fa fa-eye"
+            aria-hidden="true"
+            style={{ color: "#00d0f1", fontSize: "17px" }}
+          ></i>
+        </a>
+      ),
       width: "60px",
     },
     {
@@ -173,6 +202,44 @@ const Review = () => {
   ];
   return (
     <>
+      <ModalPopup title={review.paribahanName} target="showreview">
+        <div>
+          {review?.regNo && (
+            <p>
+              <b>Registration No : </b> {review?.regNo}
+            </p>
+          )}
+          <p>
+            <b>Name : </b> {review?.name}
+          </p>
+          {review?.phoneNumber && (
+            <p>
+              <b>Phone number : </b> {review?.phoneNumber}
+            </p>
+          )}
+          <p>
+            <b>Rating : </b> {review.rating}
+          </p>
+          {review?.comment && (
+            <p>
+              <b>Comment : </b> {review?.comment}
+            </p>
+          )}
+          {review?.tripTime && (
+            <p>
+              <b>Trip Time : </b> {formatDateTime(review?.tripTime)}
+            </p>
+          )}
+          {review?.destination && (
+            <p>
+              <b>Destination : </b> {review?.destination}
+            </p>
+          )}
+          <p>
+            <b>Entry Date : </b> {formatDateTime(review.createdAt)}
+          </p>
+        </div>
+      </ModalPopup>
       <PageHeader title="Reviews" />
       <input
         type="text"

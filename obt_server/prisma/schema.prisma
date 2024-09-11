@@ -197,6 +197,7 @@ model BusSchedule {
     destinationPlace String
     destinationMapLink String?
     rent Int?
+    discountRent Int?
     seatStatus Boolean
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
     paribahanUserId String @db.ObjectId
