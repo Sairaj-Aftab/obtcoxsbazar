@@ -7,7 +7,7 @@ const AboutPage = () => {
         <title>About OBT - Online Bus Terminal</title>
         <meta
           name="description"
-          content="Learn about the Online Bus Terminal (OBT) in Cox's Bazar. Discover its features, benefits, and how it enhances travel."
+          content="Learn about the Online Bus Terminal in Cox's Bazar. Discover its features, benefits, and how it enhances travel."
         />
       </Helmet>
 

@@ -68,7 +68,7 @@ function App() {
         </title>
         <meta
           name="description"
-          content="Welcome to Online Bus Terminal (OBT) in Cox's Bazar. Discover the convenience of smart bus travel with our digital platform, offering easy booking, real-time updates, fare comparisons, and more. Enjoy a seamless travel experience with features like seat selection, schedule information, and 24/7 customer service. Explore our platform to find all bus services, destinations, and special offers, and connect with local and tourism industries for a safer, efficient, and enjoyable journey."
+          content="Welcome to Online Bus Terminal in Cox's Bazar. Discover the convenience of smart bus travel with our digital platform, offering easy booking, real-time updates, fare comparisons, and more. Enjoy a seamless travel experience with features like seat selection, schedule information, and 24/7 customer service. Explore our platform to find all bus services, destinations, and special offers, and connect with local and tourism industries for a safer, efficient, and enjoyable journey."
         />
         {/* Meta tags for Facebook */}
         <meta
