@@ -75,11 +75,10 @@ const ProfileHeader = () => {
         <div className="flex justify-between items-start ">
           <div>
             <h1 className="text-2xl font-medium text-gray-700">
-              Paribahan Name:{" "}
               <span className="text-primary-color">{user?.paribahanName}</span>
             </h1>
             <p className="text-lg font-medium text-gray-700">
-              Sale Number:{" "}
+              Sales Number:{" "}
               <span className="text-primary-color">{user?.salesNumber}</span>
             </p>
           </div>
@@ -92,7 +91,7 @@ const ProfileHeader = () => {
         </div>
 
         <div className="text-base font-semibold pb-5 sm:flex gap-1">
-          <p className="sm:basis-4/12 lg:basis-2/12">
+          <p className="sm:basis-4/12 lg:basis-2/12 hidden sm:block">
             Notice from Traffic Police :
           </p>
           <p className="sm:basis-8/12 lg:basis-10/12">

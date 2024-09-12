@@ -1,6 +1,8 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { FaPhone } from "react-icons/fa6";
+import locationIcon from "../../assets/icon/location.png";
 import { Link, useParams } from "react-router-dom";
 import { busData } from "../../features/bus/busSlice";
 import { noticeData } from "../../features/notice/noticeSlice";
@@ -50,13 +52,14 @@ const BusInformation = () => {
         return (
           <a
             href={`tel:+88${data.guidePhone}`}
-            className="underline text-primary-color"
+            className="w-full flex items-center gap-1 text-primary-color"
           >
-            {data.guidePhone}
+            <FaPhone size={16} />
+            <span>{data.guidePhone}</span>
           </a>
         );
       },
-      width: "140px",
+      width: "160px",
     },
     {
       name: "Departure Place",
@@ -64,20 +67,24 @@ const BusInformation = () => {
       cell: (data) => {
         return (
           <a
-            href={`${data.leavingMapLink}`}
-            className="underline text-primary-color"
+            href={data.leavingMapLink}
+            className="w-full flex items-center gap-1 text-primary-color"
           >
-            {data.leavingPlace}
+            {data.leavingMapLink && (
+              <img src={locationIcon} alt="" className="w-6" />
+            )}
+            <span>{data.leavingPlace}</span>
           </a>
         );
       },
-      width: "180px",
+      width: "200px",
       sortable: true,
     },
     {
       name: "Destination",
       selector: (data) => data.destinationPlace,
       sortable: true,
+      width: "160px",
     },
     {
       name: "Fare",

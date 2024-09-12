@@ -1,4 +1,6 @@
 import { formatDateTime } from "../utils/formatDateTime";
+import { FaPhone } from "react-icons/fa6";
+import locationIcon from "../assets/icon/location.png";
 
 const scheduleColumn = [
   {
@@ -35,31 +37,39 @@ const scheduleColumn = [
       return (
         <a
           href={`tel:+88${data.guidePhone}`}
-          className="underline text-primary-color"
+          className="w-full flex items-center gap-1 text-primary-color"
         >
-          {data.guidePhone}
+          <FaPhone size={16} />
+          <span>{data.guidePhone}</span>
         </a>
       );
     },
-    width: "140px",
+    width: "160px",
   },
   {
     name: "Departure Place",
     // selector: (data) => data.leavingPlace,
     cell: (data) => {
       return (
-        <a href={data.leavingMapLink} className="underline text-primary-color">
-          {data.leavingPlace}
+        <a
+          href={data.leavingMapLink}
+          className="w-full flex items-center gap-1 text-primary-color"
+        >
+          {data.leavingMapLink && (
+            <img src={locationIcon} alt="" className="w-6" />
+          )}
+          <span>{data.leavingPlace}</span>
         </a>
       );
     },
-    width: "180px",
+    width: "200px",
     sortable: true,
   },
   {
     name: "Destination",
     selector: (data) => data.destinationPlace,
     sortable: true,
+    width: "160px",
   },
   {
     name: "Fare",

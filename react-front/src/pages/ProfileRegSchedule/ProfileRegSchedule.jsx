@@ -28,6 +28,11 @@ const ProfileRegSchedule = () => {
     message,
     error,
   } = useSelector(rgSchedulesData);
+
+  const handleHideShowRgSchedule = () => {
+    // dispatch(setRgScheduleMessageEmpty());
+  };
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
@@ -90,12 +95,19 @@ const ProfileRegSchedule = () => {
       name: "Actions",
       cell: (data) => (
         <div className="flex justify-end gap-1 w-fit">
-          <button
-            //   onClick={() => handleOpenUpdateForm(data.id)}
-            className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded w-full"
+          <label
+            onClick={() => handleHideShowRgSchedule(data.id)}
+            className="relative inline-flex items-center cursor-pointer"
           >
-            OFF
-          </button>
+            <input
+              type="checkbox"
+              checked={data.status} // Bind to status
+              className="sr-only peer"
+              readOnly
+            />
+            <div className="w-11 h-6 bg-red rounded-full peer peer-checked:bg-primary-color"></div>
+            <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+          </label>
           <button
             //   onClick={() => handleOpenUpdateForm(data.id)}
             className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded w-full"

@@ -108,16 +108,41 @@ const ProfileBusInfo = () => {
       selector: (data) => data.type,
       sortable: true,
     },
+    // {
+    //   name: "FC Expire",
+    //   cell: (data) => {
+    //     const currentDate = new Date();
+    //     const fcExpireDate = new Date(data?.fcExpire);
+    //     const isExpired = fcExpireDate < currentDate;
+
+    //     return (
+    //       <span
+    //         style={{
+    //           color: isExpired ? "red" : "inherit",
+    //           textDecoration: isExpired ? "line-through" : "none",
+    //         }}
+    //       >
+    //         {data.fcExpire}
+    //       </span>
+    //     );
+    //   },
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Route Permit",
+    //   selector: (data) => data.comment,
+    //   sortable: true,
+    // },
     {
-      name: "Road Permit",
-      selector: (data) => data.comment,
+      name: "Report",
+      selector: (data) => data.report,
       sortable: true,
     },
-    {
-      name: "Entry Date",
-      selector: (data) => formatDateTime(data.createdAt),
-      sortable: true,
-    },
+    // {
+    //   name: "Entry Date",
+    //   selector: (data) => formatDateTime(data.createdAt),
+    //   sortable: true,
+    // },
     // {
     //   name: "Actions",
     //   cell: (data) => (
@@ -179,16 +204,16 @@ const ProfileBusInfo = () => {
               <option value="Sleeper Coach">Sleeper Coach</option>
               <option value="Double-decker">Double-decker</option>
             </select>
-            <input
+            {/* <input
               type="text"
               name="comment"
               value={input.comment}
               onChange={changeInputValue}
               placeholder="Remark"
-            />
+            /> */}
             <button
               type="submit"
-              className="bg-primary-color py-1 text-base font-medium text-white rounded"
+              className="bg-primary-color py-1 text-base font-medium text-white rounded disabled:cursor-not-allowed disabled:opacity-80"
               disabled={loader}
             >
               {loader ? "Adding..." : "Add"}
@@ -285,42 +310,6 @@ const ProfileBusInfo = () => {
             },
           }}
         />
-        {/* <div className="overflow-x-auto">
-          <table className="mt-5 border border-gray-300 rounded-lg">
-            <thead>
-              <tr className="text-sm font-semibold bg-primary-color text-white">
-                <th>#</th>
-                <th>Bus Reg No</th>
-                <th>Type</th>
-                <th>Remark</th>
-                <th>Entry Date</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {busInfo
-                ?.slice()
-                .sort((a, b) => a.regNo.localeCompare(b.regNo))
-                ?.map((data, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{data.regNo}</td>
-                    <td>{data.type}</td>
-                    <td>{data?.comment}</td>
-                    <td>{formatDateTime(data.createdAt)}</td>
-                    <td className="flex justify-end gap-1">
-                      <button
-                        onClick={() => handleOpenUpdateForm(data.id)}
-                        className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div> */}
       </div>
     </>
   );

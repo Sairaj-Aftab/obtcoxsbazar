@@ -3,6 +3,8 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
+import { FaPhone } from "react-icons/fa6";
+import locationIcon from "../../assets/icon/location.png";
 import {
   schedulesData,
   setMessageEmpty,
@@ -218,14 +220,26 @@ const BusProfile = () => {
     {
       name: "Guide Phone",
       selector: (data) => data.guidePhone,
+      width: "125px",
       sortable: true,
     },
     {
       name: "Departure Place",
       // selector: (data) => data,
       cell: (data) => {
-        return <a href={data.leavingMapLink}>{data.leavingPlace}</a>;
+        return (
+          <a
+            href={data.leavingMapLink}
+            className="w-full flex items-center gap-1 text-primary-color"
+          >
+            {data.leavingMapLink && (
+              <img src={locationIcon} alt="" className="w-6" />
+            )}
+            <span>{data.leavingPlace}</span>
+          </a>
+        );
       },
+      width: "180px",
     },
     {
       name: "Destination",
