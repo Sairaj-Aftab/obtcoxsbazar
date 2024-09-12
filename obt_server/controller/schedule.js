@@ -23,6 +23,16 @@ export const createSchedule = async (req, res, next) => {
       seatStatus,
     } = req.body;
 
+    const existingTimeAndBusNo = await prisma.busSchedule.findFirst({
+      where: {
+        AND: [{ time }, { busNo }],
+      },
+    });
+
+    if (existingTimeAndBusNo) {
+      return next(createError(400, "Schedule already exists!"));
+    }
+
     // Hash the password
     const busSchedule = await prisma.busSchedule.create({
       data: {
