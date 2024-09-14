@@ -158,6 +158,7 @@ model DriverInfo {
     paribahanName String
     slug String
     name String
+    fatherName String?
     phone String?
     license String?
     address String?

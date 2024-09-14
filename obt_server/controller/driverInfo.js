@@ -6,8 +6,16 @@ const prisma = new PrismaClient();
 export const createDriverInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { paribahanName, name, phone, license, address, comment, report } =
-      req.body;
+    const {
+      paribahanName,
+      name,
+      fatherName,
+      phone,
+      license,
+      address,
+      comment,
+      report,
+    } = req.body;
 
     let queryConditions = [];
 
@@ -42,6 +50,7 @@ export const createDriverInfo = async (req, res, next) => {
         paribahanName,
         slug: createSlug(paribahanName),
         name,
+        fatherName,
         phone,
         license,
         address,
@@ -65,7 +74,8 @@ export const createDriverInfo = async (req, res, next) => {
 export const updateDriverInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, phone, license, address, comment, report } = req.body;
+    const { name, fatherName, phone, license, address, comment, report } =
+      req.body;
 
     let queryConditions = [];
 
@@ -110,6 +120,7 @@ export const updateDriverInfo = async (req, res, next) => {
       },
       data: {
         name,
+        fatherName,
         phone,
         license,
         address,

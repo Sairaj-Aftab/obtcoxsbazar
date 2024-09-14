@@ -26,6 +26,7 @@ const ProfileDriverInfo = () => {
   const [input, setInput] = useState({
     paribahanName: user?.paribahanName,
     name: "",
+    fatherName: "",
     phone: "",
     license: "",
     address: "",
@@ -37,8 +38,9 @@ const ProfileDriverInfo = () => {
   };
   const handleSubmitInfo = (e) => {
     e.preventDefault();
-    if (!input.name) {
-      toast.error("Name is required!");
+    if (!input.name || !input.fatherName) {
+      !input.name && toast.error("Name is required!");
+      !input.fatherName && toast.error("Father Name is required!");
     } else {
       dispatch(createDriverInfo({ id: user.id, data: input }));
     }
@@ -60,8 +62,9 @@ const ProfileDriverInfo = () => {
   };
   const handleUpdateInfo = (e) => {
     e.preventDefault();
-    if (!infoData.name) {
-      toast.error("Name is required");
+    if (!infoData.name || !infoData.fatherName) {
+      !infoData.name && toast.error("Name is required");
+      !infoData.fatherName && toast.error("Father Name is required");
     } else {
       dispatch(updateDriverInfo({ id, data: infoData }));
     }
@@ -104,6 +107,11 @@ const ProfileDriverInfo = () => {
     {
       name: "Name",
       selector: (data) => data.name,
+      sortable: true,
+    },
+    {
+      name: "Father Name",
+      selector: (data) => data.fatherName,
       sortable: true,
     },
     {
@@ -152,6 +160,7 @@ const ProfileDriverInfo = () => {
       toast.success(message);
       setInput({
         name: "",
+        fatherName: "",
         phone: "",
         license: "",
         address: "",
@@ -165,7 +174,7 @@ const ProfileDriverInfo = () => {
     return () => {
       dispatch(setDriverInfoMessageEmpty());
     };
-  }, [message, loader, error, dispatch, user?.id]);
+  }, [message, error, dispatch, user?.id]);
   return (
     <>
       <Toaster />
@@ -181,6 +190,13 @@ const ProfileDriverInfo = () => {
               value={input.name}
               onChange={changeInputValue}
               placeholder="Driver Name"
+            />
+            <input
+              type="text"
+              name="fatherName"
+              value={input.fatherName}
+              onChange={changeInputValue}
+              placeholder="Father Name"
             />
             <input
               type="text"
@@ -232,6 +248,13 @@ const ProfileDriverInfo = () => {
               value={infoData.name}
               onChange={changeInfoData}
               placeholder="Driver Name"
+            />
+            <input
+              type="text"
+              name="fatherName"
+              value={infoData.fatherName}
+              onChange={changeInfoData}
+              placeholder="Father Name"
             />
             <input
               type="text"
@@ -317,52 +340,6 @@ const ProfileDriverInfo = () => {
             },
           }}
         />
-        {/* <div className="overflow-x-auto">
-          <table className="mt-5 border border-gray-300 rounded-lg">
-            <thead>
-              <tr className="text-sm font-semibold bg-primary-color text-white">
-                <th>#</th>
-                <th>Driver Name</th>
-                <th>Phone Number</th>
-                <th>Driving License No</th>
-                <th>Address</th>
-                <th>Remark</th>
-                <th>Entry Date</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {driverInfo
-                ?.slice()
-                .sort((a, b) => a.name.localeCompare(b.name))
-                ?.map((data, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{data.name}</td>
-                    <td>{data?.phone}</td>
-                    <td>{data?.license}</td>
-                    <td>{data?.address}</td>
-                    <td>{data?.comment}</td>
-                    <td>{formatDateTime(data.createdAt)}</td>
-                    <td className="flex justify-end gap-1">
-                      <button
-                        onClick={() => handleOpenUpdateForm(data.id)}
-                        className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                      onClick={() => handleDeleteSchedule(data.id)}
-                      className="bg-red py-1 px-2 text-sm font-medium text-white rounded"
-                    >
-                      Delete
-                    </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div> */}
       </div>
     </>
   );

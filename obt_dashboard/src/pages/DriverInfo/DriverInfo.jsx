@@ -31,6 +31,7 @@ const DriverInfo = () => {
     id: "",
     paribahanName: "",
     name: "",
+    fatherName: "",
     phone: "",
     license: "",
     address: "",
@@ -58,8 +59,10 @@ const DriverInfo = () => {
   };
   const handleSubmitInfo = (e) => {
     e.preventDefault();
-    if (!input.paribahanName || !input.name) {
-      toast.error("Fields are required!");
+    if (!input.paribahanName || !input.name || !input.fatherName) {
+      !input.paribahanName && toast.error("Paribahan Name is required");
+      !input.name && toast.error("Name is required");
+      !input.fatherName && toast.error("Father Name is required");
     } else {
       dispatch(createDriverInfo({ id: input.id, data: input }));
     }
@@ -80,8 +83,9 @@ const DriverInfo = () => {
   };
   const handleUpdateInfo = (e) => {
     e.preventDefault();
-    if (!infoData.name) {
-      toast.error("Name is required");
+    if (!infoData.name || !infoData.fatherName) {
+      !infoData.name && toast.error("Name is required");
+      !infoData.fatherName && toast.error("Father Name is required");
     } else {
       dispatch(updateDriverInfo({ id: String(id), data: infoData }));
     }
@@ -152,6 +156,11 @@ const DriverInfo = () => {
       sortable: true,
     },
     {
+      name: "Father Name",
+      selector: (data) => data.fatherName,
+      sortable: true,
+    },
+    {
       name: "License",
       selector: (data) => data.license,
       sortable: true,
@@ -209,6 +218,7 @@ const DriverInfo = () => {
         id: "",
         paribahanName: "",
         name: "",
+        fatherName: "",
         phone: "",
         license: "",
         address: "",
@@ -266,6 +276,16 @@ const DriverInfo = () => {
               onChange={changeInputValue}
               className="form-control"
               placeholder="Driver Name"
+            />
+          </div>
+          <div className="form-group mb-2">
+            <input
+              type="text"
+              name="fatherName"
+              value={input.fatherName}
+              onChange={changeInputValue}
+              className="form-control"
+              placeholder="Father Name"
             />
           </div>
           <div className="form-group mb-2">
@@ -370,6 +390,16 @@ const DriverInfo = () => {
               onChange={changeInfoData}
               className="form-control"
               placeholder="Driver Name"
+            />
+          </div>
+          <div className="form-group mb-2">
+            <input
+              type="text"
+              name="fatherName"
+              value={infoData?.fatherName}
+              onChange={changeInfoData}
+              className="form-control"
+              placeholder="Father Name"
             />
           </div>
           <div className="form-group mb-2">

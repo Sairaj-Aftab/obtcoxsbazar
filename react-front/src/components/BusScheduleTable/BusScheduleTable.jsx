@@ -33,7 +33,7 @@ const BusScheduleTable = () => {
           <DataTable
             columns={scheduleColumn}
             data={filteredSchedules
-              ?.slice(0, 15)
+              ?.slice(0, 10)
               .sort((a, b) => new Date(a.time) - new Date(b.time))}
             responsive
             customStyles={{
@@ -51,7 +51,7 @@ const BusScheduleTable = () => {
               },
             }}
           />
-          {todaySchedules?.length > 15 && (
+          {todaySchedules?.length > 10 && (
             <Link
               to="/all-bus-schedules"
               className="block text-end text-sm font-medium text-primary-color"
