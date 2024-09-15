@@ -103,7 +103,6 @@ const Review = () => {
         >
           <i
             className="fa fa-eye"
-            aria-hidden="true"
             style={{ color: "#00d0f1", fontSize: "17px" }}
           ></i>
         </a>

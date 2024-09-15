@@ -100,6 +100,15 @@ const BusInfo = () => {
       dispatch(updateBusInfo({ id, data: infoData }));
     }
   };
+
+  const [infoDetails, setInfoDetails] = useState({});
+
+  const handleShowBusInfo = (id) => {
+    const selectedDetails = busInfo?.find((det) => det.id === id);
+    if (selectedDetails) {
+      setInfoDetails(selectedDetails);
+    }
+  };
   const handleDeleteBusInfo = (id) => {
     swal({
       title: "Are you sure?",
@@ -146,6 +155,24 @@ const BusInfo = () => {
     {
       name: "#",
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "60px",
+    },
+    {
+      name: "View",
+      cell: (data) => (
+        <a
+          data-target="#showdetails"
+          data-toggle="modal"
+          href="#edit_specialities_details"
+          rel="noreferrer"
+          onClick={() => handleShowBusInfo(data.id)}
+        >
+          <i
+            className="fa fa-eye"
+            style={{ color: "#00d0f1", fontSize: "17px" }}
+          ></i>
+        </a>
+      ),
       width: "60px",
     },
     {
@@ -247,6 +274,49 @@ const BusInfo = () => {
   }, [dispatch, error, message]);
   return (
     <>
+      <ModalPopup title={infoDetails.paribahanName} target="showdetails">
+        <div>
+          {infoDetails?.regNo && (
+            <p>
+              <b>Registration No : </b> {infoDetails?.regNo}
+            </p>
+          )}
+          {infoDetails?.type && (
+            <p>
+              <b>Type : </b> {infoDetails?.type}
+            </p>
+          )}
+          {infoDetails?.fcExpire && (
+            <p>
+              <b>Fitness Expire : </b>
+              <span
+                style={{
+                  color:
+                    new Date(infoDetails.fcExpire) < new Date()
+                      ? "red"
+                      : "inherit",
+                  textDecoration:
+                    new Date(infoDetails.fcExpire) < new Date()
+                      ? "line-through"
+                      : "none",
+                }}
+              >
+                {infoDetails.fcExpire}
+              </span>
+            </p>
+          )}
+          {infoDetails?.comment && (
+            <p>
+              <b>Route Permit : </b> {infoDetails?.comment}
+            </p>
+          )}
+          {infoDetails?.report && (
+            <p>
+              <b>Report : </b> {infoDetails?.report}
+            </p>
+          )}
+        </div>
+      </ModalPopup>
       {/* Create  Bus Info */}
       <ModalPopup title="Create Bus Info" target="createBusInfoModal">
         <form onSubmit={handleSubmitInfo}>

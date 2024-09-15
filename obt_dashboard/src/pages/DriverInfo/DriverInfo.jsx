@@ -59,10 +59,12 @@ const DriverInfo = () => {
   };
   const handleSubmitInfo = (e) => {
     e.preventDefault();
-    if (!input.paribahanName || !input.name || !input.fatherName) {
-      !input.paribahanName && toast.error("Paribahan Name is required");
-      !input.name && toast.error("Name is required");
-      !input.fatherName && toast.error("Father Name is required");
+    if (!input.paribahanName) {
+      toast.error("Paribahan Name is required");
+    } else if (!input.name) {
+      toast.error("Name is required");
+    } else if (!input.fatherName) {
+      toast.error("Father Name is required");
     } else {
       dispatch(createDriverInfo({ id: input.id, data: input }));
     }
@@ -83,9 +85,10 @@ const DriverInfo = () => {
   };
   const handleUpdateInfo = (e) => {
     e.preventDefault();
-    if (!infoData.name || !infoData.fatherName) {
-      !infoData.name && toast.error("Name is required");
-      !infoData.fatherName && toast.error("Father Name is required");
+    if (!infoData.name) {
+      toast.error("Name is required");
+    } else if (!infoData.fatherName) {
+      toast.error("Father Name is required");
     } else {
       dispatch(updateDriverInfo({ id: String(id), data: infoData }));
     }
