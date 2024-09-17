@@ -1,5 +1,10 @@
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
+import sp from "../../assets/image/sp.jpeg";
+import jsp from "../../assets/image/jashim_uddin.jpeg";
+import sai from "../../assets/image/Sairaj_Aftab.png";
+import pol from "../../assets/image/police_logo.png";
+import avatar from "../../assets/image/avatar.jfif";
 const AboutPage = () => {
   return (
     <>
@@ -72,12 +77,18 @@ const AboutPage = () => {
             choose preferred seats.
           </li>
           <li>
+            <span className="font-semibold">Google Map Links:</span> Google map
+            direction of bus counters & bus departure places is well-connected
+            here
+          </li>
+          <li>
             <span className="font-semibold">Real-Time Updates:</span>{" "}
             Notifications about booking status, bus departures, and delays.
           </li>
           <li>
             <span className="font-semibold">Fare Comparison:</span> Ability to
-            compare fares from different bus operators.
+            compare fares from different bus operators including discounted
+            fares.
           </li>
           <li>
             <span className="font-semibold">Discounts and Offers:</span> Access
@@ -168,18 +179,37 @@ const AboutPage = () => {
           posing new challenges in terms of comfort, reliability, and security
           in Cox&apos;s Bazar.
         </p>
-        <div className="md:flex justify-between gap-10 mt-6">
-          <div className="w-full md:w-1/2 text-center bg-gray-200 p-4 rounded-lg">
-            <h3 className="text-base font-bold text-black mb-3">Direction</h3>
+        {/* Member of the site */}
+        <div className="md:flex justify-between gap-10 mt-14">
+          <div className="relative w-full md:w-1/2 text-center bg-gray-200 p-4 rounded-lg">
+            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+              <img
+                src={avatar}
+                alt=""
+                className="rounded-full w-24 h-24 object-cover border-2 border-primary-color"
+              />
+            </div>
+            <h3 className="text-base font-bold text-black mt-10 mb-2">
+              Direction
+            </h3>
             <h3 className="text-base font-bold text-black">
-              Md. Mahfuzul Islam, BPM, PPM(Bar)
+              Md. Rahamat Ullah
             </h3>
             <h3 className="text-base font-bold text-black">
               Police Super, Cox&apos;s Bazar
             </h3>
           </div>
-          <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
-            <h3 className="text-base font-bold text-black mb-3">Execution</h3>
+          <div className="relative w-full md:w-1/2 mt-14 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
+            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+              <img
+                src={avatar}
+                alt=""
+                className="rounded-full w-24 h-24 object-cover border-2 border-primary-color"
+              />
+            </div>
+            <h3 className="text-base font-bold text-black mt-10 mb-2">
+              Planning & Execution
+            </h3>
             <h3 className="text-base font-bold text-black">
               Md. Jashim Uddin Chy, PPM
             </h3>
@@ -188,9 +218,16 @@ const AboutPage = () => {
             </h3>
           </div>
         </div>
-        <div className="md:flex justify-between gap-10 mt-2 sm:mt-3">
-          <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
-            <h3 className="text-base font-bold text-black mb-3">
+        <div className="md:flex justify-between gap-10 mt-14">
+          <div className="relative w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
+            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+              <img
+                src={avatar}
+                alt=""
+                className="rounded-full w-24 h-24 object-cover border-2 border-primary-color"
+              />
+            </div>
+            <h3 className="text-base font-bold text-black mt-10 mb-3">
               Developed by
             </h3>
             <h3 className="text-base font-bold text-black">
@@ -202,8 +239,17 @@ const AboutPage = () => {
               sairajaftab@gmail.com
             </h3>
           </div>
-          <div className="w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
-            <h3 className="text-base font-bold text-black mb-3">Operated by</h3>
+          <div className="relative w-full md:w-1/2 mt-14 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
+            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+              <img
+                src={pol}
+                alt=""
+                className="rounded-full w-24 h-24 object-cover border-2 border-primary-color"
+              />
+            </div>
+            <h3 className="text-base font-bold text-black mt-10 mb-2">
+              Operated by
+            </h3>
             <h3 className="text-base font-bold text-black">Traffic Division</h3>
             <h3 className="text-base font-bold text-black">
               Cox&apos;s Bazar District Police

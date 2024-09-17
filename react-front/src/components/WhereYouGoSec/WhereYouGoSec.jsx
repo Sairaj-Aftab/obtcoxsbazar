@@ -22,11 +22,11 @@ const WhereYouGoSec = () => {
         )}
         {!placesLoader &&
           destinationPlaces &&
-          destinationPlaces?.map((place, index) => (
+          destinationPlaces?.map((place) => (
             <Link
               to={`/${place.slug}/${place.id}`}
               className="bg-primary-color text-white text-base font-bold text-center py-1 px-2 rounded-md"
-              key={index}
+              key={place.id}
             >
               {place.placeName}
             </Link>

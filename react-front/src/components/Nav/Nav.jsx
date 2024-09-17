@@ -41,14 +41,6 @@ const Nav = () => {
                   Home
                 </Link>
                 <Link
-                  to="/all-bus-services"
-                  className={`text-base font-medium text-white border border-transparent ${
-                    pathName === "/all-bus-services" && "border-white"
-                  } hover:border-white py-1 px-2 rounded-sm`}
-                >
-                  All Bus Services
-                </Link>
-                <Link
                   to="/all-bus-schedules"
                   className={`text-base font-medium text-white border border-transparent ${
                     pathName === "/all-bus-schedules" && "border-white"
@@ -56,6 +48,15 @@ const Nav = () => {
                 >
                   All Bus Schedules
                 </Link>
+                <Link
+                  to="/all-bus-services"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/all-bus-services" && "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  All Bus Services
+                </Link>
+
                 <Link
                   to="http://coxscab.com/apex/osman_erp/r/coxscab//transport-permission"
                   target="_blank"
@@ -153,15 +154,6 @@ const Nav = () => {
               </Link>
               <Link
                 onClick={() => setOpen(!open)}
-                to="/all-bus-services"
-                className={`text-base font-medium text-white border border-transparent ${
-                  pathName === "/all-bus-services" && "border-white"
-                } hover:border-white py-1 px-2 rounded-sm`}
-              >
-                All Bus Services
-              </Link>
-              <Link
-                onClick={() => setOpen(!open)}
                 to="/all-bus-schedules"
                 className={`text-base font-medium text-white border border-transparent ${
                   pathName === "/all-bus-schedules" && "border-white"
@@ -169,6 +161,16 @@ const Nav = () => {
               >
                 All Bus Schedules
               </Link>
+              <Link
+                onClick={() => setOpen(!open)}
+                to="/all-bus-services"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/all-bus-services" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                All Bus Services
+              </Link>
+
               <Link
                 onClick={() => setOpen(!open)}
                 to="http://coxscab.com/apex/osman_erp/r/coxscab//transport-permission"

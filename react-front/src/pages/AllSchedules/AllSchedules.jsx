@@ -1,10 +1,12 @@
 import { useSelector } from "react-redux";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
 import DataTable from "react-data-table-component";
-import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 import TodayDate from "../../components/TodayDate";
+import scheduleColumn from "../../dataTableColumn/scheduleColumn";
+import { useNavigate } from "react-router-dom";
 
 const AllSchedules = () => {
+  const navigate = useNavigate();
   const { todaySchedules } = useSelector(schedulesData);
   return (
     <div className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
@@ -13,7 +15,7 @@ const AllSchedules = () => {
         <TodayDate className="text-base text-primary font-normal" />
       </div>
       <DataTable
-        columns={scheduleColumn}
+        columns={scheduleColumn(navigate)}
         data={todaySchedules
           ?.slice()
           .sort((a, b) => new Date(a.time) - new Date(b.time))}

@@ -1,12 +1,13 @@
 import { schedulesData } from "../../features/schedules/schedulesSlice";
 import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import TodayDate from "../TodayDate";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 
 const BusScheduleTable = () => {
+  const navigate = useNavigate();
   const { todaySchedules, todayScheduleLoader } = useSelector(schedulesData);
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
@@ -20,7 +21,7 @@ const BusScheduleTable = () => {
   return (
     <section className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
       <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 items-center mb-4">
-        <h3 className="text-xl font-semibold">Recent Bus Schedule</h3>
+        <h3 className="text-xl font-semibold">Today&apos;s Bus Schedule</h3>
         <TodayDate className="text-base text-primary font-normal" />
       </div>
       {todayScheduleLoader && !todaySchedules && (
@@ -31,7 +32,7 @@ const BusScheduleTable = () => {
       {!todayScheduleLoader && todaySchedules && (
         <>
           <DataTable
-            columns={scheduleColumn}
+            columns={scheduleColumn(navigate)}
             data={filteredSchedules
               ?.slice(0, 10)
               .sort((a, b) => new Date(a.time) - new Date(b.time))}

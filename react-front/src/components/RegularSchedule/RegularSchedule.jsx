@@ -1,10 +1,11 @@
 import DataTable from "react-data-table-component";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 
 // eslint-disable-next-line react/prop-types
 const RegularSchedule = ({ data, loader }) => {
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const scheduleColumn = [
     {
@@ -20,6 +21,18 @@ const RegularSchedule = ({ data, loader }) => {
     {
       name: "Paribahan",
       selector: (row) => row.busName,
+      cell: (row) => {
+        return (
+          <p
+            onClick={() =>
+              navigate(`/all-bus-services/${row.slug}/${row.paribahanUserId}`)
+            }
+            className="w-full flex items-center gap-1 text-primary-color cursor-pointer"
+          >
+            {row.busName}
+          </p>
+        );
+      },
       sortable: true,
     },
     {
