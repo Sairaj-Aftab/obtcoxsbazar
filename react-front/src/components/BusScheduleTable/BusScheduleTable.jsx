@@ -11,7 +11,7 @@ const BusScheduleTable = () => {
   const { todaySchedules, todayScheduleLoader } = useSelector(schedulesData);
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
-  const fiveDaysLater = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
+  const fiveDaysLater = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
   // Filter schedules within the next hour
   const filteredSchedules = todaySchedules?.filter((data) => {
@@ -33,9 +33,7 @@ const BusScheduleTable = () => {
         <>
           <DataTable
             columns={scheduleColumn(navigate)}
-            data={filteredSchedules
-              ?.slice(0, 10)
-              .sort((a, b) => new Date(a.time) - new Date(b.time))}
+            data={filteredSchedules?.slice(0, 10)}
             responsive
             customStyles={{
               headCells: {

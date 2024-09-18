@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const AllSchedules = () => {
   const navigate = useNavigate();
   const { todaySchedules } = useSelector(schedulesData);
+
   return (
     <div className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
       <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 items-center mb-4">
@@ -16,9 +17,7 @@ const AllSchedules = () => {
       </div>
       <DataTable
         columns={scheduleColumn(navigate)}
-        data={todaySchedules
-          ?.slice()
-          .sort((a, b) => new Date(a.time) - new Date(b.time))}
+        data={todaySchedules}
         responsive
         customStyles={{
           headCells: {

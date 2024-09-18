@@ -17,6 +17,7 @@ const RegularSchedule = ({ data, loader }) => {
       name: "Time",
       selector: (row) => row.time,
       sortable: true,
+      width: "150px",
     },
     {
       name: "Paribahan",
@@ -34,6 +35,7 @@ const RegularSchedule = ({ data, loader }) => {
         );
       },
       sortable: true,
+      width: "300px",
     },
     {
       name: "Type",

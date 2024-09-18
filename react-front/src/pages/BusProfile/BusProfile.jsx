@@ -3,7 +3,6 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
-import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
 import {
   schedulesData,
@@ -253,7 +252,7 @@ const BusProfile = () => {
           <span>{`৳ ${
             data.discountRent ? data.discountRent : data.rent
           }`}</span>
-          {data.discountRent > 0 && (
+          {data.discountRent > 0 && data.discountRent !== data.rent && (
             <div className="text-red -mt-2">
               ৳ <span className="line-through text-xs">{data.rent}</span>
             </div>

@@ -86,18 +86,20 @@ const scheduleColumn = (navigate) => {
     },
     {
       name: "Fare",
-      cell: (data) => (
-        <p className="w-full flex flex-col text-center">
-          <span>{`৳ ${
-            data.discountRent ? data.discountRent : data.rent
-          }`}</span>
-          {data.discountRent > 0 && (
-            <div className="text-red -mt-2">
-              ৳ <span className="line-through text-xs">{data.rent}</span>
-            </div>
-          )}
-        </p>
-      ),
+      cell: (data) => {
+        return (
+          <p className="w-full flex flex-col text-center">
+            <span>{`৳ ${
+              data.discountRent ? data.discountRent : data.rent
+            }`}</span>
+            {data.discountRent > 0 && data.discountRent !== data.rent && (
+              <div className="text-red -mt-2">
+                ৳ <span className="line-through text-xs">{data.rent}</span>
+              </div>
+            )}
+          </p>
+        );
+      },
       sortable: true,
       width: "90px",
     },

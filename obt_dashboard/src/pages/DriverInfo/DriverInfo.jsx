@@ -154,13 +154,13 @@ const DriverInfo = () => {
       sortable: true,
     },
     {
-      name: "Phone",
-      selector: (data) => data.phone,
+      name: "Father Name",
+      selector: (data) => data.fatherName,
       sortable: true,
     },
     {
-      name: "Father Name",
-      selector: (data) => data.fatherName,
+      name: "Phone",
+      selector: (data) => data.phone,
       sortable: true,
     },
     {

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { busData } from "../../features/bus/busSlice";
 import { noticeData } from "../../features/notice/noticeSlice";
 import { getBusInfoData } from "../../features/bus/busApiSlice";
@@ -93,7 +93,7 @@ const BusInformation = () => {
           <span>{`৳ ${
             data.discountRent ? data.discountRent : data.rent
           }`}</span>
-          {data.discountRent > 0 && (
+          {data.discountRent > 0 && data.discountRent !== data.rent && (
             <div className="text-red -mt-2">
               ৳ <span className="line-through text-xs">{data.rent}</span>
             </div>

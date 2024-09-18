@@ -157,7 +157,7 @@ export const getAllSchedules = async (req, res, next) => {
         paribahanUser: true,
       },
       orderBy: {
-        time: "desc",
+        time: "asc",
       },
     });
 
@@ -235,7 +235,7 @@ export const getTodaysSchedules = async (req, res, next) => {
         paribahanUser: true,
       },
       orderBy: {
-        time: "desc",
+        time: "asc",
       },
     });
 
@@ -315,7 +315,7 @@ export const getSchedulesByParibahanUserId = async (req, res, next) => {
       take: limit,
       where: whereClause,
       orderBy: {
-        time: "desc",
+        time: "asc",
       },
       include: {
         paribahanUser: true,
