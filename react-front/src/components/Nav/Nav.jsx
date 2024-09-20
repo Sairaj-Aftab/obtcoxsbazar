@@ -58,9 +58,11 @@ const Nav = () => {
                 </Link>
 
                 <Link
-                  to="http://coxscab.com/apex/osman_erp/r/coxscab//transport-permission"
-                  target="_blank"
-                  className={`text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm`}
+                  to="/tourist-bus-entry-permission"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    pathName === "/tourist-bus-entry-permission" &&
+                    "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
                 >
                   Tourist Bus Entry Permission
                 </Link>
@@ -173,8 +175,10 @@ const Nav = () => {
 
               <Link
                 onClick={() => setOpen(!open)}
-                to="http://coxscab.com/apex/osman_erp/r/coxscab//transport-permission"
-                className={`text-base font-medium text-white border border-transparent hover:border-white py-1 px-2 rounded-sm`}
+                to="/tourist-bus-entry-permission"
+                className={`text-base font-medium text-white border border-transparent ${
+                  pathName === "/tourist-bus-entry-permission" && "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
               >
                 Tourist Bus Entry Permission
               </Link>

@@ -239,3 +239,28 @@ model LeaveDestinationPlace {
     updatedAt DateTime @updatedAt
 }
 
+model TouristBusEntryPermission {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  applicantName     String
+  phone              String
+  institutionName   String
+  arrivalPlace      String
+  arrivalDateTime   DateTime
+  numberTourist     Int
+  numberBus         Int
+  transportName     String
+  vehicleRegNo      String
+  destinationName   String
+  parkingPlace      String
+  returnDateTime    DateTime
+  description       String?
+  approved          Boolean  @default(false)
+  pending           Boolean  @default(true)
+  rejected          Boolean  @default(false)
+  permissionReason  String?
+  approvalDate      DateTime?
+  rejectionDate     DateTime?
+  trash Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

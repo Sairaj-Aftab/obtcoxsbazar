@@ -62,9 +62,10 @@ const ProfileDriverInfo = () => {
   };
   const handleUpdateInfo = (e) => {
     e.preventDefault();
-    if (!infoData.name || !infoData.fatherName) {
-      !infoData.name && toast.error("Name is required");
-      !infoData.fatherName && toast.error("Father Name is required");
+    if (!infoData.name) {
+      toast.error("Name is required");
+    } else if (!infoData.fatherName) {
+      toast.error("Father Name is required");
     } else {
       dispatch(updateDriverInfo({ id, data: infoData }));
     }

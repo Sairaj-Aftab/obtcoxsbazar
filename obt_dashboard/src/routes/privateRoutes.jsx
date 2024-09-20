@@ -13,6 +13,7 @@ import BusInfo from "../pages/BusInfo/BusInfo";
 import GuideInfo from "../pages/GuideInfo/GuideInfo";
 import DriverInfo from "../pages/DriverInfo/DriverInfo";
 import Review from "../pages/Review/Review";
+import TouristBusPermission from "../pages/TouristBusPermission/TouristBusPermission";
 
 const privateRoutes = [
   {
@@ -68,6 +69,10 @@ const privateRoutes = [
           {
             path: "/destination",
             element: <Destination />,
+          },
+          {
+            path: "/tourist-bus-permission",
+            element: <TouristBusPermission />,
           },
           {
             path: "/review",

@@ -77,3 +77,18 @@ export const formatDateTime = (dateString) => {
 
   return dayPart;
 };
+
+export const formatDateAndTime = (dateTimeString) => {
+  const date = new Date(dateTimeString);
+
+  const day = String(date.getUTCDate()).padStart(2, "0"); // Day (2 digits)
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Month (2 digits)
+  const hours = date.getUTCHours();
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0"); // Minutes (2 digits)
+
+  // Format hours for 12-hour clock
+  const formattedHours = hours % 12 || 12; // Convert 0 to 12
+  const ampm = hours < 12 ? "AM" : "PM"; // Determine AM/PM
+
+  return `${day}/${month} at ${formattedHours}:${minutes} ${ampm}`;
+};

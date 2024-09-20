@@ -119,6 +119,18 @@ const SideBar = () => {
                 </Link>
               </li>
             )}
+            {permissions.includes("TOURIST-BUS-PERMISSION") && (
+              <li
+                className={`${
+                  location.pathname === "/tourist-bus-permission" && "active"
+                }`}
+              >
+                <Link to="/tourist-bus-permission">
+                  <i className="fa fa-pencil-square-o"></i>{" "}
+                  <span>Tourist Bus Permission</span>
+                </Link>
+              </li>
+            )}
             {permissions.includes("REVIEWS") && (
               <li className={`${location.pathname === "/review" && "active"}`}>
                 <Link to="/review">

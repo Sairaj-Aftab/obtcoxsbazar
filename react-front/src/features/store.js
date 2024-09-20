@@ -8,6 +8,7 @@ import noticeSlice from "./notice/noticeSlice";
 import paribahanAuthSlice from "./paribahanAuth/paribahanAuthSlice";
 import regularBusScheduleSlice from "./regularBusSchedule/regularBusScheduleSlice";
 import authReviewSlice from "./authReview/authReviewSlice";
+import touristBusPermissionSlice from "./touristBusPermission/touristBusPermissionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     driverInfo: driverInfoSlice,
     guideInfo: guideInfoSlice,
     notice: noticeSlice,
+    touristBusPermission: touristBusPermissionSlice,
     authReview: authReviewSlice,
   },
 });

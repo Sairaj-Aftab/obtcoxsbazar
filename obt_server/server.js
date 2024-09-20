@@ -16,6 +16,7 @@ import notice from "./routes/notice.js";
 import busInfo from "./routes/busInfo.js";
 import guideInfo from "./routes/guideInfo.js";
 import driverInfo from "./routes/driverInfo.js";
+import touristPermission from "./routes/touristBusEntryPermission.js";
 import review from "./routes/review.js";
 import errorHandler from "./middleware/errorHandler.js";
 
@@ -69,6 +70,7 @@ app.use("/api/v1/notice", notice);
 app.use("/api/v1/businfo", busInfo);
 app.use("/api/v1/guideinfo", guideInfo);
 app.use("/api/v1/driverinfo", driverInfo);
+app.use("/api/v1/tourist-permission", touristPermission);
 app.use("/api/v1/review", review);
 
 // Error Handler

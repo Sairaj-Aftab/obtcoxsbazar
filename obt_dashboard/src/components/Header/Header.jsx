@@ -178,6 +178,19 @@ const Header = () => {
                 </Link>
               </li>
             )}
+            {permissions.includes("TOURIST-BUS-PERMISSION") && (
+              <li
+                onClick={() => setToggle(!toggle)}
+                className={`${
+                  location.pathname === "/tourist-bus-permission" && "active"
+                }`}
+              >
+                <Link to="/tourist-bus-permission">
+                  <i className="fa fa-pencil-square-o" aria-hidden="true"></i>{" "}
+                  <span>Tourist Bus Permission</span>
+                </Link>
+              </li>
+            )}
             {permissions.includes("REVIEWS") && (
               <li
                 onClick={() => setToggle(!toggle)}
