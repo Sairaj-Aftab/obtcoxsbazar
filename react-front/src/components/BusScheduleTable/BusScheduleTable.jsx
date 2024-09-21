@@ -24,7 +24,7 @@ const BusScheduleTable = () => {
         <h3 className="text-xl font-semibold">Today&apos;s Bus Schedule</h3>
         <TodayDate className="text-base text-primary font-normal" />
       </div>
-      {todayScheduleLoader && !todaySchedules && (
+      {todayScheduleLoader && (
         <div className="w-full">
           <Skeleton height={150} />
         </div>

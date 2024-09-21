@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   createTouristBusPermission,
@@ -104,9 +105,17 @@ const TouristBusEntryPermission = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto sm:my-5">
-      <h1 className="text-xl font-medium text-center mb-5 text-primary-color">
-        Tourist Bus Entry Permission
-      </h1>
+      <div className="flex justify-between items-center mb-5">
+        <h1 className="text-xl font-medium text-primary-color">
+          Tourist Bus Entry Permission
+        </h1>
+        <Link
+          to="/tourist-bus-entry-permission-list"
+          className="bg-primary-color rounded-md py-1 px-2 text-white text-sm font-medium"
+        >
+          View recent entry list
+        </Link>
+      </div>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label

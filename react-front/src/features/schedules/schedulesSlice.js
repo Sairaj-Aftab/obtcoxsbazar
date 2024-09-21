@@ -111,8 +111,8 @@ const schedulesSlice = createSlice({
         state.todayScheduleLoader = true;
       })
       .addCase(getTodaysSchedules.fulfilled, (state, action) => {
-        state.todayScheduleLoader = false;
         state.todaySchedules = action.payload.schedules;
+        state.todayScheduleLoader = false;
       })
       .addCase(getSchedulesDataByAuthId.rejected, (state) => {
         // state.error = action.error.message;

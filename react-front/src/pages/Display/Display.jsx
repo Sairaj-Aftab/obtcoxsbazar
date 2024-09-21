@@ -93,10 +93,10 @@ const Display = () => {
 
   return (
     <div className="display bg-black h-screen w-full flex items-center justify-center fixed -z-10">
-      <div className="w-full flex flex-col gap-8">
-        <div className="flex justify-between items-center w-[95%] mx-auto">
-          <div className="w-40 text-white">
-            <img src={logoImg2} alt="OBT" sizes="100vw" className="w-48" />
+      <div className="w-full flex flex-col gap-5">
+        <div className="flex justify-between items-center w-[90%] mx-auto">
+          <div className="w-28 text-white">
+            <img src={logoImg2} alt="OBT" sizes="100vw" className="w-full" />
           </div>
           <div className="basis-2/4 text-white flex flex-col items-center">
             <h1 className="text-white text-3xl font-bold"></h1>
@@ -115,21 +115,18 @@ const Display = () => {
           </div>
 
           <div
-            className={`w-40 h-40 flex flex-col justify-center items-center border border-red border-double rounded-full`}
+            className={`w-28 h-28 flex flex-col justify-center items-center border border-red border-double rounded-full`}
           >
             <DigitalClock />
           </div>
         </div>
 
         <div className="block">
-          <div className="flex border-b border-white text-white bg-primary-color">
-            <span className="basis-1/6">Time</span>
-            <span className="basis-1/4 border-x border-white">Paribahan</span>
-            <span className="basis-1/4">Reg No</span>
-            <span className="basis-1/4 border-x border-white">
-              Departure Place
-            </span>
-            <span className="basis-1/4">Destination</span>
+          <div className="table-header flex border-b border-white text-white bg-primary-color">
+            <p className="basis-2/12">Time</p>
+            <p className="basis-4/12 border-x border-white">Paribahan</p>
+            <p className="basis-3/12 border-r border-white">Departure Place</p>
+            <p className="basis-3/12">Destination</p>
           </div>
           <div className="contain" ref={scrollRef}>
             {disSchedules?.length > 0 ? (
@@ -141,19 +138,17 @@ const Display = () => {
                     key={index}
                     className="flex border-b border-white text-yellow"
                   >
-                    <span className="basis-1/6">
-                      {formatDateTime(data.time)}
-                    </span>
-                    <span className="basis-1/4 border-x border-white">
-                      {data.busName?.toUpperCase()}
-                    </span>
-                    <span className="basis-1/4">{data.busNo}</span>
-                    <span className="basis-1/4 border-x border-white">
+                    <p className="basis-2/12">{formatDateTime(data.time)}</p>
+                    <p className="basis-4/12 border-x border-white">
+                      <span>{data.busName?.toUpperCase()}</span>
+                      <span>{data.busNo}</span>
+                    </p>
+                    <p className="basis-3/12 border-r border-white">
                       {data.leavingPlace?.toUpperCase()}
-                    </span>
-                    <span className="basis-1/4">
+                    </p>
+                    <p className="basis-3/12">
                       {data.destinationPlace?.toUpperCase()}
-                    </span>
+                    </p>
                   </div>
                 ))
             ) : (
@@ -163,7 +158,7 @@ const Display = () => {
             )}
           </div>
         </div>
-        <div className="text-white w-[95%] mx-auto text-3xl font-semibold">
+        <div className="text-white w-[90%] mx-auto text-3xl font-semibold">
           <NoticeFromAdmin status="Display" />
         </div>
       </div>
