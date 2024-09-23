@@ -4,12 +4,15 @@ import { useSelector } from "react-redux";
 import { busData } from "../../features/bus/busSlice";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 import { Link, useParams } from "react-router-dom";
+import { schedulesData } from "../../features/schedules/schedulesSlice";
 
 const BusServicesByPlace = () => {
   const params = useParams();
   const { bus } = useSelector(busData);
+  const { destinationPlaces } = useSelector(schedulesData);
 
   const [busByPlace, setBusByPlace] = useState([]);
+  const [currentDestination, setCurrentDestination] = useState(null);
 
   useEffect(() => {
     const getBusesByDestinationId = (destinationId) => {
@@ -17,15 +20,29 @@ const BusServicesByPlace = () => {
         bus.destination.some((dest) => dest.id === destinationId)
       );
     };
+    // Get destination place by ID
+    const getDestinationById = (destinationId) => {
+      return destinationPlaces?.find((place) => place.id === destinationId);
+    };
     const buses = getBusesByDestinationId(String(params.id));
+    const destination = getDestinationById(String(params.id));
 
     setBusByPlace(buses);
-  }, [bus, params.id]);
+    setCurrentDestination(destination);
+  }, [bus, destinationPlaces, params.id]);
 
   return (
     <div className="container mx-auto bg-white rounded-lg my-5">
-      <h1 className="text-lg font-semibold text-white bg-primary-color text-center py-1 rounded-t-lg mb-2">
-        Cox&apos;s Bazar to {params?.place?.toUpperCase()}
+      <h1 className="flex justify-center items-center sm:gap-1 flex-col sm:flex-row text-lg font-semibold text-white bg-primary-color py-1 rounded-t-lg mb-2">
+        <p>
+          Cox&apos;s Bazar to{" "}
+          <span className="text-yellow">
+            {currentDestination?.placeName?.toUpperCase() || "UNKNOWN PLACE"}
+          </span>
+        </p>
+        {currentDestination?.destinationKM && (
+          <p>&#10132; {currentDestination?.destinationKM || "N/A"} KM</p>
+        )}
       </h1>
       <p className="text-base font-medium text-black mb-3">
         <NoticeFromAdmin status="Passenger" />

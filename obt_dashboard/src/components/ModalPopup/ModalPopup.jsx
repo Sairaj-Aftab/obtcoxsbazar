@@ -1,9 +1,13 @@
 import { Modal } from "@rakan/bootstrap4rtl";
 
-const ModalPopup = ({ title, target, children }) => {
+// eslint-disable-next-line react/prop-types
+const ModalPopup = ({ size, title, target, children }) => {
   return (
     <div className="modal fade" id={target} aria-hidden="true" role="dialog">
-      <div className="modal-dialog modal-dialog-centered" role="document">
+      <div
+        className={`modal-dialog modal-dialog-centered ${size && size}`}
+        role="document"
+      >
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{title}</h5>

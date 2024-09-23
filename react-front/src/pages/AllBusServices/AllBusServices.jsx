@@ -117,6 +117,20 @@ const AllBusServices = ({ title }) => {
             />
             <span className="text-sm">Suite Class</span>
           </label>
+          <label
+            htmlFor="hyundai-biz-class"
+            className="flex items-center space-x-2 cursor-pointer"
+          >
+            <input
+              type="radio"
+              id="hyundai-biz-class"
+              value={"6"}
+              className="accent-blue-600 h-4 w-4 rounded-sm"
+              onChange={handleRadioChange}
+              checked={selectedDigit === "6"}
+            />
+            <span className="text-sm">Hyundai Biz Class</span>
+          </label>
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-5">

@@ -402,6 +402,7 @@ const BusProfile = () => {
               <option value="Sleeper Coach">Sleeper Coach</option>
               <option value="Double Decker">Double Decker</option>
               <option value="Suite Class">Suite Class</option>
+              <option value="Hyundai Biz Class">Hyundai Biz Class</option>
             </select>
             <select
               name="leavingPlace"
@@ -541,6 +542,7 @@ const BusProfile = () => {
                   <option value="Sleeper Coach">Sleeper Coach</option>
                   <option value="Double Decker">Double Decker</option>
                   <option value="Suite Class">Suite Class</option>
+                  <option value="Hyundai Biz Class">Hyundai Biz Class</option>
                 </select>
               </div>
             </div>

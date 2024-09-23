@@ -20,7 +20,6 @@ const Destination = () => {
   const { places, leavingPlaces, destinationPlaces, message, success, error } =
     useSelector(placeData);
   const [placeName, setPlaceName] = useState("");
-  const [mapLink, setMapLink] = useState("");
   const [placeStatus, setPlaceStatus] = useState("");
 
   const handleSubmit = (e) => {
@@ -36,18 +35,25 @@ const Destination = () => {
   const [id, setId] = useState("");
   const [plName, setPlName] = useState("");
   const [map, setMap] = useState("");
+  const [destinationKM, setDestinationKM] = useState("");
   const handleShowPlaceName = (id) => {
     setId(id);
     const place = places.find((pl) => pl.id === id);
     setPlName(place.placeName);
     setMap(place?.mapLink);
+    setDestinationKM(place?.destinationKM);
   };
 
   const handleUpdate = (id) => {
     if (!plName) {
       toast.error("Place is required!");
     } else {
-      dispatch(updatePlace({ id, data: { placeName: plName, mapLink: map } }));
+      dispatch(
+        updatePlace({
+          id,
+          data: { placeName: plName, mapLink: map, destinationKM },
+        })
+      );
       setId("");
     }
   };
@@ -82,9 +88,9 @@ const Destination = () => {
     if (error) {
       toast.error(error);
     }
-    return () => {
+    if (message || success || error) {
       dispatch(setPlaceMessageEmpty());
-    };
+    }
   }, [dispatch, message, error, success]);
   return (
     <>
@@ -108,7 +114,7 @@ const Destination = () => {
           onChange={(e) => setPlaceStatus(e.target.value)}
         >
           <option value="">Select Status</option>
-          <option value="leave">Leave</option>
+          <option value="leave">Departure</option>
           <option value="destination">Destination</option>
         </select>
         <button
@@ -149,9 +155,23 @@ const Destination = () => {
                                 onChange={(e) => setPlName(e.target.value)}
                                 className="form-control"
                               />
+                              <input
+                                type="number"
+                                value={destinationKM}
+                                onChange={(e) =>
+                                  setDestinationKM(e.target.value)
+                                }
+                                className="form-control"
+                                placeholder="Destination KM"
+                              />
                             </td>
                           ) : (
-                            <td>{place.placeName}</td>
+                            <td className="d-flex flex-column">
+                              <span>{place.placeName}</span>
+                              {place?.destinationKM && (
+                                <span>{place?.destinationKM} KM</span>
+                              )}
+                            </td>
                           )}
 
                           <td className="text-right">
@@ -203,7 +223,7 @@ const Destination = () => {
           <div className="card">
             <div className="card-body">
               <div className="d-flex justify-content-between mb-2">
-                <h5>Leaving Places</h5>
+                <h5>Departure Places</h5>
               </div>
               <div className="table-responsive">
                 {leavingPlaces && (
@@ -233,6 +253,7 @@ const Destination = () => {
                                 value={map}
                                 onChange={(e) => setMap(e.target.value)}
                                 className="form-control"
+                                placeholder="Google Map Link"
                               />
                             </td>
                           ) : (

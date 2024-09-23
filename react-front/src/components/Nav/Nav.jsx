@@ -60,8 +60,10 @@ const Nav = () => {
                 <Link
                   to="/tourist-bus-entry-permission"
                   className={`text-base font-medium text-white border border-transparent ${
-                    pathName === "/tourist-bus-entry-permission" &&
-                    "border-white"
+                    [
+                      "/tourist-bus-entry-permission",
+                      "/tourist-bus-entry-permission/form",
+                    ].includes(pathName) && "border-white"
                   } hover:border-white py-1 px-2 rounded-sm`}
                 >
                   Tourist Bus Entry Permission

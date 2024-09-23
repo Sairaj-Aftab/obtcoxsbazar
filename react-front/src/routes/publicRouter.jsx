@@ -1,4 +1,5 @@
 import Nav from "../components/Nav/Nav";
+import TouristBusEntryPerHeader from "../components/TouristBusEntryPerHeader";
 import AboutPage from "../pages/AboutPage/AboutPage";
 import AllBusServices from "../pages/AllBusServices/AllBusServices";
 import AllSchedules from "../pages/AllSchedules/AllSchedules";
@@ -14,6 +15,7 @@ import Home from "../pages/Home/Home";
 import Login from "../pages/Login/Login";
 import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 import TouristBusEntryPermission from "../pages/TouristBusEntryPermission/TouristBusEntryPermission";
+import TouristBusEntryPermissionList from "../pages/TouristBusEntryPermission/TouristBusEntryPermissionList";
 
 const publicRoutes = [
   {
@@ -49,8 +51,17 @@ const publicRoutes = [
         element: <BusEntryPermissionList />,
       },
       {
-        path: "/tourist-bus-entry-permission",
-        element: <TouristBusEntryPermission />,
+        element: <TouristBusEntryPerHeader />,
+        children: [
+          {
+            path: "/tourist-bus-entry-permission",
+            element: <TouristBusEntryPermissionList />,
+          },
+          {
+            path: "/tourist-bus-entry-permission/form",
+            element: <TouristBusEntryPermission />,
+          },
+        ],
       },
       {
         path: "/about",

@@ -104,18 +104,12 @@ const TouristBusEntryPermission = () => {
   }, [dispatch, error, message]);
 
   return (
-    <div className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto sm:my-5">
-      <div className="flex justify-between items-center mb-5">
-        <h1 className="text-xl font-medium text-primary-color">
-          Tourist Bus Entry Permission
-        </h1>
-        <Link
-          to="/tourist-bus-entry-permission-list"
-          className="bg-primary-color rounded-md py-1 px-2 text-white text-sm font-medium"
-        >
-          View recent entry list
-        </Link>
-      </div>
+    <div className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto">
+      {/* <div className="flex justify-between items-center mb-5">
+            <h1 className="text-xl font-medium text-primary-color">
+              Tourist Bus Entry Permission
+            </h1>
+          </div> */}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label

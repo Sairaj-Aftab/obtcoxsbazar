@@ -176,7 +176,11 @@ const ParibahanUsers = () => {
   return (
     <>
       {/* Create Paribahan User */}
-      <ModalPopup title="Create Paribahan User" target="paribahanCreateModal">
+      <ModalPopup
+        size="modal-lg"
+        title="Create Paribahan User"
+        target="paribahanCreateModal"
+      >
         <form onSubmit={handleCreateParibahanUserSubmit}>
           <div className="form-group mb-2">
             <input
@@ -303,6 +307,16 @@ const ParibahanUsers = () => {
                 />{" "}
                 Suite Class
               </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={6}
+                  onChange={handleChangeType}
+                  checked={type.includes("6")}
+                />{" "}
+                Hyundai Biz Class
+              </label>
             </div>
           </div>
           {destinationPlaces && (
@@ -335,7 +349,11 @@ const ParibahanUsers = () => {
         </form>
       </ModalPopup>
       {/* Update Paribahan User */}
-      <ModalPopup title="Edit Paribahan User" target="ruleEditPopup">
+      <ModalPopup
+        size="modal-lg"
+        title="Edit Paribahan User"
+        target="ruleEditPopup"
+      >
         <form onSubmit={handleEditUserSubmit}>
           <div className="form-row">
             <div className="form-group col-md-6">
@@ -485,6 +503,16 @@ const ParibahanUsers = () => {
                   checked={type.includes("5")}
                 />{" "}
                 Suite Class
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={6}
+                  onChange={handleChangeType}
+                  checked={type.includes("6")}
+                />{" "}
+                Hyundai Biz Class
               </label>
             </div>
           </div>

@@ -105,7 +105,7 @@ export const getAllTouristBusEntryPermissions = async (req, res, next) => {
     const offset = (page - 1) * limit;
 
     // Get filter query parameters (if any)
-    const { applicantName, institutionName, approved, pending, denied } =
+    const { applicantName, institutionName, approved, pending, rejected } =
       req.query;
 
     // Construct the 'where' clause for filters
@@ -118,7 +118,7 @@ export const getAllTouristBusEntryPermissions = async (req, res, next) => {
       }),
       ...(approved && { approved: approved === "true" }), // Convert string to boolean
       ...(pending && { pending: pending === "true" }),
-      ...(denied && { denied: denied === "true" }),
+      ...(rejected && { rejected: rejected === "true" }),
     };
 
     // Fetch permissions with pagination and filtering
@@ -126,9 +126,12 @@ export const getAllTouristBusEntryPermissions = async (req, res, next) => {
       skip: offset,
       take: limit,
       where,
-      orderBy: {
-        createdAt: "asc", // You can change to "desc" for reverse order
-      },
+      orderBy: [
+        { pending: "desc" }, // Pending data first (true values come before false)
+        { approved: "desc" }, // Approved data next (false values come before true)
+        { rejected: "desc" }, // Rejected data last (false values come before true)
+        { createdAt: "desc" }, // Then, order by createdAt for records with the same status
+      ],
     });
 
     // Count total records and filtered records

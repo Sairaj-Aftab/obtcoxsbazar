@@ -43,3 +43,36 @@ td.dt-empty {
     max-width: 300px;
   }
 }
+
+.permission-review-modal ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.permission-review-modal ul li {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.permission-review-modal ul li p {
+  margin: 0;
+}
+.permission-review-modal ul li p:first-child {
+  font-weight: bold;
+}
+@media (min-width: 640px) {
+  .permission-review-modal ul {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 990px) {
+  .permission-review-modal ul {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
