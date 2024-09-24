@@ -8,7 +8,7 @@ const touristBusPermissionSlice = createSlice({
   name: "touristBusPermission",
   initialState: {
     permissions: [],
-    permissionsCount: 0,
+    count: 0,
     message: null,
     error: null,
     loader: false,
@@ -33,6 +33,7 @@ const touristBusPermissionSlice = createSlice({
       })
       .addCase(createTouristBusPermission.fulfilled, (state, action) => {
         state.permissions.unshift(action.payload);
+        state.count++;
         state.message = action.payload.message;
         state.loader = false;
       })
@@ -45,7 +46,7 @@ const touristBusPermissionSlice = createSlice({
       })
       .addCase(getAllTouristBusPermission.fulfilled, (state, action) => {
         state.permissions = action.payload.permissions;
-        state.permissionsCount = action.payload.count;
+        state.count = action.payload.count;
         state.permissionLoader = false;
       });
   },

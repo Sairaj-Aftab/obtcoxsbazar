@@ -245,7 +245,6 @@ model TouristBusEntryPermission {
   applicantName     String
   phone              String
   institutionName   String
-  arrivalPlace      String
   arrivalDateTime   DateTime
   numberTourist     Int
   numberBus         Int

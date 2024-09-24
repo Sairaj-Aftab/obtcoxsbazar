@@ -1,65 +1,22 @@
 import DataTable from "react-data-table-component";
 import { formatDateTime } from "../../utils/formatDateTime";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import Modal from "../../components/Modal/Modal";
-
-const dummyData = [
-  {
-    id: 1,
-    applicantName: "John Doe",
-    phone: "123-456-7890",
-    institutionName: "XYZ University",
-    arrivalPlace: "Cox's Bazar",
-    arrivalDateTime: "2024-09-25T08:00:00",
-    numberTourist: 25,
-    numberBus: 2,
-    transportName: "Green Line",
-    vehicleRegNo: "Dhaka Metro B-1234",
-    destinationName: "Saint Martin",
-    parkingPlace: "Cox's Bazar Parking Lot",
-    returnDateTime: "2024-09-30T18:00:00",
-    description: "Student trip for research purposes.",
-  },
-  {
-    id: 2,
-    applicantName: "Jane Smith",
-    phone: "987-654-3210",
-    institutionName: "ABC School",
-    arrivalPlace: "Cox's Bazar",
-    arrivalDateTime: "2024-09-26T09:30:00",
-    numberTourist: 40,
-    numberBus: 3,
-    transportName: "Shyamoli Paribahan",
-    vehicleRegNo: "Chittagong B-4567",
-    destinationName: "Teknaf",
-    parkingPlace: "Teknaf Parking Zone",
-    returnDateTime: "2024-09-29T17:45:00",
-    description: "School field trip to Teknaf.",
-  },
-  {
-    id: 3,
-    applicantName: "Alice Johnson",
-    phone: "456-789-0123",
-    institutionName: "DEF College",
-    arrivalPlace: "Cox's Bazar",
-    arrivalDateTime: "2024-09-27T07:15:00",
-    numberTourist: 15,
-    numberBus: 1,
-    transportName: "Sohag Paribahan",
-    vehicleRegNo: "Sylhet B-7890",
-    destinationName: "Inani Beach",
-    parkingPlace: "Inani Beach Parking",
-    returnDateTime: "2024-09-28T16:30:00",
-    description: "College tour to Inani Beach.",
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { touristBusPermissionsData } from "../../features/touristBusPermission/touristBusPermissionSlice";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
+import { getAllTouristBusPermission } from "../../features/touristBusPermission/touristBusPermissionApiSlice";
 
 const TouristBusEntryPermissionList = () => {
+  const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [reviewPermission, setReviewPermission] = useState({});
+  const { permissions, count, permissionLoader } = useSelector(
+    touristBusPermissionsData
+  );
   const handleShowViewPermission = (id) => {
-    const selectedReview = dummyData?.find((per) => per.id === id);
+    const selectedReview = permissions?.find((per) => per.id === id);
     if (selectedReview) {
       setReviewPermission(selectedReview);
     }
@@ -69,12 +26,12 @@ const TouristBusEntryPermissionList = () => {
   const [rowPage, setRowPage] = useState(10);
   const handlePageChange = (page) => {
     setPage(page);
-    // dispatch(getAllTouristBusPermission({ page, limit: rowPage, search }));
+    dispatch(getAllTouristBusPermission({ page, limit: rowPage }));
   };
 
   const handlePerRowsChange = (newPerPage, page) => {
     setRowPage(newPerPage);
-    // dispatch(getAllTouristBusPermission({ page, limit: newPerPage, search }));
+    dispatch(getAllTouristBusPermission({ page, limit: newPerPage }));
   };
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
@@ -99,8 +56,16 @@ const TouristBusEntryPermissionList = () => {
       selector: (data) => data.applicantName,
       cell: (data) => (
         <>
-          <p className="w-full text-center text-white bg-red py-1 rounded-md font-medium">
-            Pending
+          <p
+            className={`w-full text-center ${
+              data.pending && "text-black bg-yellow"
+            } ${data.approved && "text-white bg-primary-color"} ${
+              data.rejected && "text-white bg-red"
+            }  py-1 rounded-md font-medium`}
+          >
+            {data.pending && "Pending"}
+            {data.approved && "Approved"}
+            {data.rejected && "Rejected"}
           </p>
         </>
       ),
@@ -117,23 +82,14 @@ const TouristBusEntryPermissionList = () => {
       sortable: true,
     },
     {
-      name: "Institution Name",
+      name: "Institution & Arrival Place",
       selector: (data) => data.institutionName,
-      sortable: true,
-    },
-    {
-      name: "Arrival Place",
-      selector: (data) => data.arrivalPlace,
       sortable: true,
     },
     {
       name: "Arrival Date & Time",
       selector: (data) => formatDateTime(data.arrivalDateTime),
       sortable: true,
-    },
-    {
-      name: "No of Tourist",
-      selector: (data) => data.numberTourist,
     },
     {
       name: "Number of Bus",
@@ -148,10 +104,6 @@ const TouristBusEntryPermissionList = () => {
       selector: (data) => data.vehicleRegNo,
     },
     {
-      name: "Destination",
-      selector: (data) => data.destinationName,
-    },
-    {
       name: "Parking Place",
       selector: (data) => data.parkingPlace,
     },
@@ -164,6 +116,9 @@ const TouristBusEntryPermissionList = () => {
       selector: (data) => data.description,
     },
   ];
+  useEffect(() => {
+    dispatch(getAllTouristBusPermission({ page: 1, limit: 10 }));
+  }, [dispatch]);
   let styles = "flex flex-col gap-1 border border-primary-color rounded-md p-2";
   return (
     <>
@@ -175,17 +130,13 @@ const TouristBusEntryPermissionList = () => {
                 <p className="font-semibold">Applicant Name</p>
                 <p>{reviewPermission?.applicantName}</p>
               </li>
-              <li className={styles}>
+              {/* <li className={styles}>
                 <p className="font-semibold">Mobile No.</p>
                 <p>{reviewPermission?.phone}</p>
-              </li>
+              </li> */}
               <li className={styles}>
                 <p className="font-semibold">Institution & Arrival Place</p>
                 <p>{reviewPermission?.institutionName}</p>
-              </li>
-              <li className={styles}>
-                <p className="font-semibold">No of Tourist</p>
-                <p>{reviewPermission?.numberTourist}</p>
               </li>
               <li className={styles}>
                 <p className="font-semibold">No of Transport</p>
@@ -200,10 +151,6 @@ const TouristBusEntryPermissionList = () => {
                 <p>{reviewPermission?.vehicleRegNo}</p>
               </li>
               <li className={styles}>
-                <p className="font-semibold">Destination Place</p>
-                <p>{reviewPermission?.destinationName}</p>
-              </li>
-              <li className={styles}>
                 <p className="font-semibold">Parking Place</p>
                 <p>{reviewPermission?.parkingPlace}</p>
               </li>
@@ -215,10 +162,10 @@ const TouristBusEntryPermissionList = () => {
                 <p className="font-semibold">Return Date & Time</p>
                 <p>{formatDateTime(reviewPermission?.returnDateTime)}</p>
               </li>
-              <li className={styles}>
+              {/* <li className={styles}>
                 <p className="font-semibold">Permission</p>
                 <p>Pending</p>
-              </li>
+              </li> */}
             </ul>
             <div className="flex justify-end mt-2">
               <button
@@ -235,13 +182,17 @@ const TouristBusEntryPermissionList = () => {
       <div className="container mx-auto bg-white rounded-lg">
         <DataTable
           columns={columns}
-          data={dummyData}
+          data={permissions || []}
           responsive
-          // progressPending={permissionLoader}
-          // progressComponent={<Loading />}
+          progressPending={permissionLoader}
+          progressComponent={
+            <div className="bg-white h-[70vh]">
+              <ComponentLoader />
+            </div>
+          }
           pagination
           paginationServer
-          // paginationTotalRows={permissionsCount}
+          paginationTotalRows={count}
           onChangeRowsPerPage={handlePerRowsChange}
           onChangePage={handlePageChange}
           paginationRowsPerPageOptions={[10, 20, 50, 100]}

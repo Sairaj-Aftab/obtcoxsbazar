@@ -184,13 +184,8 @@ const TouristBusPermission = () => {
       sortable: true,
     },
     {
-      name: "Institution Name",
+      name: "Institution & Arrival Place",
       selector: (data) => data.institutionName,
-      sortable: true,
-    },
-    {
-      name: "Arrival Place",
-      selector: (data) => data.arrivalPlace,
       sortable: true,
     },
     {

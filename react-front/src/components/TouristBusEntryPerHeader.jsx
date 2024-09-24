@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 const TouristBusEntryPerHeader = () => {
   const { pathname } = useLocation();
+
   return (
     <div>
       <div className="bg-white rounded-t-md flex gap-3 w-fit mx-auto mt-2 sm:mt-5 p-2">

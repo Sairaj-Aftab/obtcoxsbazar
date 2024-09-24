@@ -19,12 +19,12 @@ export const createTouristBusPermission = createAsyncThunk(
 
 export const getAllTouristBusPermission = createAsyncThunk(
   "touristBusPermission/getAllTouristBusPermission",
-  async ({ page, limit, filters }) => {
+  async ({ page, limit }) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/tourist-permission`,
+        `${import.meta.env.VITE_API_URL}/tourist-permission/getreturnofdate`,
         {
-          params: { page, limit, ...filters },
+          params: { page, limit },
           withCredentials: true,
         }
       );

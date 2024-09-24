@@ -9,7 +9,6 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
       applicantName,
       phone,
       institutionName,
-      arrivalPlace,
       arrivalDateTime,
       numberTourist,
       numberBus,
@@ -28,7 +27,6 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
           applicantName,
           phone,
           institutionName,
-          arrivalPlace,
           arrivalDateTime: new Date(arrivalDateTime),
           numberTourist: Number(numberTourist),
           numberBus: Number(numberBus),
@@ -145,6 +143,48 @@ export const getAllTouristBusEntryPermissions = async (req, res, next) => {
       permissions,
       count,
       filteredCount,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+export const getTouristBusEntriesByReturnDate = async (req, res, next) => {
+  try {
+    // Set up pagination variables
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const today = new Date();
+    const nextDay = new Date(today);
+    nextDay.setDate(today.getDate() - 1); // Add one day
+
+    // Fetch permissions with pagination, filtering by returnDateTime exactly on the next day
+    const permissions = await prisma.touristBusEntryPermission.findMany({
+      skip: offset,
+      take: limit,
+      where: {
+        returnDateTime: {
+          gte: nextDay.toISOString(),
+        },
+      },
+      orderBy: {
+        createdAt: "desc", // Order by createdAt for sorting
+      },
+    });
+
+    const count = await prisma.touristBusEntryPermission.count({
+      where: {
+        returnDateTime: {
+          gte: nextDay.toISOString(),
+        },
+      },
+    });
+
+    // Return the permissions with pagination and filter data
+    return res.status(200).json({
+      permissions,
+      count,
     });
   } catch (error) {
     return next(error);

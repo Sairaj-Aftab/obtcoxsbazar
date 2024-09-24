@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   createTouristBusPermission,
@@ -18,7 +17,6 @@ const TouristBusEntryPermission = () => {
     applicantName: "",
     phone: "",
     institutionName: "",
-    arrivalPlace: "",
     arrivalDateTime: "",
     numberTourist: "",
     numberBus: "",
@@ -44,7 +42,6 @@ const TouristBusEntryPermission = () => {
       applicantName,
       phone,
       institutionName,
-      arrivalPlace,
       arrivalDateTime,
       numberTourist,
       numberBus,
@@ -59,7 +56,6 @@ const TouristBusEntryPermission = () => {
       !applicantName ||
       !phone ||
       !institutionName ||
-      !arrivalPlace ||
       !arrivalDateTime ||
       numberTourist < 1 ||
       numberBus < 1 ||
@@ -86,7 +82,6 @@ const TouristBusEntryPermission = () => {
         applicantName: "",
         phone: "",
         institutionName: "",
-        arrivalPlace: "",
         arrivalDateTime: "",
         numberTourist: "",
         numberBus: "",
@@ -150,28 +145,12 @@ const TouristBusEntryPermission = () => {
             htmlFor="institutionName"
             className="text-sm font-medium text-gray-600 block mb-1"
           >
-            Institution Name (প্রতিষ্ঠানের নাম)
+            Institution & Arrival Place (প্রতিষ্ঠান এবং আগমনের স্থান)
           </label>
           <input
             name="institutionName"
             id="institutionName"
             value={formData.institutionName}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="arrivalPlace"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Arrival Place (আগমনের স্থান)
-          </label>
-          <input
-            name="arrivalPlace"
-            id="arrivalPlace"
-            value={formData.arrivalPlace}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
             required
