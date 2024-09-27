@@ -123,10 +123,10 @@ const Display = () => {
 
         <div className="block">
           <div className="table-header flex border-b border-white text-white bg-primary-color">
-            <p className="basis-2/12">Time</p>
-            <p className="basis-4/12 border-x border-white">Paribahan</p>
-            <p className="basis-3/12 border-r border-white">Departure Place</p>
-            <p className="basis-3/12">Destination</p>
+            <p className="basis-[14%]">Time</p>
+            <p className="basis-[34%] border-x border-white">Paribahan</p>
+            <p className="basis-[28%] border-r border-white">Departure Place</p>
+            <p className="basis-[24%]">Destination</p>
           </div>
           <div className="contain" ref={scrollRef}>
             {disSchedules?.length > 0 ? (
@@ -138,15 +138,17 @@ const Display = () => {
                     key={index}
                     className="flex border-b border-white text-yellow"
                   >
-                    <p className="basis-2/12">{formatDateTime(data.time)}</p>
-                    <p className="basis-4/12 border-x border-white">
+                    <p className="basis-[14%] time">
+                      {formatDateTime(data.time)}
+                    </p>
+                    <p className="basis-[34%] border-x border-white">
                       <span>{data.busName?.toUpperCase()}</span>
                       <span>{data.busNo}</span>
                     </p>
-                    <p className="basis-3/12 border-r border-white">
+                    <p className="basis-[28%] border-r border-white">
                       {data.leavingPlace?.toUpperCase()}
                     </p>
-                    <p className="basis-3/12">
+                    <p className="basis-[24%]">
                       {data.destinationPlace?.toUpperCase()}
                     </p>
                   </div>
