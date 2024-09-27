@@ -5,8 +5,8 @@ const ContactUs = () => {
       <div className="mb-2 flex flex-col sm:flex-row gap-2 text-sm sm:text-base font-semibold ">
         <span>
           Phone:{" "}
-          <a href="tel:+8801320108413" className="text-primary-color underline">
-            01320108413
+          <a href="tel:+8801320108405" className="text-primary-color underline">
+            01320108405
           </a>
         </span>
         <span>

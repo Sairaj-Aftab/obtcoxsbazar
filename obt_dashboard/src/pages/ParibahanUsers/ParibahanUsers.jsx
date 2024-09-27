@@ -317,6 +317,16 @@ const ParibahanUsers = () => {
                 />{" "}
                 Hyundai Biz Class
               </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={7}
+                  onChange={handleChangeType}
+                  checked={type.includes("7")}
+                />{" "}
+                Local Service
+              </label>
             </div>
           </div>
           {destinationPlaces && (
@@ -513,6 +523,16 @@ const ParibahanUsers = () => {
                   checked={type.includes("6")}
                 />{" "}
                 Hyundai Biz Class
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={7}
+                  onChange={handleChangeType}
+                  checked={type.includes("7")}
+                />{" "}
+                Local Service
               </label>
             </div>
           </div>

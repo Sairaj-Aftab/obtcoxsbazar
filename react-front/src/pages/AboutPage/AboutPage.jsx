@@ -30,7 +30,7 @@ const AboutPage = () => {
           <span className="font-semibold">
             Traffic Division, Cox’s Bazar District Police
           </span>{" "}
-          to make a smart, disciple, safe and tourism-friendly bus traffic
+          to make a smart, discipline, safe and tourism-friendly bus traffic
           management in tourist area.
         </p>
         <p className="mb-2">
