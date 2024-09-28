@@ -264,3 +264,12 @@ model TouristBusEntryPermission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model VisitorCount {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  date        DateTime @default(now()) @unique
+  dailyCount  Int      @default(0)
+  monthlyCount Int     @default(0)
+  yearlyCount  Int     @default(0)
+  totalCount   Int     @default(0)
+}

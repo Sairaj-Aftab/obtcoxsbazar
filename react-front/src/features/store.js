@@ -9,6 +9,7 @@ import paribahanAuthSlice from "./paribahanAuth/paribahanAuthSlice";
 import regularBusScheduleSlice from "./regularBusSchedule/regularBusScheduleSlice";
 import authReviewSlice from "./authReview/authReviewSlice";
 import touristBusPermissionSlice from "./touristBusPermission/touristBusPermissionSlice";
+import visitorCountSlice from "./visitorCount/visitorCountSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export const store = configureStore({
     notice: noticeSlice,
     touristBusPermission: touristBusPermissionSlice,
     authReview: authReviewSlice,
+    visitorCount: visitorCountSlice,
   },
 });

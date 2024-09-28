@@ -23,10 +23,21 @@ import {
 } from "./features/schedules/schedulesSlice";
 import { getLogedInUser } from "./features/paribahanAuth/paribahanAuthApiSlice";
 import { getAllRgSchedules } from "./features/regularBusSchedule/regularBusScheduleApiSlice";
-
+import GoogleAnalytics from "./components/GoogleAnalytics";
+import {
+  getVisitorStats,
+  updateVisitorCount,
+} from "./features/visitorCount/visitorCountApiSlice";
 function App() {
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    dispatch(getVisitorStats());
+  }, [dispatch]);
+  useEffect(() => {
+    if (import.meta.env.MODE === "production") {
+      dispatch(updateVisitorCount());
+    }
+  }, [dispatch]);
   useEffect(() => {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
@@ -104,7 +115,9 @@ function App() {
         />
       </Helmet>
       <Toaster />
-      <RouterProvider router={router} />
+      <RouterProvider router={router}>
+        <GoogleAnalytics />
+      </RouterProvider>
     </>
   );
 }

@@ -18,6 +18,7 @@ import guideInfo from "./routes/guideInfo.js";
 import driverInfo from "./routes/driverInfo.js";
 import touristPermission from "./routes/touristBusEntryPermission.js";
 import review from "./routes/review.js";
+import visitor from "./routes/visitorCount.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -72,6 +73,7 @@ app.use("/api/v1/guideinfo", guideInfo);
 app.use("/api/v1/driverinfo", driverInfo);
 app.use("/api/v1/tourist-permission", touristPermission);
 app.use("/api/v1/review", review);
+app.use("/api/v1/visitorcount", visitor);
 
 // Error Handler
 app.use(errorHandler);

@@ -4,6 +4,7 @@ import sp from "../../assets/image/sp.jpeg";
 import jsp from "../../assets/image/jashim_uddin.jpeg";
 import sai from "../../assets/image/Sairaj_Aftab.png";
 import pol from "../../assets/image/police_logo.png";
+import bizman from "../../assets/image/bizman.jpg";
 import avatar from "../../assets/image/avatar.jfif";
 const AboutPage = () => {
   return (
@@ -255,6 +256,22 @@ const AboutPage = () => {
               Cox&apos;s Bazar District Police
             </h3>
           </div>
+        </div>
+        <div className="relative w-full md:w-1/2 mx-auto mt-14 text-center bg-gray-200 p-4 rounded-lg">
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
+            <img
+              src={bizman}
+              alt=""
+              className="rounded-full w-40 object-cover border-2 border-primary-color"
+            />
+          </div>
+          <h3 className="text-base font-bold text-black mt-10 mb-2">
+            Brand Partner
+          </h3>
+          <h3 className="text-base font-bold text-black">Bizman Media</h3>
+          {/* <h3 className="text-base font-bold text-black">
+            Cox&apos;s Bazar District Police
+          </h3> */}
         </div>
       </section>
     </>
