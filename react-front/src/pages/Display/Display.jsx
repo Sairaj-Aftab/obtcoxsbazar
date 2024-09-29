@@ -93,7 +93,7 @@ const Display = () => {
 
   return (
     <div className="display bg-black h-screen w-full flex items-center justify-center fixed -z-10">
-      <div className="w-full flex flex-col gap-5">
+      <div className="w-full flex flex-col">
         <div className="flex justify-between items-center w-[90%] mx-auto">
           <div className="w-20 lg:w-28 text-white">
             <img src={logoImg2} alt="OBT" sizes="100vw" className="w-full" />
@@ -154,8 +154,8 @@ const Display = () => {
                   </div>
                 ))
             ) : (
-              <h1 className="text-white text-2xl font-semibold flex justify-center items-center h-full w-full">
-                No schedules
+              <h1 className="text-white text-3xl font-bold flex justify-center items-center h-full w-full">
+                Welcome to Online Bus Terminal
               </h1>
             )}
           </div>

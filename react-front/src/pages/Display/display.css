@@ -1,7 +1,7 @@
 .display .block {
   position: relative;
-  margin: auto;
   width: 90%;
+  margin: 20px auto;
   background: linear-gradient(0deg, #000, #272727);
 }
 .display .block:before,
