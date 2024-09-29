@@ -109,7 +109,7 @@ const Display = () => {
               </h1>
             </div>
 
-            <span className="text-white text-3xl font-semibold">
+            <span className="text-white text-2xl lg:text-3xl font-semibold">
               Cox&apos;s Bazar
             </span>
           </div>

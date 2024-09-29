@@ -102,13 +102,13 @@
 }
 
 .display .block .contain {
-  height: 280px;
+  height: 270px;
   overflow-y: scroll;
 }
 
 .display .block .table-header p {
   padding: 5px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   display: flex;
   flex-direction: column;
@@ -116,14 +116,14 @@
 }
 .display .block .contain p {
   padding: 5px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 .display .block .contain .time {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 @media (min-width: 1024px) {
   .head_text_parent {
