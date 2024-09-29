@@ -95,16 +95,16 @@ const Display = () => {
     <div className="display bg-black h-screen w-full flex items-center justify-center fixed -z-10">
       <div className="w-full flex flex-col gap-5">
         <div className="flex justify-between items-center w-[90%] mx-auto">
-          <div className="w-28 text-white">
+          <div className="w-20 lg:w-28 text-white">
             <img src={logoImg2} alt="OBT" sizes="100vw" className="w-full" />
           </div>
           <div className="basis-2/4 text-white flex flex-col items-center">
-            <h1 className="text-white text-3xl font-bold"></h1>
+            {/* <h1 className="text-white text-3xl font-bold"></h1> */}
             <div className="head_text_parent">
-              <h1 className="head_text text-3xl md:text-5xl">
+              <h1 className="head_text text-4xl lg:text-5xl">
                 Online Bus Terminal
               </h1>
-              <h1 className="head_text text-3xl md:text-5xl">
+              <h1 className="head_text text-4xl lg:text-5xl">
                 Online Bus Terminal
               </h1>
             </div>
@@ -115,7 +115,7 @@ const Display = () => {
           </div>
 
           <div
-            className={`w-28 h-28 flex flex-col justify-center items-center border border-red border-double rounded-full`}
+            className={`w-20 h-20 lg:w-28 lg:h-28 flex flex-col justify-center items-center border border-red border-double rounded-full`}
           >
             <DigitalClock />
           </div>
@@ -160,7 +160,7 @@ const Display = () => {
             )}
           </div>
         </div>
-        <div className="text-white w-[90%] mx-auto text-3xl font-semibold">
+        <div className="text-white w-[90%] mx-auto text-2xl lg:text-3xl font-semibold">
           <NoticeFromAdmin status="Display" />
         </div>
       </div>

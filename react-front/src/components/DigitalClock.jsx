@@ -16,12 +16,14 @@ const DigitalClock = () => {
   return (
     <div
       style={{ fontFamily: "Digital" }}
-      className="flex flex-col items-center mt-3"
+      className="flex flex-col items-center mt-2"
     >
-      <div className="text-white text-4xl font-bold">
+      <div className="text-white text-3xl lg:text-4xl font-bold">
         <span>{hours}</span> : <span>{minutes}</span>
       </div>
-      <span className="text-red text-3xl font-semibold">{seconds}</span>
+      <span className="text-red text-2xl lg:text-3xl font-semibold">
+        {seconds}
+      </span>
     </div>
   );
 };
