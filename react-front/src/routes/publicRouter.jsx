@@ -4,7 +4,6 @@ import AboutPage from "../pages/AboutPage/AboutPage";
 import AllBusServices from "../pages/AllBusServices/AllBusServices";
 import AllSchedules from "../pages/AllSchedules/AllSchedules";
 import BusComReviewByQR from "../pages/BusComReviewByQR/BusComReviewByQR";
-import BusEntryPermissionList from "../pages/BusEntryPermissionList/BusEntryPermissionList";
 import BusInfo from "../pages/BusInfo/BusInfo";
 import BusInformation from "../pages/BusInformation/BusInformation";
 import BusServicesByPlace from "../pages/BusServicesByPlace/BusServicesByPlace";
@@ -45,10 +44,6 @@ const publicRoutes = [
       {
         path: "/all-regular-schedules",
         element: <RegularBusSchedule />,
-      },
-      {
-        path: "/tourist-bus-entry-permission-list",
-        element: <BusEntryPermissionList />,
       },
       {
         element: <TouristBusEntryPerHeader />,

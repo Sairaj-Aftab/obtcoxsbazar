@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { loginAuthUser } from "../../features/auth/authApiSlice";
 import { authData, setMessageEmpty } from "../../features/auth/authSlice";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import WhiteLogo from "../../components/Logo/WhiteLogo";
@@ -9,7 +9,7 @@ import WhiteLogo from "../../components/Logo/WhiteLogo";
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { error, message, authUser } = useSelector(authData);
+  const { error, message, authUser, loader } = useSelector(authData);
   const [input, setInput] = useState({
     userName: "",
     password: "",
@@ -47,7 +47,7 @@ const Login = () => {
     return () => {
       dispatch(setMessageEmpty());
     };
-  }, [dispatch, error, message]);
+  }, [authUser, dispatch, error, message, navigate]);
   return (
     <div className="main-wrapper login-body">
       <div className="login-wrapper">
@@ -84,8 +84,12 @@ const Login = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <button className="btn btn-primary btn-block" type="submit">
-                      Login
+                    <button
+                      className="btn btn-primary btn-block"
+                      type="submit"
+                      disabled={loader}
+                    >
+                      {loader ? "Login..." : "Login"}
                     </button>
                   </div>
                 </form>

@@ -9,7 +9,9 @@ const Modal = ({ title, children, close }) => {
           <h1 className="text-lg font-semibold">{title}</h1>
           <BiX className="cursor-pointer" size={30} onClick={close} />
         </div>
-        <div className="max-h-[90vh] overflow-y-auto">{children}</div>
+        <div className="max-h-[70vh] lg:max-h-[90vh] overflow-y-auto">
+          {children}
+        </div>
       </div>
     </div>
   );

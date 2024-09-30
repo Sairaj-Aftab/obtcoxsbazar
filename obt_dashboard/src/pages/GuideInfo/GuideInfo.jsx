@@ -300,7 +300,13 @@ const GuideInfo = () => {
               placeholder="Report"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              authUser?.role?.name === "VIEWER" || loader ? true : false
+            }
+          >
             Create
           </button>
         </form>
@@ -388,7 +394,13 @@ const GuideInfo = () => {
               placeholder="Report"
             />
           </div>
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              authUser?.role?.name === "VIEWER" || loader ? true : false
+            }
+          >
             Edit
           </button>
         </form>

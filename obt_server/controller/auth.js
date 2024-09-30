@@ -11,13 +11,6 @@ export const login = async (req, res, next) => {
       where: {
         userName,
       },
-      include: {
-        role: {
-          include: {
-            permissions: true,
-          },
-        },
-      },
     });
     if (!user) {
       return next(createError(404, "User not found"));
@@ -27,16 +20,23 @@ export const login = async (req, res, next) => {
       return next(createError(400, "Wrong password"));
     }
 
-    // Capture the user's IP address
+    // Get the user's IP address, handling both IPv4 and IPv6
     const userIp =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     // Update lastLoginDate and lastLoginIp
-    await prisma.authUser.update({
+    const updatedUser = await prisma.authUser.update({
       where: { id: user.id },
       data: {
         lastLoginTime: new Date(),
         lastLoginIp: userIp,
+      },
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
       },
     });
 
@@ -51,7 +51,7 @@ export const login = async (req, res, next) => {
 
     return res.status(200).json({
       message: "Login successfully",
-      user,
+      user: updatedUser,
       token,
     });
   } catch (error) {
@@ -118,6 +118,7 @@ export const register = async (req, res, next) => {
 export const getAllUsers = async (req, res, next) => {
   try {
     const users = await prisma.authUser.findMany({
+      orderBy: { createdAt: "asc" },
       include: {
         role: true,
       },

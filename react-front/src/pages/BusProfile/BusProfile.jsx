@@ -452,6 +452,10 @@ const BusProfile = () => {
                 value={input.rent}
                 onChange={changeInputValue}
                 placeholder="৳ Regular Price"
+                onInput={(e) => {
+                  if (e.target.value.length > 4)
+                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
+                }}
               />
               <input
                 type="number"
@@ -459,6 +463,10 @@ const BusProfile = () => {
                 value={input.discountRent}
                 onChange={changeInputValue}
                 placeholder="৳ Discount Price (Optional)"
+                onInput={(e) => {
+                  if (e.target.value.length > 4)
+                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
+                }}
               />
             </div>
             {/* For Mobile view */}
@@ -469,6 +477,10 @@ const BusProfile = () => {
                 value={input.rent}
                 onChange={changeInputValue}
                 placeholder="৳ Reg. Price"
+                onInput={(e) => {
+                  if (e.target.value.length > 4)
+                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
+                }}
               />
               <input
                 type="number"
@@ -476,6 +488,10 @@ const BusProfile = () => {
                 value={input.discountRent}
                 onChange={changeInputValue}
                 placeholder="৳ Dis. Price (Optional)"
+                onInput={(e) => {
+                  if (e.target.value.length > 4)
+                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
+                }}
               />
             </div>
             <select

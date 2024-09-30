@@ -406,7 +406,13 @@ const BusInfo = () => {
               className="form-control"
             />
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loader}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              authUser?.role?.name === "VIEWER" || loader ? true : false
+            }
+          >
             {loader ? "Creating..." : "Create"}
           </button>
         </form>
@@ -500,7 +506,13 @@ const BusInfo = () => {
               className="form-control"
             />
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loader}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={
+              authUser?.role?.name === "VIEWER" || loader ? true : false
+            }
+          >
             {loader ? "Editing..." : "Edit"}
           </button>
         </form>

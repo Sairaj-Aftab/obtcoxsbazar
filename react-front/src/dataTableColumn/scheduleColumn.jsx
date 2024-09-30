@@ -75,7 +75,7 @@ const scheduleColumn = (navigate) => {
           </a>
         );
       },
-      width: "200px",
+      width: "225px",
       sortable: true,
     },
     {

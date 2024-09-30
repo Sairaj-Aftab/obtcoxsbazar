@@ -37,11 +37,11 @@ const BusServicesByPlace = () => {
         <p>
           Cox&apos;s Bazar to{" "}
           <span className="text-yellow">
-            {currentDestination?.placeName?.toUpperCase() || "UNKNOWN PLACE"}
+            {currentDestination?.placeName?.toUpperCase()}
           </span>
         </p>
         {currentDestination?.destinationKM && (
-          <p>&#10132; {currentDestination?.destinationKM || "N/A"} KM</p>
+          <p>&#10132; {currentDestination?.destinationKM} KM</p>
         )}
       </h1>
       <p className="text-base font-medium text-black mb-3">

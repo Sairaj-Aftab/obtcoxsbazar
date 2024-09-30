@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import router from "./routes/router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getLogedInUser } from "./features/auth/authApiSlice";
 import {
   getAllAuthUser,
@@ -29,9 +29,11 @@ import { getAllGuideInfo } from "./features/guideInfo/guideInfoApiSlice";
 import { getAllDriverInfo } from "./features/driverInfo/driverInfoApiSlice";
 import { getAllRgSchedules } from "./features/regularSchedule/regularScheduleApiSlice";
 import { getAllReview } from "./features/review/reviewApiSlice";
+import { authData } from "./features/auth/authSlice";
 
 function App() {
   const dispatch = useDispatch();
+  const { authUser } = useSelector(authData);
 
   useEffect(() => {
     if (localStorage.getItem("authUser")) {
@@ -42,7 +44,7 @@ function App() {
     dispatch(getAllRgSchedules({ page: 1, limit: 10 }));
     dispatch(getAllPermission());
     dispatch(getAllRoles());
-    dispatch(getAllAuthUser());
+
     dispatch(getParibahanUser());
     dispatch(getAllPlace());
     dispatch(getLeavingPlaces());
@@ -54,6 +56,9 @@ function App() {
     dispatch(getAllDriverInfo({ page: 1, limit: 10 }));
     dispatch(getAllReview({ page: 1, limit: 10 }));
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(getAllAuthUser());
+  }, [dispatch, authUser]);
   return (
     <>
       <Toaster />

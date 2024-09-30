@@ -76,11 +76,11 @@ const TouristBusEntryPermissionList = () => {
       selector: (data) => data.applicantName,
       sortable: true,
     },
-    {
-      name: "Phone No.",
-      selector: (data) => data.phone,
-      sortable: true,
-    },
+    // {
+    //   name: "Phone No.",
+    //   selector: (data) => data.phone,
+    //   sortable: true,
+    // },
     {
       name: "Institution & Arrival Place",
       selector: (data) => data.institutionName,
@@ -94,6 +94,7 @@ const TouristBusEntryPermissionList = () => {
     {
       name: "Number of Bus",
       selector: (data) => data.numberBus,
+      width: "60px",
     },
     {
       name: "Transport Name",
@@ -162,6 +163,12 @@ const TouristBusEntryPermissionList = () => {
                 <p className="font-semibold">Return Date & Time</p>
                 <p>{formatDateTime(reviewPermission?.returnDateTime)}</p>
               </li>
+              {reviewPermission?.description && (
+                <li className={styles}>
+                  <p className="font-semibold">Description</p>
+                  <p>{reviewPermission.description}</p>
+                </li>
+              )}
               {/* <li className={styles}>
                 <p className="font-semibold">Permission</p>
                 <p>Pending</p>
@@ -197,6 +204,15 @@ const TouristBusEntryPermissionList = () => {
           onChangePage={handlePageChange}
           paginationRowsPerPageOptions={[10, 20, 50, 100]}
         />
+        <h1 className="bg-primary-color p-2 text-white text-sm font-normal text-center sm:text-start">
+          জরুরি প্রয়োজনে কল করুন : ‍
+          <a
+            href="tel:+8801320108710"
+            className="text-yellow text-base font-semibold"
+          >
+            01320-108710
+          </a>
+        </h1>
       </div>
     </>
   );

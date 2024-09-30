@@ -5,7 +5,11 @@ import PageHeader from "../../components/PageHeader/PageHeader";
 import FormInputValue from "../../hooks/formInputValue";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllData, setMessageEmpty } from "../../features/user/userSlice";
-import { formatDate, formatDateAndTime } from "../../utils/timeAgo";
+import {
+  formatDate,
+  formatDateAndTime,
+  formatDateTime,
+} from "../../utils/timeAgo";
 import swal from "sweetalert";
 import {
   createAuthUser,
@@ -26,7 +30,6 @@ const Users = () => {
     password: "",
     roleId: "",
   });
-  console.log(input);
 
   const handleGenRanPassword = () => {
     const ranPass = generateRandomPassword();
@@ -295,7 +298,7 @@ const Users = () => {
                             <td>{index + 1}</td>
                             <td>{data.userName}</td>
                             <td>{data.role?.name}</td>
-                            <td>{formatDateAndTime(data?.lastLoginTime)}</td>
+                            <td>{formatDateTime(data?.lastLoginTime)}</td>
                             <td>{data?.lastLoginIp}</td>
                             <td>{data?.phone}</td>
                             {authUser?.role?.name === "SUPER-ADMIN" && (
@@ -361,7 +364,7 @@ const Users = () => {
                             <td>{index + 1}</td>
                             <td>{data.userName}</td>
                             <td>{data.role?.name}</td>
-                            <td>{formatDateAndTime(data?.lastLoginTime)}</td>
+                            <td>{formatDateTime(data?.lastLoginTime)}</td>
                             <td>{data?.lastLoginIp}</td>
                             <td>{data?.phone}</td>
                             {authUser?.role?.name === "SUPER-ADMIN" && (
