@@ -26,6 +26,20 @@ export const login = async (req, res, next) => {
     if (!isPasswordCorrect) {
       return next(createError(400, "Wrong password"));
     }
+
+    // Capture the user's IP address
+    const userIp =
+      req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+
+    // Update lastLoginDate and lastLoginIp
+    await prisma.authUser.update({
+      where: { id: user.id },
+      data: {
+        lastLoginTime: new Date(),
+        lastLoginIp: userIp,
+      },
+    });
+
     const token = createToken({ userName: user.userName }, "365d");
     res.cookie("auth_token", token, {
       httpOnly: true,

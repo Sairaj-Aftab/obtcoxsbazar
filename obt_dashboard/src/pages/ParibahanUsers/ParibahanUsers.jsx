@@ -589,14 +589,11 @@ const ParibahanUsers = () => {
                       <th>#</th>
                       <th>Paribahan</th>
                       <th>Contact Person</th>
-                      <th>Contact No.</th>
                       <th>Sales Name</th>
-                      <th>Sales No.</th>
                       <th>Destinations</th>
                       <th>Password</th>
                       <th>QR Code</th>
-                      <th>Created by</th>
-                      <th>Created At</th>
+                      <th>Created by & At</th>
                       <th className="text-right">Actions</th>
                     </tr>
                   </thead>
@@ -606,17 +603,21 @@ const ParibahanUsers = () => {
                         <tr key={data.id}>
                           <td>{index + 1}</td>
                           <td>{data.paribahanName}</td>
-                          <th>{data?.contactPerson}</th>
                           <th>
-                            <a href={`tel:+88${data?.contactNumber}`}>
-                              {data?.contactNumber}
-                            </a>
+                            <p>{data?.contactPerson}</p>
+                            <p>
+                              <a href={`tel:+88${data?.contactNumber}`}>
+                                {data?.contactNumber}
+                              </a>
+                            </p>
                           </th>
-                          <th>{data?.salesPerson}</th>
                           <th>
-                            <a href={`tel:+88${data?.salesNumber}`}>
-                              {data?.salesNumber}
-                            </a>
+                            <p>{data?.salesPerson}</p>
+                            <p>
+                              <a href={`tel:+88${data?.salesNumber}`}>
+                                {data?.salesNumber}
+                              </a>
+                            </p>
                           </th>
                           <td>
                             <ul>
@@ -634,10 +635,12 @@ const ParibahanUsers = () => {
                             />
                           </td>
                           <td>
-                            {data.authUser?.userName} .{" "}
-                            {data?.authUser?.role?.name}
+                            <p>
+                              {data.authUser?.userName} .{" "}
+                              {data?.authUser?.role?.name}
+                            </p>
+                            <p>{formatDate(data.createdAt)}s</p>
                           </td>
-                          <td>{formatDate(data.createdAt)}</td>
                           <td className="text-right">
                             <div className="actions">
                               <a

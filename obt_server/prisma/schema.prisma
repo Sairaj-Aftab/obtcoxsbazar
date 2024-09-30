@@ -16,6 +16,8 @@ model AuthUser {
     roleId String @db.ObjectId
     password String
     plainPassword String?
+    lastLoginTime DateTime? @default(now())
+    lastLoginIp String?
     notice NoticeFromAdmin[]
     paribahanUser ParibahanUser[]
     status Boolean @default(true)

@@ -293,41 +293,48 @@ const TouristBusPermission = () => {
               <p>Return Date & Time</p>{" "}
               <p>{formatDateAndTime(reviewPermission?.returnDateTime)}</p>
             </li>
-            <li>
-              <p>Permission</p>{" "}
-              <div className="d-flex">
-                <label
-                  htmlFor="accept"
-                  className="mr-2 mb-0 form-control d-flex align-items-center"
-                >
-                  <input
-                    type="radio"
-                    id="accept"
-                    name="status"
-                    value="approved"
-                    checked={reviewStatus === "approved"}
-                    onChange={(e) => setReviewStatus(e.target.value)}
-                  />
-                  <span className="ml-1 font-weight-bold">Approve</span>
-                </label>
-                <label
-                  htmlFor="reject"
-                  className="mb-0 form-control d-flex align-items-center"
-                >
-                  <input
-                    type="radio"
-                    id="reject"
-                    name="status"
-                    value="rejected"
-                    checked={reviewStatus === "rejected"}
-                    onChange={(e) => setReviewStatus(e.target.value)}
-                  />
-                  <span className="ml-1 font-weight-bold text-danger">
-                    Reject
-                  </span>
-                </label>
-              </div>
-            </li>
+            {reviewPermission?.description && (
+              <li>
+                <p>Description</p> <p>{reviewPermission?.description}</p>
+              </li>
+            )}
+            {reviewPermission?.pending && (
+              <li>
+                <p>Permission</p>{" "}
+                <div className="d-flex">
+                  <label
+                    htmlFor="accept"
+                    className="mr-2 mb-0 form-control d-flex align-items-center"
+                  >
+                    <input
+                      type="radio"
+                      id="accept"
+                      name="status"
+                      value="approved"
+                      checked={reviewStatus === "approved"}
+                      onChange={(e) => setReviewStatus(e.target.value)}
+                    />
+                    <span className="ml-1 font-weight-bold">Approve</span>
+                  </label>
+                  <label
+                    htmlFor="reject"
+                    className="mb-0 form-control d-flex align-items-center"
+                  >
+                    <input
+                      type="radio"
+                      id="reject"
+                      name="status"
+                      value="rejected"
+                      checked={reviewStatus === "rejected"}
+                      onChange={(e) => setReviewStatus(e.target.value)}
+                    />
+                    <span className="ml-1 font-weight-bold text-danger">
+                      Reject
+                    </span>
+                  </label>
+                </div>
+              </li>
+            )}
           </ul>
           <div className="d-flex justify-content-end mt-3">
             <button

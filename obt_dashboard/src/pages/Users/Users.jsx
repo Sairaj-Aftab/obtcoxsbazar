@@ -5,7 +5,7 @@ import PageHeader from "../../components/PageHeader/PageHeader";
 import FormInputValue from "../../hooks/formInputValue";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllData, setMessageEmpty } from "../../features/user/userSlice";
-import { formatDate } from "../../utils/timeAgo";
+import { formatDate, formatDateAndTime } from "../../utils/timeAgo";
 import swal from "sweetalert";
 import {
   createAuthUser,
@@ -266,7 +266,7 @@ const Users = () => {
         Add new user
       </button>
       <div className="row">
-        <div className="col-sm-12">
+        <div className="col-sm-6">
           <div className="card">
             <div className="card-body">
               <div className="table-responsive">
@@ -277,34 +277,42 @@ const Users = () => {
                         <th>#</th>
                         <th>User Name</th>
                         <th>Role</th>
+                        <th>Last Login</th>
+                        <th>Last Login IP</th>
                         <th>Phone</th>
-                        {authUser?.role?.name === "ADMIN" && <th>Password</th>}
+                        {authUser?.role?.name === "SUPER-ADMIN" && (
+                          <th>Password</th>
+                        )}
                         <th>Created At</th>
                         <th className="text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {users?.map((data, index) => (
-                        <tr key={data.id}>
-                          <td>{index + 1}</td>
-                          <td>{data.userName}</td>
-                          <td>{data.role?.name}</td>
-                          <td>{data?.phone}</td>
-                          {authUser?.role?.name === "ADMIN" && (
-                            <td>{data?.plainPassword}</td>
-                          )}
-                          <td>{formatDate(data.createdAt)}</td>
-                          <td className="text-right">
-                            <div className="actions">
-                              <a
-                                className="btn btn-sm bg-success-light mr-1"
-                                data-toggle="modal"
-                                href="#userEditModalPopup"
-                                onClick={() => handleEditShowModal(data.id)}
-                              >
-                                <i className="fe fe-pencil"></i>
-                              </a>
-                              {/* <button
+                      {users
+                        ?.filter((data) => data.role?.name !== "SUPER-ADMIN")
+                        ?.map((data, index) => (
+                          <tr key={data.id}>
+                            <td>{index + 1}</td>
+                            <td>{data.userName}</td>
+                            <td>{data.role?.name}</td>
+                            <td>{formatDateAndTime(data?.lastLoginTime)}</td>
+                            <td>{data?.lastLoginIp}</td>
+                            <td>{data?.phone}</td>
+                            {authUser?.role?.name === "SUPER-ADMIN" && (
+                              <td>{data?.plainPassword}</td>
+                            )}
+                            <td>{formatDate(data.createdAt)}</td>
+                            <td className="text-right">
+                              <div className="actions">
+                                <a
+                                  className="btn btn-sm bg-success-light mr-1"
+                                  data-toggle="modal"
+                                  href="#userEditModalPopup"
+                                  onClick={() => handleEditShowModal(data.id)}
+                                >
+                                  <i className="fe fe-pencil"></i>
+                                </a>
+                                {/* <button
                                 onClick={() => handleDeleteUser(data.id)}
                                 className="btn btn-sm bg-danger-light"
                                 disabled={
@@ -313,10 +321,76 @@ const Users = () => {
                               >
                                 <i className="fe fe-trash"></i>
                               </button> */}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-sm-6">
+          <div className="card">
+            <div className="card-body">
+              <div className="table-responsive">
+                {users && (
+                  <table className="datatable table table-hover table-center mb-0">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>User Name</th>
+                        <th>Role</th>
+                        <th>Last Login</th>
+                        <th>Last Login IP</th>
+                        <th>Phone</th>
+                        {authUser?.role?.name === "SUPER-ADMIN" && (
+                          <th>Password</th>
+                        )}
+                        <th>Created At</th>
+                        <th className="text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users
+                        ?.filter((data) => data.role?.name === "SUPER-ADMIN")
+                        ?.map((data, index) => (
+                          <tr key={data.id}>
+                            <td>{index + 1}</td>
+                            <td>{data.userName}</td>
+                            <td>{data.role?.name}</td>
+                            <td>{formatDateAndTime(data?.lastLoginTime)}</td>
+                            <td>{data?.lastLoginIp}</td>
+                            <td>{data?.phone}</td>
+                            {authUser?.role?.name === "SUPER-ADMIN" && (
+                              <td>{data?.plainPassword}</td>
+                            )}
+                            <td>{formatDate(data.createdAt)}</td>
+                            <td className="text-right">
+                              <div className="actions">
+                                <a
+                                  className="btn btn-sm bg-success-light mr-1"
+                                  data-toggle="modal"
+                                  href="#userEditModalPopup"
+                                  onClick={() => handleEditShowModal(data.id)}
+                                >
+                                  <i className="fe fe-pencil"></i>
+                                </a>
+                                {/* <button
+                                onClick={() => handleDeleteUser(data.id)}
+                                className="btn btn-sm bg-danger-light"
+                                disabled={
+                                  authUser?.role?.name === "VIEWER" && true
+                                }
+                              >
+                                <i className="fe fe-trash"></i>
+                              </button> */}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 )}
