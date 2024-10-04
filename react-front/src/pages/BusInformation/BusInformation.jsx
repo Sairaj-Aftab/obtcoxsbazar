@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
+import { FaStar } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
@@ -155,7 +156,7 @@ const BusInformation = () => {
       <div className="container mx-auto bg-white rounded-lg my-5">
         {/* Heading */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-primary-color rounded-t-lg text-white py-2 px-3">
-          <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 items-center">
+          <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-center">
             {busInfoLoader && (
               <div className="w-full sm:w-96">
                 <Skeleton height={30} baseColor="#008B8B" />
@@ -165,8 +166,40 @@ const BusInformation = () => {
               <>
                 <h1 className="text-xl font-medium">
                   {busInfo?.paribahanName}
-                </h1>
-                <TodayDate className="text-base text-white font-normal" />
+                </h1>{" "}
+                <div className="flex justify-between items-center gap-6">
+                  {busInfo?.totalReviewCount > 0 && (
+                    <>
+                      <span className="hidden sm:block">&#10072;</span>
+                      <div className="text-yellow text-base font-semibold flex gap-1">
+                        <span>Rating :</span>
+                        <div className="flex gap-2">
+                          <div className="flex items-center text-primary-color">
+                            {[...Array(5)].map((_, index) => (
+                              <FaStar
+                                key={index}
+                                className={`${
+                                  index < Math.round(busInfo.averageRating)
+                                    ? "text-yellow"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span>({busInfo.totalReviewCount})</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  <a
+                    href={`tel:+88${busInfo?.salesNumber}`}
+                    className="flex gap-3 items-center text-base font-semibold sm:hidden"
+                  >
+                    <span>Call for Ticket</span>
+                    <span className="text-2xl">&#9990;</span>
+                  </a>
+                </div>
+                <TodayDate className="text-base text-white font-normal sm:ml-10" />
               </>
             )}
           </div>
@@ -177,7 +210,7 @@ const BusInformation = () => {
             </div>
           )}
           {!busInfoLoader && (
-            <p className="text-sm md:text-base font-medium">
+            <p className="text-sm md:text-base font-medium hidden sm:block">
               টিকেট এর জন্য যোগাযোগ করুন :{" "}
               <a
                 href={`tel:+88${busInfo?.salesNumber}`}

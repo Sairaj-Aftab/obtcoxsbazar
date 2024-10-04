@@ -63,7 +63,12 @@ const Notice = () => {
       return;
     }
 
-    const validStatuses = ["Passenger", "Display", "Paribahan"];
+    const validStatuses = [
+      "Passenger",
+      "Display",
+      "Paribahan",
+      "Tourist-Bus-Permission",
+    ];
 
     if (validStatuses.includes(status)) {
       dispatch(updateAdminNotice({ id, title }));
@@ -128,6 +133,7 @@ const Notice = () => {
           <option value="Paribahan">Paribahan</option>
           <option value="Passenger">Passenger</option>
           <option value="Display">Display</option>
+          <option value="Tourist-Bus-Permission">Tourist Bus Permission</option>
         </select>
         <button
           disabled={authUser?.role?.name === "VIEWER" && true}

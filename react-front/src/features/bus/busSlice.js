@@ -5,6 +5,8 @@ const busSlice = createSlice({
   initialState: {
     bus: [],
     busInfo: null,
+    totalReviewCount: 0,
+    averageRating: 0,
     message: null,
     error: null,
     busLoader: false,
@@ -41,6 +43,11 @@ const busSlice = createSlice({
       .addCase(getBusInfoData.fulfilled, (state, action) => {
         state.busInfoLoader = false;
         state.busInfo = action.payload.paribahanUser;
+        state.busInfo = {
+          ...state.busInfo,
+          totalReviewCount: action.payload.totalReviewCount,
+          averageRating: action.payload.averageRating,
+        };
       });
   },
 });

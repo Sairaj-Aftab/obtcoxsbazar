@@ -3,6 +3,7 @@ import { createBusInfo, getBusInfo, updateBusInfo } from "./busInfoApiSlice";
 const busInfoSlice = createSlice({
   name: "busInfo",
   initialState: {
+    // Bus Registration Number for Login poribahan
     busInfo: [],
     totalCount: 0,
     searchCount: 0,
@@ -33,10 +34,10 @@ const busInfoSlice = createSlice({
         state.loader = true;
       })
       .addCase(createBusInfo.fulfilled, (state, action) => {
-        state.loader = false;
         state.busInfo.unshift(action.payload.busInfo);
         state.totalCount++;
         state.message = action.payload.message;
+        state.loader = false;
       })
       .addCase(updateBusInfo.rejected, (state, action) => {
         state.error = action.error.message;
@@ -46,7 +47,6 @@ const busInfoSlice = createSlice({
         state.loader = true;
       })
       .addCase(updateBusInfo.fulfilled, (state, action) => {
-        state.loader = false;
         const infoIndex = state.busInfo.findIndex(
           (info) => info.id === action.payload.busInfo.id
         );
@@ -54,6 +54,7 @@ const busInfoSlice = createSlice({
           state.busInfo[infoIndex] = action.payload.busInfo;
         }
         state.message = action.payload.message;
+        state.loader = false;
       });
   },
 });

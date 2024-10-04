@@ -110,7 +110,7 @@ const Display = () => {
             </div>
 
             <span className="text-white text-2xl lg:text-3xl font-semibold">
-              Cox&apos;s Bazar
+              www.obtcoxsbazar.com
             </span>
           </div>
 
