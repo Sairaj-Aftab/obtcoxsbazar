@@ -19,7 +19,6 @@ const Permission = () => {
   const { authUser } = useSelector(authData);
 
   const { permissions } = useSelector(getAllData);
-  console.log(permissions);
 
   const [name, setName] = useState("");
 

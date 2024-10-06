@@ -9,20 +9,22 @@ const VisitorCountSection = () => {
       <div className="container mx-auto p-4 grid grid-cols-2 md:grid-cols-none md:flex flex-col md:flex-row gap-5 justify-center md:justify-between">
         <div className="flex flex-col items-center">
           <p className="text-white text-base md:text-lg font-medium">
-            Total Visitor
-          </p>
-          <p className="text-yellow text-2xl md:text-4xl font-medium">
-            {visitorStats.total}
-          </p>
-        </div>
-        <div className="flex flex-col items-center">
-          <p className="text-white text-base md:text-lg font-medium">
-            Daily Visitor
+            Daily Visitors
           </p>
           <p className="text-yellow text-2xl md:text-4xl font-medium">
             {visitorStats.daily}
           </p>
         </div>
+
+        <div className="flex flex-col items-center">
+          <p className="text-white text-base md:text-lg font-medium">
+            Total Visitors
+          </p>
+          <p className="text-yellow text-2xl md:text-4xl font-medium">
+            {visitorStats.total}
+          </p>
+        </div>
+
         <div className="flex flex-col col-span-2 items-center">
           <p className="text-white text-base md:text-lg font-medium">
             Brand Partner
