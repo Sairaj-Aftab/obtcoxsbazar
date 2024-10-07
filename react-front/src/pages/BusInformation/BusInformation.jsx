@@ -271,7 +271,7 @@ const BusInformation = () => {
       <div className="container w-full mx-auto flex flex-col items-center">
         <div
           onClick={handleGoReviewPage}
-          className="flex gap-1 items-center text-yellow_500 cursor-pointer"
+          className="flex gap-1 items-center text-yellow_500 cursor-pointer shadow-md bg-white py-1 px-3 rounded-full"
         >
           <FaStar />
           <FaStar />
@@ -283,8 +283,8 @@ const BusInformation = () => {
           onClick={handleGoReviewPage}
           className="flex gap-2 items-center text-sm font-semibold cursor-pointer"
         >
-          <span className="text-blue">Rating</span>
-          <span className="text-yellow_500">Review</span>
+          <span className="text-primary-color">Review</span>&#10072;
+          <span className="text-yellow_500">Rating</span>&#10072;
           <span className="text-primary-color">Comment</span>
         </div>
       </div>
