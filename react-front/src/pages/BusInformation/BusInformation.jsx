@@ -4,7 +4,7 @@ import { FaStar } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { busData } from "../../features/bus/busSlice";
 import { noticeData } from "../../features/notice/noticeSlice";
 import { getBusInfoData } from "../../features/bus/busApiSlice";
@@ -19,11 +19,16 @@ import {
 
 const BusInformation = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { busInfo, busInfoLoader } = useSelector(busData);
   const { paribahanRgSchedules, loader } = useSelector(rgSchedulesData);
   const { paribahanNotices } = useSelector(noticeData);
   const [paribahanNotice, setParibahanNotice] = useState(null);
+
+  const handleGoReviewPage = () => {
+    navigate(`/bus/comp/${params.slug}/${params.id}`);
+  };
 
   const column = [
     {
@@ -263,7 +268,27 @@ const BusInformation = () => {
           />
         )}
       </div>
-      <section className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
+      <div className="container w-full mx-auto flex flex-col items-center">
+        <div
+          onClick={handleGoReviewPage}
+          className="flex gap-1 items-center text-yellow_500 cursor-pointer"
+        >
+          <FaStar />
+          <FaStar />
+          <FaStar />
+          <FaStar />
+          <FaStar />
+        </div>
+        <div
+          onClick={handleGoReviewPage}
+          className="flex gap-2 items-center text-sm font-semibold cursor-pointer"
+        >
+          <span className="text-blue">Rating</span>
+          <span className="text-yellow_500">Review</span>
+          <span className="text-primary-color">Comment</span>
+        </div>
+      </div>
+      <section className="container w-full mx-auto mt-3 mb-8 p-4 bg-white border border-primary-color md:rounded-lg">
         <div className="flex justify-between items-center mb-3 sm:mb-4">
           <h3 className="text-base sm:text-lg text-center sm:text-left font-semibold">
             Regular Schedule
