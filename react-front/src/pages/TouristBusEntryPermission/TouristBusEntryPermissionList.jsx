@@ -2,6 +2,7 @@ import DataTable from "react-data-table-component";
 import { formatDateTime } from "../../utils/formatDateTime";
 import { useEffect, useState } from "react";
 import { FaRegEye } from "react-icons/fa";
+import locationIcon from "../../assets/icon/location.png";
 import Modal from "../../components/Modal/Modal";
 import { useDispatch, useSelector } from "react-redux";
 import { touristBusPermissionsData } from "../../features/touristBusPermission/touristBusPermissionSlice";
@@ -76,11 +77,6 @@ const TouristBusEntryPermissionList = () => {
       selector: (data) => data.applicantName,
       sortable: true,
     },
-    // {
-    //   name: "Phone No.",
-    //   selector: (data) => data.phone,
-    //   sortable: true,
-    // },
     {
       name: "Institution & Arrival Place",
       selector: (data) => data.institutionName,
@@ -106,7 +102,19 @@ const TouristBusEntryPermissionList = () => {
     },
     {
       name: "Parking Place",
-      selector: (data) => data.parkingPlace,
+      cell: (data) => {
+        return (
+          <a
+            href={data.parkingPlaceMapLink}
+            className="w-full flex items-center gap-1 text-primary-color cursor-pointer"
+          >
+            {data.parkingPlaceMapLink && (
+              <img src={locationIcon} alt="" className="w-6" />
+            )}
+            <span>{data.parkingPlace}</span>
+          </a>
+        );
+      },
     },
     {
       name: "Return Date & Time",
@@ -153,7 +161,15 @@ const TouristBusEntryPermissionList = () => {
               </li>
               <li className={styles}>
                 <p className="font-semibold">Parking Place</p>
-                <p>{reviewPermission?.parkingPlace}</p>
+                <a
+                  href={reviewPermission.parkingPlaceMapLink}
+                  className="w-full flex items-center gap-1 text-primary-color cursor-pointer"
+                >
+                  {reviewPermission.parkingPlaceMapLink && (
+                    <img src={locationIcon} alt="" className="w-6" />
+                  )}
+                  <span>{reviewPermission.parkingPlace}</span>
+                </a>
               </li>
               <li className={styles}>
                 <p className="font-semibold">Arrival Date & Time</p>
