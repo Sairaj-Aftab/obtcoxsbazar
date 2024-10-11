@@ -4,6 +4,7 @@ import {
   deleteSchedule,
   getDestinationPlace,
   getLeavingPlace,
+  getParkingPlace,
   getSchedulesDataByAuthId,
   getTodaysSchedules,
   updateSchedule,
@@ -18,6 +19,7 @@ const schedulesSlice = createSlice({
     authSearchCount: 0,
     leavingPlaces: null,
     destinationPlaces: null,
+    parkingPlaces: [],
     message: null,
     error: null,
     loader: false,
@@ -168,6 +170,17 @@ const schedulesSlice = createSlice({
       })
       .addCase(getDestinationPlace.fulfilled, (state, action) => {
         state.destinationPlaces = action.payload.places;
+        state.placesLoader = false;
+      })
+      .addCase(getParkingPlace.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.placesLoader = false;
+      })
+      .addCase(getParkingPlace.pending, (state) => {
+        state.placesLoader = true;
+      })
+      .addCase(getParkingPlace.fulfilled, (state, action) => {
+        state.parkingPlaces = action.payload.places;
         state.placesLoader = false;
       });
   },

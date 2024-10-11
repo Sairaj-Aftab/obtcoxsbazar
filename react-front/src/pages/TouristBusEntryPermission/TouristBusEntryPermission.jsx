@@ -9,9 +9,11 @@ import {
   setMessageEmpty,
   touristBusPermissionsData,
 } from "../../features/touristBusPermission/touristBusPermissionSlice";
+import { schedulesData } from "../../features/schedules/schedulesSlice";
 
 const TouristBusEntryPermission = () => {
   const dispatch = useDispatch();
+  const { parkingPlaces } = useSelector(schedulesData);
   const { message, error, loader } = useSelector(touristBusPermissionsData);
   const [formData, setFormData] = useState({
     applicantName: "",
@@ -24,16 +26,28 @@ const TouristBusEntryPermission = () => {
     vehicleRegNo: "",
     destinationName: "",
     parkingPlace: "",
+    parkingPlaceMapLink: "",
     returnDateTime: "",
     description: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if (name === "parkingPlace") {
+      const selectedPlace = parkingPlaces.find(
+        (place) => place.placeName === value
+      );
+      setFormData({
+        ...formData,
+        parkingPlace: value,
+        parkingPlaceMapLink: selectedPlace ? selectedPlace.mapLink : "",
+      });
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -89,6 +103,7 @@ const TouristBusEntryPermission = () => {
         vehicleRegNo: "",
         destinationName: "",
         parkingPlace: "",
+        parkingPlaceMapLink: "",
         returnDateTime: "",
         description: "",
       });
@@ -100,11 +115,6 @@ const TouristBusEntryPermission = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto">
-      {/* <div className="flex justify-between items-center mb-5">
-            <h1 className="text-xl font-medium text-primary-color">
-              Tourist Bus Entry Permission
-            </h1>
-          </div> */}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label
@@ -265,15 +275,35 @@ const TouristBusEntryPermission = () => {
           >
             Parking Place (পার্কিং এর স্থান)
           </label>
-          <input
-            type="text"
-            id="parkingPlace"
+          <select
             name="parkingPlace"
+            id="parkingPlace"
             value={formData.parkingPlace}
-            onChange={handleChange}
             required
+            onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
+          >
+            <option value="">Select Parking Place</option>
+            {parkingPlaces?.map((place, index) => (
+              <option key={index} value={place?.placeName}>
+                {place?.placeName}
+              </option>
+            ))}
+          </select>
+          <select
+            name="parkingPlaceMapLink"
+            id="parkingPlaceMapLink"
+            value={formData.parkingPlaceMapLink}
+            onChange={handleChange}
+            className="hidden"
+          >
+            <option value="">Parking Map Link</option>
+            {parkingPlaces?.map((place, index) => (
+              <option key={index} value={place?.mapLink}>
+                {place?.mapLink}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="mb-3">
           <label

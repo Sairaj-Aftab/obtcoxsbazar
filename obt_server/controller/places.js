@@ -6,8 +6,9 @@ const prisma = new PrismaClient();
 export const createPlace = async (req, res, next) => {
   try {
     const { placeName, status, mapLink, destinationKM } = req.body;
-    const existingPlace = await prisma.leaveDestinationPlace.findUnique({
+    const existingPlace = await prisma.leaveDestinationPlace.findFirst({
       where: {
+        status,
         placeName,
       },
     });
@@ -32,11 +33,12 @@ export const createPlace = async (req, res, next) => {
 export const updatePlace = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { placeName, mapLink, destinationKM } = req.body;
+    const { placeName, status, mapLink, destinationKM } = req.body;
 
     const existingPlace = await prisma.leaveDestinationPlace.findFirst({
       where: {
         placeName,
+        status,
         id: {
           not: String(id),
         },
@@ -68,6 +70,7 @@ export const getPlaces = async (req, res, next) => {
     if (places.length < 1) {
       return next(createError(400, "Cannot find any place!"));
     }
+
     return res.status(200).json({ places });
   } catch (error) {
     return next(error);
@@ -102,6 +105,20 @@ export const getDestinationsPlaces = async (req, res, next) => {
     if (places.length < 1) {
       return next(createError(400, "Cannot find any destination place!"));
     }
+    return res.status(200).json({ places });
+  } catch (error) {
+    return next(error);
+  }
+};
+export const getParkingPlaces = async (req, res, next) => {
+  try {
+    const places = await prisma.leaveDestinationPlace.findMany({
+      where: { status: "parkingPlace" },
+      orderBy: {
+        placeName: "asc",
+      },
+    });
+
     return res.status(200).json({ places });
   } catch (error) {
     return next(error);

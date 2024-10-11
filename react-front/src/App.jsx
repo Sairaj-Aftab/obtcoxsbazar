@@ -9,6 +9,7 @@ import socket from "./utils/socket";
 import {
   getDestinationPlace,
   getLeavingPlace,
+  getParkingPlace,
   getTodaysSchedules,
 } from "./features/schedules/schedulesApiSlice";
 import { getAllBusServices } from "./features/bus/busApiSlice";
@@ -46,6 +47,7 @@ function App() {
     dispatch(getAllRgSchedules({ page: 1, limit: 1000 }));
     dispatch(getLeavingPlace());
     dispatch(getDestinationPlace());
+    dispatch(getParkingPlace());
     dispatch(getAllBusServices());
     dispatch(getNoticeFromAdmin());
     dispatch(getAllParibahanNotice());

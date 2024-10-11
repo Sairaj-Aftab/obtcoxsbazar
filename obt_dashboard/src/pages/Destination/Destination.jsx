@@ -17,8 +17,15 @@ import { authData } from "../../features/auth/authSlice";
 const Destination = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
-  const { places, leavingPlaces, destinationPlaces, message, success, error } =
-    useSelector(placeData);
+  const {
+    places,
+    leavingPlaces,
+    destinationPlaces,
+    parkingPlaces,
+    message,
+    success,
+    error,
+  } = useSelector(placeData);
   const [placeName, setPlaceName] = useState("");
   const [placeStatus, setPlaceStatus] = useState("");
 
@@ -34,12 +41,14 @@ const Destination = () => {
 
   const [id, setId] = useState("");
   const [plName, setPlName] = useState("");
+  const [plStatus, setPlStatus] = useState("");
   const [map, setMap] = useState("");
   const [destinationKM, setDestinationKM] = useState("");
   const handleShowPlaceName = (id) => {
     setId(id);
     const place = places.find((pl) => pl.id === id);
     setPlName(place.placeName);
+    setPlStatus(place.status);
     setMap(place?.mapLink);
     setDestinationKM(place?.destinationKM);
   };
@@ -51,7 +60,12 @@ const Destination = () => {
       dispatch(
         updatePlace({
           id,
-          data: { placeName: plName, mapLink: map, destinationKM },
+          data: {
+            placeName: plName,
+            status: plStatus,
+            mapLink: map,
+            destinationKM,
+          },
         })
       );
       setId("");
@@ -116,6 +130,7 @@ const Destination = () => {
           <option value="">Select Status</option>
           <option value="leave">Departure</option>
           <option value="destination">Destination</option>
+          <option value="parkingPlace">TB Parking Place</option>
         </select>
         <button
           disabled={authUser?.role?.name === "VIEWER" && true}
@@ -125,6 +140,97 @@ const Destination = () => {
           Submit
         </button>
       </form>
+      <div className="row">
+        {/* Tourist Bus Parking Place */}
+        <div className="col-sm-6">
+          <div className="card">
+            <div className="card-body">
+              <div className="d-flex justify-content-between mb-2">
+                <h5>TB Parking Places</h5>
+              </div>
+              <div className="table-responsive">
+                {parkingPlaces && (
+                  <table className="datatable table table-hover table-center mb-0">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Place & Map</th>
+                        <th className="text-right">Actions</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {parkingPlaces?.map((place, index) => (
+                        <tr key={place.id}>
+                          <td>{index + 1}</td>
+                          {id === place?.id ? (
+                            <td className="d-flex flex-column">
+                              <input
+                                type="text"
+                                value={plName}
+                                onChange={(e) => setPlName(e.target.value)}
+                                className="form-control"
+                              />
+                              <input
+                                type="text"
+                                value={map}
+                                onChange={(e) => setMap(e.target.value)}
+                                className="form-control"
+                                placeholder="Google Map Link"
+                              />
+                            </td>
+                          ) : (
+                            <td className="d-flex flex-column">
+                              <span>{place.placeName}</span>
+                              <a target="_blank" href={place?.mapLink}>
+                                {place?.mapLink}
+                              </a>
+                            </td>
+                          )}
+                          <td className="text-right">
+                            <div className="actions">
+                              {id === place?.id ? (
+                                <button
+                                  onClick={() => handleUpdate(place?.id)}
+                                  className="btn btn-sm bg-primary-light mr-1"
+                                  disabled={
+                                    authUser?.role?.name === "VIEWER" && true
+                                  }
+                                >
+                                  <i className="fa fa-check-square-o"></i>
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleShowPlaceName(place?.id)}
+                                  className="btn btn-sm bg-primary-light mr-1"
+                                  disabled={
+                                    authUser?.role?.name === "VIEWER" && true
+                                  }
+                                >
+                                  <i className="fa fa-pencil-square-o"></i>
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeletePlace(place.id)}
+                                className="btn btn-sm bg-danger-light"
+                                disabled={
+                                  authUser?.role?.name === "VIEWER" && true
+                                }
+                              >
+                                <i className="fe fe-trash"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="row">
         {/* This is Dashboard Management Users table */}
         <div className="col-sm-6">

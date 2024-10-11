@@ -230,8 +230,8 @@ model RegularBusSchedule {
 
 model LeaveDestinationPlace {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    placeName String @unique
-    slug String @unique
+    placeName String 
+    slug String 
     status String
     mapLink String?
     destinationKM String?
@@ -254,6 +254,7 @@ model TouristBusEntryPermission {
   vehicleRegNo      String
   destinationName   String
   parkingPlace      String
+  parkingPlaceMapLink      String?
   returnDateTime    DateTime
   description       String?
   approved          Boolean  @default(false)

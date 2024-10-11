@@ -16,6 +16,7 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
       vehicleRegNo,
       destinationName,
       parkingPlace,
+      parkingPlaceMapLink,
       returnDateTime,
       description,
     } = req.body;
@@ -34,6 +35,7 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
           vehicleRegNo,
           destinationName,
           parkingPlace,
+          parkingPlaceMapLink,
           returnDateTime: new Date(returnDateTime),
           description,
         },

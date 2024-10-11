@@ -15,6 +15,7 @@ import {
   getAllPlace,
   getDestinationPlaces,
   getLeavingPlaces,
+  getParkingPlaces,
 } from "./features/place/placeApiSlice";
 import {
   getAllSchedules,
@@ -49,6 +50,7 @@ function App() {
     dispatch(getAllPlace());
     dispatch(getLeavingPlaces());
     dispatch(getDestinationPlaces());
+    dispatch(getParkingPlaces());
     dispatch(getAuthNotice());
     dispatch(getAllParibahanNotice());
     dispatch(getAllBusInfo({ page: 1, limit: 10 }));

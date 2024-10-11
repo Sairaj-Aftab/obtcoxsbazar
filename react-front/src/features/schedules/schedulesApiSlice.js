@@ -117,3 +117,20 @@ export const getLeavingPlace = createAsyncThunk(
     }
   }
 );
+
+export const getParkingPlace = createAsyncThunk(
+  "place/getParkingPlace",
+  async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/place/parking`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
