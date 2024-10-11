@@ -155,7 +155,7 @@ const TouristBusEntryPermission = () => {
             htmlFor="institutionName"
             className="text-sm font-medium text-gray-600 block mb-1"
           >
-            Institution / Address (প্রতিষ্ঠান / ঠিকানা)
+            Institution/Address (প্রতিষ্ঠান/ঠিকানা)
           </label>
           <input
             name="institutionName"

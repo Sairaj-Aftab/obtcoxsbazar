@@ -78,7 +78,7 @@ const TouristBusEntryPermissionList = () => {
       sortable: true,
     },
     {
-      name: "Institution & Arrival Place",
+      name: "Institution/Address",
       selector: (data) => data.institutionName,
       sortable: true,
     },
@@ -144,7 +144,7 @@ const TouristBusEntryPermissionList = () => {
                 <p>{reviewPermission?.phone}</p>
               </li> */}
               <li className={styles}>
-                <p className="font-semibold">Institution & Arrival Place</p>
+                <p className="font-semibold">Institution/Address</p>
                 <p>{reviewPermission?.institutionName}</p>
               </li>
               <li className={styles}>
