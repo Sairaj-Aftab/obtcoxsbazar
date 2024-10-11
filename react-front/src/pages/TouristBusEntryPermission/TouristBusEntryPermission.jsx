@@ -138,7 +138,7 @@ const TouristBusEntryPermission = () => {
             htmlFor="phone"
             className="text-sm font-medium text-gray-600 block mb-1"
           >
-            Mobile No (মোবাইল নাম্বার উদাহরণস্বরূপ: 01320108413)
+            Mobile No (মোবাইল নাম্বার)
           </label>
           <input
             type="text"
@@ -155,7 +155,7 @@ const TouristBusEntryPermission = () => {
             htmlFor="institutionName"
             className="text-sm font-medium text-gray-600 block mb-1"
           >
-            Institution & Arrival Place (প্রতিষ্ঠান এবং আগমনের স্থান)
+            Institution / Address (প্রতিষ্ঠান / ঠিকানা)
           </label>
           <input
             name="institutionName"
@@ -356,14 +356,14 @@ const TouristBusEntryPermission = () => {
                 Terms & Condition (অবশ্যই পালনীয়)
               </label>
               <ul className="text-sm text-gray-600 list-disc list-inside mt-2">
-                <li>১) আবেদনকারীকে অবশ্যই গাড়িতে থাকতে হবে।</li>
-                <li>২) ট্রাফিক আইন মেনে চলতে হবে।</li>
+                <li>১) ট্রাফিক আইন মেনে চলতে হবে।</li>
                 <li>
-                  ৩) যাত্রী নামার সাথে সাথে বাস সুনির্দিষ্ট পার্কিং এ চলে যেতে
+                  ২) যাত্রী নামার সাথে সাথে বাস সুনির্দিষ্ট পার্কিং এ চলে যেতে
                   হবে।
                 </li>
-                <li>৪) সড়কের পাশে পার্কিং করা যাবে না।</li>
-                <li>৫) যত্রতত্র আবর্জনা ফেলা যাবে না।</li>
+                <li>৩) সড়কের পাশে পার্কিং করা যাবে না।</li>
+                <li>৪) যত্রতত্র আবর্জনা ফেলা যাবে না।</li>
+                <li>৫) মেরিন ড্রাইভে বাস প্রবেশ করা যাবে না।</li>
               </ul>
             </div>
           </div>
