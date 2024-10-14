@@ -179,6 +179,12 @@ const TouristBusPermission = () => {
       sortable: true,
     },
     {
+      name: "App. No.",
+      selector: (data) => data.applicationNo,
+      sortable: true,
+      width: "100px",
+    },
+    {
       name: "Phone No.",
       selector: (data) => data.phone,
       sortable: true,
