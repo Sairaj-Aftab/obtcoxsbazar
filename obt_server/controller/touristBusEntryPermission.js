@@ -143,7 +143,7 @@ export const getAllTouristBusEntryPermissions = async (req, res, next) => {
       where,
       orderBy: [
         { pending: "desc" }, // Pending data first (true values come before false)
-        {applicationNo: "desc"}
+        {applicationNo: "desc"},
         { approved: "desc" }, // Approved data next (false values come before true)
         { createdAt: "desc" }, // Then, order by createdAt for records with the same status
       ],
