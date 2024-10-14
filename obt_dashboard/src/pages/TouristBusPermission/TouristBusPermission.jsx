@@ -174,15 +174,15 @@ const TouristBusPermission = () => {
       width: "140px",
     },
     {
-      name: "Applicant Name",
-      selector: (data) => data.applicantName,
-      sortable: true,
-    },
-    {
       name: "App. No.",
       selector: (data) => data.applicationNo,
       sortable: true,
       width: "100px",
+    },
+    {
+      name: "Applicant Name",
+      selector: (data) => data.applicantName,
+      sortable: true,
     },
     {
       name: "Phone No.",
