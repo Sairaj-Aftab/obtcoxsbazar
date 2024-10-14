@@ -288,7 +288,7 @@ const BusInformation = () => {
           <span className="text-primary-color">Comment</span>
         </div>
       </div>
-      <section className="container w-full mx-auto mt-3 mb-8 p-4 bg-white border border-primary-color md:rounded-lg">
+      <section className="container w-full mx-auto mt-3 mb-2 p-4 bg-white border border-primary-color md:rounded-lg">
         <div className="flex justify-between items-center mb-3 sm:mb-4">
           <h3 className="text-base sm:text-lg text-center sm:text-left font-semibold">
             Regular Schedule
@@ -321,6 +321,24 @@ const BusInformation = () => {
               }}
             />
           </>
+        )}
+      </section>
+      <section className="mb-8">
+        {busInfo?.counterLocation && (
+          <div className="w-fit mx-auto flex flex-col items-center">
+            <h3 className="text-base font-semibold text-black">
+              Counter Location
+            </h3>
+            <span className="text-lg text-primary-color">&#8681;</span>
+            <a href={busInfo?.counterLocationMap} className="flex gap-1">
+              {busInfo?.counterLocationMap && (
+                <img src={locationIcon} alt="" className="w-6" />
+              )}
+              <span className="text-base font-semibold text-primary-color">
+                {busInfo?.counterLocation}
+              </span>
+            </a>
+          </div>
         )}
       </section>
     </>

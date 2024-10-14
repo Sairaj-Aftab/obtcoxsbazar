@@ -31,12 +31,14 @@ const userSlice = createSlice({
     error: null,
     message: null,
     success: false,
+    loader: false,
   },
   reducers: {
     setMessageEmpty: (state) => {
       state.error = null;
       state.message = null;
       state.success = false;
+      state.loader = false;
     },
   },
   extraReducers: (builder) => {
@@ -64,6 +66,9 @@ const userSlice = createSlice({
         );
       })
       .addCase(updatePermissionStatus.rejected, (state, action) => {
+        state.error = action.error.message;
+      })
+      .addCase(updatePermissionStatus.pending, (state, action) => {
         state.error = action.error.message;
       })
       .addCase(updatePermissionStatus.fulfilled, (state, action) => {
@@ -162,8 +167,14 @@ const userSlice = createSlice({
         ];
         state.totalCount++;
       })
+      .addCase(updateParibahanUser.pending, (state) => {
+        state.success = false;
+        state.loader = true;
+      })
       .addCase(updateParibahanUser.rejected, (state, action) => {
         state.error = action.error.message;
+        state.success = false;
+        state.loader = false;
       })
       .addCase(updateParibahanUser.fulfilled, (state, action) => {
         state.paribahanUsers[
@@ -172,6 +183,8 @@ const userSlice = createSlice({
           )
         ] = action.payload.paribahanUser;
         state.message = action.payload.message;
+        state.loader = false;
+        state.success = true;
       })
       .addCase(deleteParibahanUser.rejected, (state, action) => {
         state.error = action.error.message;

@@ -78,6 +78,8 @@ model ParibahanUser {
     plainPassword String
     type Int?
     qrCode String?
+    counterLocation String?
+    counterLocationMap String?
     destination LeaveDestinationPlace[] @relation(fields: [destinationId], references: [id])
     destinationId String[] @db.ObjectId
     authUser AuthUser @relation(fields: [authUserId], references: [id])
@@ -244,6 +246,7 @@ model LeaveDestinationPlace {
 
 model TouristBusEntryPermission {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  applicationNo     Int
   applicantName     String
   phone              String
   institutionName   String

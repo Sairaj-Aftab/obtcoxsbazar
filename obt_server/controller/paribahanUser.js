@@ -21,6 +21,8 @@ export const createParibahanUserAccount = async (req, res, next) => {
       salesNumber,
       password,
       type,
+      counterLocation,
+      counterLocationMap,
       destinationId,
     } = req.body;
 
@@ -49,6 +51,8 @@ export const createParibahanUserAccount = async (req, res, next) => {
           },
         }),
         type: parseInt(type),
+        counterLocation,
+        counterLocationMap,
         authUserId: String(authUserId),
       },
       include: {
@@ -63,6 +67,10 @@ export const createParibahanUserAccount = async (req, res, next) => {
         destination: true,
       },
     });
+
+    if (!paribahanUser) {
+      return next(createError(400, "Please try again!"));
+    }
 
     const qrCodeDataURL = await qr.toDataURL(
       `https://obtcoxsbazar.com/bus/comp/${paribahanUser.slug}/${paribahanUser.id}`,
@@ -98,6 +106,8 @@ export const updateParibahanUser = async (req, res, next) => {
       salesNumber,
       plainPassword,
       type,
+      counterLocation,
+      counterLocationMap,
       destinationId,
     } = req.body;
 
@@ -134,6 +144,8 @@ export const updateParibahanUser = async (req, res, next) => {
           },
         }),
         type: parseInt(type),
+        counterLocation,
+        counterLocationMap,
       },
       include: {
         authUser: {
@@ -146,6 +158,11 @@ export const updateParibahanUser = async (req, res, next) => {
         destination: true,
       },
     });
+
+    if (!paribahanUser) {
+      return next(createError(400, "Please try again!"));
+    }
+
     return res
       .status(200)
       .json({ paribahanUser, message: "Updated successfully" });
@@ -177,6 +194,7 @@ export const getAllParibahanUser = async (req, res, next) => {
     });
 
     const count = await prisma.paribahanUser.count();
+
     if (paribahanUsers.length < 1) {
       return next(createError(400, "Cannot find any Paribahan User!"));
     }

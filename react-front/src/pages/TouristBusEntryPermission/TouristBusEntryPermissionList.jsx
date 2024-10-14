@@ -73,6 +73,12 @@ const TouristBusEntryPermissionList = () => {
       width: "100px",
     },
     {
+      name: "App. No.",
+      selector: (data) => data.applicationNo,
+      sortable: true,
+      width: "100px",
+    },
+    {
       name: "Applicant Name",
       selector: (data) => data.applicantName,
       sortable: true,
@@ -115,6 +121,7 @@ const TouristBusEntryPermissionList = () => {
           </a>
         );
       },
+      width: "260px",
     },
     {
       name: "Return Date & Time",
@@ -132,7 +139,10 @@ const TouristBusEntryPermissionList = () => {
   return (
     <>
       {showModal && (
-        <Modal title="View details" close={() => setShowModal(false)}>
+        <Modal
+          title="Tourist Bus Entry Permission"
+          close={() => setShowModal(false)}
+        >
           <div className="permission-review-modal p-3">
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <li className={styles}>

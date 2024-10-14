@@ -21,7 +21,8 @@ const ParibahanUsers = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
 
-  const { paribahanUsers, success, message, error } = useSelector(getAllData);
+  const { paribahanUsers, success, loader, message, error } =
+    useSelector(getAllData);
   const { destinationPlaces } = useSelector(placeData);
 
   const [selected, setSelected] = useState([]);
@@ -79,6 +80,8 @@ const ParibahanUsers = () => {
     salesNumber: "",
     password: "",
     type: "",
+    counterLocation: "",
+    counterLocationMap: "",
     destinationId: [],
   });
 
@@ -128,6 +131,8 @@ const ParibahanUsers = () => {
           salesPerson: findUser.salesPerson,
           salesNumber: findUser.salesNumber,
           plainPassword: findUser.plainPassword,
+          counterLocation: findUser.counterLocation,
+          counterLocationMap: findUser.counterLocationMap,
           type: type,
           destinationId: selected,
         },
@@ -169,9 +174,9 @@ const ParibahanUsers = () => {
       toast.success(message);
     }
 
-    return () => {
+    if (success || error || message) {
       dispatch(setMessageEmpty());
-    };
+    }
   }, [dispatch, success, message, error, paribahanFormReset]);
   return (
     <>
@@ -456,6 +461,36 @@ const ParibahanUsers = () => {
               />
             </div>
           </div>
+          <div className="form-row">
+            <div className="form-group col-md-6 mb-1">
+              <label htmlFor="counterLocation" className="mb-1">
+                Counter Location
+              </label>
+              <input
+                type="text"
+                id="counterLocation"
+                name="counterLocation"
+                value={findUser.counterLocation}
+                onChange={handleChangeEditValue}
+                className="form-control"
+                placeholder="Counter Location (Optional)"
+              />
+            </div>
+            <div className="form-group col-md-6 mb-1">
+              <label htmlFor="counterLocationMap" className="mb-1">
+                Counter Location Map Link
+              </label>
+              <input
+                type="text"
+                id="counterLocationMap"
+                name="counterLocationMap"
+                value={findUser.counterLocationMap}
+                onChange={handleChangeEditValue}
+                className="form-control"
+                placeholder="Counter Location Map Link (Optional)"
+              />
+            </div>
+          </div>
           <div>
             <p className="my-2">*Types</p>
             <div
@@ -561,11 +596,11 @@ const ParibahanUsers = () => {
             </div>
           )}
           <button
-            disabled={authUser?.role?.name === "VIEWER" && true}
+            disabled={(authUser?.role?.name === "VIEWER" || loader) && true}
             type="submit"
             className="btn btn-primary"
           >
-            Update
+            {loader ? "Loading..." : "Update"}
           </button>
         </form>
       </ModalPopup>
@@ -593,6 +628,7 @@ const ParibahanUsers = () => {
                       <th>Destinations</th>
                       <th>Password</th>
                       <th>QR Code</th>
+                      <th>Counter Location</th>
                       <th>Created by & At</th>
                       <th className="text-right">Actions</th>
                     </tr>
@@ -633,6 +669,12 @@ const ParibahanUsers = () => {
                               alt={data?.paribahanName}
                               style={{ width: "100px" }}
                             />
+                          </td>
+                          <td>
+                            <p>{data?.counterLocation}</p>
+                            <a href={data?.counterLocationMap}>
+                              {data?.counterLocationMap}
+                            </a>
                           </td>
                           <td>
                             <p>
