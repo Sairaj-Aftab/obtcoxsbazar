@@ -24,18 +24,18 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
     // Get the last entry and increment the serial number
     const lastEntry = await prisma.touristBusEntryPermission.findFirst({
       orderBy: {
-        serialNumber: "desc", // Sorting by the serial number to get the last one
+        applicationNo: "desc", // Sorting by the serial number to get the last one
       },
     });
 
     // Set the new serial number (if there's no previous entry, start from 1)
-    const newSerialNumber = lastEntry ? lastEntry.serialNumber + 1 : 1;
+    const newApplicationNumber = lastEntry ? lastEntry.applicationNo + 1 : 1;
 
     // Create a new record
     const touristBusEntryPermission =
       await prisma.touristBusEntryPermission.create({
         data: {
-          applicationNo: parseInt(newSerialNumber),
+          applicationNo: parseInt(newApplicationNumber),
           applicantName,
           phone,
           institutionName,
@@ -143,7 +143,7 @@ export const getAllTouristBusEntryPermissions = async (req, res, next) => {
       where,
       orderBy: [
         { pending: "desc" }, // Pending data first (true values come before false)
-        {applicationNo: "desc"}
+        { applicationNo: "desc" },
         { approved: "desc" }, // Approved data next (false values come before true)
         { createdAt: "desc" }, // Then, order by createdAt for records with the same status
       ],
