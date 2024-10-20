@@ -182,7 +182,7 @@ export const getTouristBusEntriesByReturnDate = async (req, res, next) => {
       skip: offset,
       take: limit,
       where: {
-        returnDateTime: {
+        arrivalDateTime: {
           gte: nextDay.toISOString(),
         },
       },
@@ -193,7 +193,7 @@ export const getTouristBusEntriesByReturnDate = async (req, res, next) => {
 
     const count = await prisma.touristBusEntryPermission.count({
       where: {
-        returnDateTime: {
+        arrivalDateTime: {
           gte: nextDay.toISOString(),
         },
       },

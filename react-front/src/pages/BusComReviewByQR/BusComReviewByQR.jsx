@@ -35,6 +35,7 @@ const BusComReviewByQR = () => {
   const [loader, setLoader] = useState(false);
   const [input, setInput] = useState({
     paribahanName: "",
+    regNo: "",
     rating: "",
     name: "",
     phoneNumber: "",
@@ -136,6 +137,7 @@ const BusComReviewByQR = () => {
         setInput({
           name: "",
           phoneNumber: "",
+          regNo: "",
           comment: "",
           tripTime: "",
           destination: "",
@@ -245,7 +247,7 @@ const BusComReviewByQR = () => {
 
           <input
             type="text"
-            placeholder="Phone Number"
+            placeholder="Mobile Number"
             name="phoneNumber"
             value={input.phoneNumber}
             onChange={changeInputValue}
@@ -253,7 +255,15 @@ const BusComReviewByQR = () => {
           />
           <input
             type="text"
-            placeholder="Destination"
+            placeholder="Bus/Coach No."
+            name="regNo"
+            value={input.regNo}
+            onChange={changeInputValue}
+            className="border p-2 mb-3 w-full text-base font-medium text-gray-700"
+          />
+          <input
+            type="text"
+            placeholder="Route/Location"
             name="destination"
             value={input.destination}
             onChange={changeInputValue}
@@ -272,7 +282,7 @@ const BusComReviewByQR = () => {
             className="bg-primary-color text-white text-base font-medium py-2 px-4 rounded disabled:bg-opacity-80"
             disabled={loader}
           >
-            Submit Review
+            {loader ? "Please wait..." : "Submit Review"}
           </button>
         </form>
       </div>
