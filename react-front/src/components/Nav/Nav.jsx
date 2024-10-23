@@ -66,7 +66,7 @@ const Nav = () => {
                     ].includes(pathName) && "border-white"
                   } hover:border-white py-1 px-2 rounded-sm`}
                 >
-                  Tourist Bus Entry Permission
+                  Tourist Bus Permission
                 </Link>
                 <Link
                   to="/about"
@@ -182,7 +182,7 @@ const Nav = () => {
                   pathName === "/tourist-bus-entry-permission" && "border-white"
                 } hover:border-white py-1 px-2 rounded-sm`}
               >
-                Tourist Bus Entry Permission
+                Tourist Bus Permission
               </Link>
               <Link
                 onClick={() => setOpen(!open)}
