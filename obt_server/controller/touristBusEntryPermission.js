@@ -52,6 +52,12 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
         },
       });
 
+    // if (touristBusEntryPermission) {
+    //   await sendSMStoPhone(
+    //     "01881591572",
+    //     `From OBT Cox's Bazar! New application from ${applicantName} and ${phone} and application number is ${newApplicationNumber}`
+    //   );
+    // }
     if (!touristBusEntryPermission) {
       return next(createError(400, "Please try again!"));
     }
@@ -182,7 +188,7 @@ export const getTouristBusEntriesByReturnDate = async (req, res, next) => {
       skip: offset,
       take: limit,
       where: {
-        arrivalDateTime: {
+        returnDateTime: {
           gte: nextDay.toISOString(),
         },
       },
@@ -193,7 +199,7 @@ export const getTouristBusEntriesByReturnDate = async (req, res, next) => {
 
     const count = await prisma.touristBusEntryPermission.count({
       where: {
-        arrivalDateTime: {
+        returnDateTime: {
           gte: nextDay.toISOString(),
         },
       },
