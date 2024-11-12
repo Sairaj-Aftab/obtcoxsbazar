@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import avatar from "../../assets/image/avatar.png";
 import {
   driverInfoData,
   setDriverInfoMessageEmpty,
@@ -104,6 +105,20 @@ const ProfileDriverInfo = () => {
       name: "#",
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
       width: "60px",
+    },
+    {
+      name: "Photo",
+      cell: (data) => (
+        <img
+          src={data.imageUrl ? data.imageUrl : avatar}
+          alt=""
+          style={{ width: "70px", height: "70px", objectFit: "cover" }}
+        />
+      ),
+      width: "70px",
+      style: {
+        padding: "0",
+      },
     },
     {
       name: "Name",

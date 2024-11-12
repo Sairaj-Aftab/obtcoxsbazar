@@ -19,6 +19,7 @@ import ModalPopup from "../../components/ModalPopup/ModalPopup";
 import swal from "sweetalert";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading/Loading";
+import avatar from "../../assets/img/avatar.png";
 
 const DriverInfo = () => {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ const DriverInfo = () => {
     comment: "",
     report: "",
   });
+  const [file, setFile] = useState(null);
   const changeInputValue = (e) => {
     const { name, value } = e.target;
     if (name === "paribahanName") {
@@ -66,7 +68,17 @@ const DriverInfo = () => {
     } else if (!input.fatherName) {
       toast.error("Father Name is required");
     } else {
-      dispatch(createDriverInfo({ id: input.id, data: input }));
+      const formData = new FormData();
+      formData.append("photo", file);
+      formData.append("paribahanName", input.paribahanName);
+      formData.append("name", input.name);
+      formData.append("fatherName", input.fatherName);
+      formData.append("phone", input.phone);
+      formData.append("license", input.license);
+      formData.append("address", input.address);
+      formData.append("comment", input.comment);
+      formData.append("report", input.report);
+      dispatch(createDriverInfo({ id: input.id, data: formData }));
     }
   };
 
@@ -77,6 +89,7 @@ const DriverInfo = () => {
     setInfoData({ ...infoData, [name]: value });
   };
   const handleOpenUpdateForm = (id) => {
+    setFile(null);
     const data = driverInfo.find((info) => info.id === id);
     setId(data.id);
     setInfoData({
@@ -90,9 +103,19 @@ const DriverInfo = () => {
     } else if (!infoData.fatherName) {
       toast.error("Father Name is required");
     } else {
-      dispatch(updateDriverInfo({ id: String(id), data: infoData }));
+      const formData = new FormData();
+      formData.append("photo", file);
+      formData.append("name", infoData.name);
+      formData.append("fatherName", infoData.fatherName);
+      formData.append("phone", infoData.phone);
+      formData.append("license", infoData.license);
+      formData.append("address", infoData.address);
+      formData.append("comment", infoData.comment);
+      formData.append("report", infoData.report);
+      dispatch(updateDriverInfo({ id: String(id), data: formData }));
     }
   };
+
   const handleDeleteInfo = (id) => {
     swal({
       title: "Are you sure?",
@@ -147,6 +170,20 @@ const DriverInfo = () => {
       name: "Paribahan",
       selector: (data) => data.paribahanName,
       sortable: true,
+    },
+    {
+      name: "Photo",
+      cell: (data) => (
+        <img
+          src={data.imageUrl ? data.imageUrl : avatar}
+          alt=""
+          style={{ width: "100px", height: "100px", objectFit: "cover" }}
+        />
+      ),
+      width: "100px",
+      style: {
+        padding: "0",
+      },
     },
     {
       name: "Name",
@@ -217,6 +254,7 @@ const DriverInfo = () => {
   useEffect(() => {
     if (message) {
       toast.success(message);
+      setFile(null);
       setInput({
         id: "",
         paribahanName: "",
@@ -239,8 +277,30 @@ const DriverInfo = () => {
   return (
     <>
       {/* Create  Bus Info */}
-      <ModalPopup title="Create Guide Info" target="createDriverInfoModal">
-        <form onSubmit={handleSubmitInfo}>
+      <ModalPopup
+        close={message && false}
+        title="Create Guide Info"
+        target="createDriverInfoModal"
+      >
+        <form onSubmit={handleSubmitInfo} encType="multipart/form-data">
+          <div className="profile-photo-container">
+            <label htmlFor="driver-photo" className="profile-photo-label">
+              <input
+                type="file"
+                id="driver-photo"
+                className="profile-photo-input"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+              <img
+                src={file ? URL.createObjectURL(file) : avatar}
+                alt="Profile Photo"
+                id="profile-photo"
+                className="profile-photo"
+              />
+            </label>
+            <div className="upload-text">Driver Image</div>
+          </div>
           <div className="form-group mb-2">
             <select
               name="id"
@@ -353,8 +413,36 @@ const DriverInfo = () => {
         </form>
       </ModalPopup>
       {/* Update Bus Info */}
-      <ModalPopup title="Edit Guide Info" target="driverInfoEditPopup">
-        <form onSubmit={handleUpdateInfo}>
+      <ModalPopup
+        close={message && false}
+        title="Edit Guide Info"
+        target="driverInfoEditPopup"
+      >
+        <form onSubmit={handleUpdateInfo} encType="multipart/form-data">
+          <div className="profile-photo-container">
+            <label htmlFor="driver-photo" className="profile-photo-label">
+              <input
+                type="file"
+                id="driver-photo"
+                className="profile-photo-input"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+              <img
+                src={
+                  file
+                    ? URL.createObjectURL(file)
+                    : infoData?.imageUrl
+                    ? infoData?.imageUrl
+                    : avatar
+                }
+                alt="Profile Photo"
+                id="profile-photo"
+                className="profile-photo"
+              />
+            </label>
+            <div className="upload-text">Driver Image</div>
+          </div>
           <div className="form-group mb-2">
             {/* <select
               name="id"

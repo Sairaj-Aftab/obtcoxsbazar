@@ -1,6 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import createError from "../utils/createError.js";
 import { createSlug } from "../utils/slug.js";
+import {
+  uploadFile,
+  getObjectSignedUrl,
+  deleteExistingFile,
+} from "../utils/s3.js";
+import crypto from "crypto";
 const prisma = new PrismaClient();
 
 export const createDriverInfo = async (req, res, next) => {
@@ -43,9 +49,21 @@ export const createDriverInfo = async (req, res, next) => {
         }
       }
     }
+    let fileNameWithFolder;
+    if (req.file) {
+      fileNameWithFolder = `driver/${crypto.randomBytes(32).toString("hex")}-${
+        req.file.originalname
+      }`;
+
+      try {
+        await uploadFile(req.file, fileNameWithFolder);
+      } catch (error) {
+        return next(error);
+      }
+    }
 
     // Create
-    const driverInfo = await prisma.driverInfo.create({
+    let driverInfo = await prisma.driverInfo.create({
       data: {
         paribahanName,
         slug: createSlug(paribahanName),
@@ -56,12 +74,17 @@ export const createDriverInfo = async (req, res, next) => {
         address,
         comment,
         report,
+        ...(fileNameWithFolder && { image: fileNameWithFolder }),
         paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
       },
     });
+
+    if (driverInfo.image) {
+      driverInfo.imageUrl = await getObjectSignedUrl(driverInfo.image);
+    }
 
     return res
       .status(200)
@@ -114,7 +137,24 @@ export const updateDriverInfo = async (req, res, next) => {
       }
     }
 
-    const driverInfo = await prisma.driverInfo.update({
+    let fileNameWithFolder;
+    if (req.file) {
+      fileNameWithFolder = `driver/${crypto.randomBytes(32).toString("hex")}-${
+        req.file.originalname
+      }`;
+
+      const existImage = await prisma.driverInfo.findFirst({
+        where: { id: String(id) },
+      });
+
+      try {
+        await uploadFile(req.file, fileNameWithFolder, existImage?.image);
+      } catch (error) {
+        return next(error);
+      }
+    }
+
+    let driverInfo = await prisma.driverInfo.update({
       where: {
         id: String(id),
       },
@@ -126,11 +166,16 @@ export const updateDriverInfo = async (req, res, next) => {
         address,
         comment,
         report,
+        ...(fileNameWithFolder && { image: fileNameWithFolder }),
       },
       include: {
         paribahanUser: true,
       },
     });
+
+    if (driverInfo.image) {
+      driverInfo.imageUrl = await getObjectSignedUrl(driverInfo.image);
+    }
 
     return res
       .status(200)
@@ -173,6 +218,18 @@ export const getDriverInfo = async (req, res, next) => {
         paribahanUser: true,
       },
     });
+    const driverInfoWithUrls = await Promise.all(
+      driverInfo.map(async (driver) => {
+        if (driver.image) {
+          try {
+            driver.imageUrl = await getObjectSignedUrl(driver.image);
+          } catch (err) {
+            driver.imageUrl = null; // Set to null if URL generation fails
+          }
+        }
+        return driver;
+      })
+    );
 
     const count = await prisma.driverInfo.count({
       where: {
@@ -183,7 +240,9 @@ export const getDriverInfo = async (req, res, next) => {
       where: whereClause,
     });
 
-    return res.status(200).json({ driverInfo, count, searchCount });
+    return res
+      .status(200)
+      .json({ driverInfo: driverInfoWithUrls, count, searchCount });
   } catch (error) {
     return next(error);
   }
@@ -220,13 +279,27 @@ export const getAllDriverInfo = async (req, res, next) => {
         paribahanUser: true,
       },
     });
+    const driverInfoWithUrls = await Promise.all(
+      driverInfo.map(async (driver) => {
+        if (driver.image) {
+          try {
+            driver.imageUrl = await getObjectSignedUrl(driver.image);
+          } catch (err) {
+            driver.imageUrl = null; // Set to null if URL generation fails
+          }
+        }
+        return driver;
+      })
+    );
 
     const totalCount = await prisma.driverInfo.count();
     const searchCount = await prisma.driverInfo.count({
       where,
     });
 
-    return res.status(200).json({ driverInfo, totalCount, searchCount });
+    return res
+      .status(200)
+      .json({ driverInfo: driverInfoWithUrls, totalCount, searchCount });
   } catch (error) {
     return next(error);
   }
@@ -240,6 +313,9 @@ export const deleteDriverInfo = async (req, res, next) => {
         id: String(id),
       },
     });
+    if (driverInfo?.image) {
+      await deleteExistingFile(driverInfo?.image);
+    }
     return res
       .status(200)
       .json({ driverInfo, message: "Deleted successfully" });

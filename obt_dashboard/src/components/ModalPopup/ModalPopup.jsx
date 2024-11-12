@@ -1,9 +1,26 @@
 import { Modal } from "@rakan/bootstrap4rtl";
+import { useEffect, useRef } from "react";
 
 // eslint-disable-next-line react/prop-types
-const ModalPopup = ({ size, title, target, children }) => {
+const ModalPopup = ({ size, title, target, children, close }) => {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    if (!close) {
+      modalRef.current?.classList.add("hide");
+      modalRef.current?.classList.remove("show");
+      document.body?.classList.remove("modal-open");
+      // document.body.classList.remove("modal-open");
+    }
+  }, [close]);
   return (
-    <div className="modal fade" id={target} aria-hidden="true" role="dialog">
+    <div
+      ref={modalRef}
+      className="modal fade"
+      id={target}
+      aria-hidden="true"
+      role="dialog"
+    >
       <div
         className={`modal-dialog modal-dialog-centered ${size && size}`}
         role="document"

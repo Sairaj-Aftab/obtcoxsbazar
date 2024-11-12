@@ -70,6 +70,7 @@ const driverInfoSlice = createSlice({
       })
       .addCase(updateDriverInfo.rejected, (state, action) => {
         state.error = action.error.message;
+        state.loader = false;
       })
       .addCase(updateDriverInfo.pending, (state) => {
         state.loader = true;
