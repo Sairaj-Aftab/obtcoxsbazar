@@ -40,6 +40,8 @@ const DriverInfo = () => {
     report: "",
   });
   const [file, setFile] = useState(null);
+  const [viewData, setViewData] = useState();
+
   const changeInputValue = (e) => {
     const { name, value } = e.target;
     if (name === "paribahanName") {
@@ -84,9 +86,15 @@ const DriverInfo = () => {
 
   const [id, setId] = useState();
   const [infoData, setInfoData] = useState();
+
   const changeInfoData = (e) => {
     const { name, value } = e.target;
     setInfoData({ ...infoData, [name]: value });
+  };
+  const viewDriverInfo = (id) => {
+    setFile(null);
+    const data = driverInfo.find((info) => info.id === id);
+    setViewData(data);
   };
   const handleOpenUpdateForm = (id) => {
     setFile(null);
@@ -166,10 +174,75 @@ const DriverInfo = () => {
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
       width: "60px",
     },
+
     {
-      name: "Paribahan",
-      selector: (data) => data.paribahanName,
-      sortable: true,
+      name: "Action",
+      cell: (data) => (
+        <div className="dropdown">
+          <i
+            style={{
+              width: "30px",
+              height: "30px",
+              backgroundColor: "#ccc",
+              borderRadius: "50%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            className="fa fa-ellipsis-v"
+            aria-hidden="true"
+            data-toggle="dropdown"
+            aria-expanded="false"
+          ></i>
+          <div className="dropdown-menu" style={{ padding: "10px" }}>
+            <a
+              className="btn btn-sm bg-primary-light mr-2 mb-1 dropdown-item"
+              data-target="#driverInfoViewPopup"
+              data-toggle="modal"
+              href="#edit_specialities_details"
+              onClick={() => viewDriverInfo(data.id)}
+            >
+              <div
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
+              >
+                <i className="fa fa-eye" aria-hidden="true"></i>
+                <span>View</span>
+              </div>
+            </a>
+            <a
+              className="btn btn-sm bg-success-light mr-2 mb-1 dropdown-item"
+              data-target="#driverInfoEditPopup"
+              data-toggle="modal"
+              href="#edit_specialities_details"
+              onClick={() => handleOpenUpdateForm(data.id)}
+            >
+              <div
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
+              >
+                <i className="fe fe-pencil"></i>
+                <span>Update</span>
+              </div>
+            </a>
+            <a
+              href="#"
+              onClick={() => handleDeleteInfo(data.id)}
+              className="btn btn-sm bg-danger-light dropdown-item"
+              disabled={authUser?.role?.name === "VIEWER" && true}
+            >
+              <div
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
+              >
+                <i className="fe fe-trash"></i>
+                <span>Delete</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      ),
+      width: "50px",
+      style: {
+        padding: "0",
+      },
     },
     {
       name: "Photo",
@@ -206,6 +279,11 @@ const DriverInfo = () => {
       sortable: true,
     },
     {
+      name: "Paribahan",
+      selector: (data) => data.paribahanName,
+      sortable: true,
+    },
+    {
       name: "Address",
       selector: (data) => data.address,
       sortable: true,
@@ -224,30 +302,6 @@ const DriverInfo = () => {
       name: "Entry Date",
       selector: (data) => formatDate(data.createdAt),
       sortable: true,
-    },
-    {
-      name: "Actions",
-      cell: (data) => (
-        <div className="actions">
-          <a
-            className="btn btn-sm bg-success-light mr-2"
-            data-target="#driverInfoEditPopup"
-            data-toggle="modal"
-            href="#edit_specialities_details"
-            onClick={() => handleOpenUpdateForm(data.id)}
-          >
-            <i className="fe fe-pencil"></i>
-          </a>
-          <button
-            onClick={() => handleDeleteInfo(data.id)}
-            className="btn btn-sm bg-danger-light"
-            disabled={authUser?.role?.name === "VIEWER" && true}
-          >
-            <i className="fe fe-trash"></i>
-          </button>
-        </div>
-      ),
-      right: true, // Align the column to the right
     },
   ];
 
@@ -279,7 +333,7 @@ const DriverInfo = () => {
       {/* Create  Bus Info */}
       <ModalPopup
         close={message && false}
-        title="Create Guide Info"
+        title="Create Driver Info"
         target="createDriverInfoModal"
       >
         <form onSubmit={handleSubmitInfo} encType="multipart/form-data">
@@ -415,7 +469,7 @@ const DriverInfo = () => {
       {/* Update Bus Info */}
       <ModalPopup
         close={message && false}
-        title="Edit Guide Info"
+        title="Update Driver Info"
         target="driverInfoEditPopup"
       >
         <form onSubmit={handleUpdateInfo} encType="multipart/form-data">
@@ -553,6 +607,47 @@ const DriverInfo = () => {
             {loader ? <i className="fa fa-spinner fa-spin"></i> : "Update"}
           </button>
         </form>
+      </ModalPopup>
+      {/* View data */}
+      <ModalPopup title="View Driver Info" target="driverInfoViewPopup">
+        <div className="view-driver-info">
+          <div className="driver-header">
+            <img
+              src={viewData?.imageUrl ? viewData?.imageUrl : avatar}
+              alt=""
+            />
+            <div className="driver-name">
+              <h2>{viewData?.name}</h2>
+              <p>{viewData?.phone}</p>
+            </div>
+          </div>
+          <ul>
+            <li>
+              <p>Father name</p>{" "}
+              <p>{viewData?.fatherName ? viewData?.fatherName : "--"}</p>
+            </li>
+            <li>
+              <p>License</p>{" "}
+              <p>{viewData?.license ? viewData?.license : "--"}</p>
+            </li>
+            <li>
+              <p>paribahanName</p>{" "}
+              <p>{viewData?.paribahanName ? viewData?.paribahanName : "--"}</p>
+            </li>
+            <li>
+              <p>Remark</p>{" "}
+              <p>{viewData?.comment ? viewData?.comment : "--"}</p>
+            </li>
+            <li>
+              <p>Report</p> <p>{viewData?.report ? viewData?.report : "--"}</p>
+            </li>
+            <li>
+              <p>Address</p>{" "}
+              <p>{viewData?.address ? viewData?.address : "--"}</p>
+            </li>
+          </ul>
+          <h1>www.obtcoxsbazar.com</h1>
+        </div>
       </ModalPopup>
       <PageHeader title="Driver Info" />
       <button

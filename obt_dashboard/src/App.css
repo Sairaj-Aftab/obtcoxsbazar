@@ -67,6 +67,17 @@ td.dt-empty {
   font-weight: bold;
 }
 
+@media (min-width: 640px) {
+  .permission-review-modal ul {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 990px) {
+  .permission-review-modal ul {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
 /* Driver Profile Photo */
 .profile-photo-container {
   display: flex;
@@ -97,13 +108,57 @@ td.dt-empty {
   font-size: 14px;
   color: #555;
 }
-@media (min-width: 640px) {
-  .permission-review-modal ul {
-    grid-template-columns: 1fr 1fr;
-  }
+/* Driver View Data */
+.view-driver-info .driver-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
-@media (min-width: 990px) {
-  .permission-review-modal ul {
-    grid-template-columns: 1fr 1fr 1fr;
+.view-driver-info .driver-header img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid cyan;
+}
+.view-driver-info .driver-name h2 {
+  font-size: 1.2rem;
+}
+.view-driver-info .driver-name p {
+  font-size: 1rem;
+  margin: 0;
+}
+.view-driver-info ul {
+  margin: 0;
+  margin-top: 10px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+.view-driver-info ul li {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px;
+}
+.view-driver-info ul li p {
+  margin: 0;
+}
+.view-driver-info ul li p:first-child {
+  font-weight: bold;
+}
+.view-driver-info h1 {
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  color: #008080;
+  margin: 0;
+  margin-top: 10px;
+}
+@media (min-width: 640px) {
+  .view-driver-info ul {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 }
