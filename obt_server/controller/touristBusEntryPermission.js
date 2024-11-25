@@ -116,7 +116,7 @@ export const updateTouristBusEntryPermission = async (req, res, next) => {
     // send approval sms to applicant mobile number
     if (updatedPermission.approved && isPhoneNumber(updatedPermission.phone)) {
       const message =
-        `Dear Mr. ${updatedPermission.applicantName},\n\nYour "Tourist Bus Entry Permission" is accepted.\nApproval ID: (${updatedPermission.applicationNo}).\nPlease place your vehicle at ${updatedPermission.parkingPlace}.\n\nFor further query:\nCall: 01320108710\nVisit: www.obtcoxsbazar.com\n\nRegards,\nCox’s Bazar District Police`.trim();
+        `Dear Mr. ${updatedPermission.applicantName},\n\nYour "Tourist Bus Entry Permission" is accepted.\nApproval ID: (${updatedPermission.applicationNo}).\nPlease place your vehicle at ${updatedPermission.parkingPlace}.\n\nFor further queries:\nCall: 01320108710\nVisit: www.obtcoxsbazar.com\n\nRegards,\nCox’s Bazar District Police`.trim();
       await sendSMStoPhone(
         updatedPermission.phone,
         encodeURIComponent(message)
@@ -125,7 +125,7 @@ export const updateTouristBusEntryPermission = async (req, res, next) => {
     // send approval sms to applicant mobile number
     if (updatedPermission.rejected && isPhoneNumber(updatedPermission.phone)) {
       const message =
-        `Dear Mr. ${updatedPermission.applicantName},\n\nYour application for "Tourist Bus Entry Permission" is not accepted due to ${rejectedReason}.\n\nFor further querie:\nCall: 01320108710\nVisit: www.obtcoxsbazar.com\n\nRegards,\nCox’s Bazar District Police`.trim();
+        `Dear Mr. ${updatedPermission.applicantName},\n\nYour application for "Tourist Bus Entry Permission" is not accepted due to ${rejectedReason}.\n\nFor further queries:\nCall: 01320108710\nVisit: www.obtcoxsbazar.com\n\nRegards,\nCox’s Bazar District Police`.trim();
 
       await sendSMStoPhone(
         updatedPermission.phone, // Recipient's phone number
