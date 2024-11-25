@@ -31,6 +31,7 @@ const TouristBusPermission = () => {
 
   const [reviewPermission, setReviewPermission] = useState({});
   const [reviewStatus, setReviewStatus] = useState("");
+  const [rejectContent, setRejectContent] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
@@ -48,6 +49,7 @@ const TouristBusPermission = () => {
       );
     }
   };
+
   const handleStatusChange = (id, status) => {
     const approved = status === "approved";
     const rejected = status === "rejected";
@@ -57,7 +59,7 @@ const TouristBusPermission = () => {
         id,
         approved,
         rejected,
-        // permissionReason: "User changed status",
+        rejectedReason: rejectContent,
       })
     ).then(() => {
       setEditStatusId(null); // Reset the edit mode
@@ -80,16 +82,16 @@ const TouristBusPermission = () => {
     dispatch(getAllTouristBusPermission({ page, limit: newPerPage, search }));
   };
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getAllTouristBusPermission({
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    );
-  };
+  // const handleSearchChange = (e) => {
+  //   setSearch(e.target.value);
+  //   dispatch(
+  //     getAllTouristBusPermission({
+  //       page,
+  //       limit: rowPage,
+  //       search: e.target.value,
+  //     })
+  //   );
+  // };
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
   };
@@ -105,10 +107,15 @@ const TouristBusPermission = () => {
     if (error) {
       toast.error(error);
     }
+    if (message) {
+      setReviewPermission({
+        pending: false,
+      });
+    }
     if (error || message) {
       dispatch(setMessageEmpty());
     }
-  }, [dispatch, message, error]);
+  }, [dispatch, message, error, reviewPermission?.pending]);
 
   const columns = [
     {
@@ -341,6 +348,32 @@ const TouristBusPermission = () => {
                 </div>
               </li>
             )}
+            {reviewPermission?.pending && reviewStatus === "rejected" && (
+              <li>
+                <p className="text-danger">Reason for rejection</p>{" "}
+                <div className="form-group">
+                  <select
+                    value={rejectContent}
+                    onChange={(e) => setRejectContent(e.target.value)}
+                    className="form-control"
+                  >
+                    <option value="Rejected">Rejected</option>
+                    <option value="Traffic Jam in Town Area">
+                      Traffic Jam in Town Area
+                    </option>
+                    <option value="Incomplete Bus Reg. Number">
+                      Incomplete Bus Reg. Number
+                    </option>
+                    <option value="Incomplete  Information">
+                      Incomplete Information
+                    </option>
+                    <option value="Wrong selection of parking area">
+                      Wrong selection of parking area
+                    </option>
+                  </select>
+                </div>
+              </li>
+            )}
           </ul>
           <div className="d-flex justify-content-end mt-3">
             <button
@@ -350,9 +383,15 @@ const TouristBusPermission = () => {
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={loader}>
-              {loader ? "Updating..." : "Update Status"}
-            </button>
+            {reviewPermission?.pending && (
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loader}
+              >
+                {loader ? "Updating..." : "Update Status"}
+              </button>
+            )}
           </div>
         </form>
       </ModalPopup>

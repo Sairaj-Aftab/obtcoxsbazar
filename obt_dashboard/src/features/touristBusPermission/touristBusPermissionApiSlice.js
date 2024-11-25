@@ -22,14 +22,14 @@ export const getAllTouristBusPermission = createAsyncThunk(
 // New thunk for updating a permission
 export const updateTouristBusPermission = createAsyncThunk(
   "touristBusPermission/updateTouristBusPermission",
-  async ({ id, approved, rejected, permissionReason }) => {
+  async ({ id, approved, rejected, rejectedReason }) => {
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/tourist-permission/update/${id}`,
         {
           approved,
           rejected,
-          permissionReason,
+          rejectedReason,
         },
         {
           withCredentials: true,

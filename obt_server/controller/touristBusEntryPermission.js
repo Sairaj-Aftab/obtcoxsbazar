@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import createError from "../utils/createError.js";
+import { sendSMStoPhone } from "../utils/sendSmsToMobileNumber.js";
+import { isPhoneNumber } from "../utils/validate.js";
 
 const prisma = new PrismaClient();
 
@@ -52,12 +54,14 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
         },
       });
 
-    // if (touristBusEntryPermission) {
-    //   await sendSMStoPhone(
-    //     "01881591572",
-    //     `From OBT Cox's Bazar! New application from ${applicantName} and ${phone} and application number is ${newApplicationNumber}`
-    //   );
-    // }
+    if (touristBusEntryPermission) {
+      const message =
+        `Dear OBT Admin,\n\nMr. ${applicantName} (App. No. ${newApplicationNumber}) has applied for "Tourist Bus Entry Permission".\n\nPlease review and reply ASAP.\n\nRegards\nOBT`.trim();
+      await sendSMStoPhone(
+        "01320108710,01320108405",
+        encodeURIComponent(message)
+      );
+    }
     if (!touristBusEntryPermission) {
       return next(createError(400, "Please try again!"));
     }
@@ -74,7 +78,7 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
 export const updateTouristBusEntryPermission = async (req, res, next) => {
   try {
     const { id } = req.params; // Get the ID of the permission to be updated
-    const { approved, rejected, permissionReason } = req.body;
+    const { approved, rejected, rejectedReason } = req.body;
 
     // Fetch the existing permission entry
     const existingPermission =
@@ -94,13 +98,13 @@ export const updateTouristBusEntryPermission = async (req, res, next) => {
       updatedData.rejected = false;
       updatedData.pending = false;
       updatedData.approvalDate = new Date();
-      updatedData.permissionReason = permissionReason || "Approved";
+      updatedData.permissionReason = "";
     } else if (rejected) {
       updatedData.approved = false;
       updatedData.rejected = true;
       updatedData.pending = false;
       updatedData.rejectionDate = new Date();
-      updatedData.permissionReason = permissionReason || "Rejected";
+      updatedData.permissionReason = rejectedReason || "Rejected";
     }
 
     // Update the permission entry
@@ -108,6 +112,26 @@ export const updateTouristBusEntryPermission = async (req, res, next) => {
       where: { id },
       data: updatedData,
     });
+
+    // send approval sms to applicant mobile number
+    if (updatedPermission.approved && isPhoneNumber(updatedPermission.phone)) {
+      const message =
+        `Dear Mr. ${updatedPermission.applicantName},\n\nYour "Tourist Bus Entry Permission" is accepted.\nApproval ID: (${updatedPermission.applicationNo}).\nPlease place your vehicle at ${updatedPermission.parkingPlace}.\n\nFor further query:\nCall: 01320108710\nVisit: www.obtcoxsbazar.com\n\nRegards,\nCox’s Bazar District Police`.trim();
+      await sendSMStoPhone(
+        updatedPermission.phone,
+        encodeURIComponent(message)
+      );
+    }
+    // send approval sms to applicant mobile number
+    if (updatedPermission.rejected && isPhoneNumber(updatedPermission.phone)) {
+      const message =
+        `Dear Mr. ${updatedPermission.applicantName},\n\nYour application for "Tourist Bus Entry Permission" is not accepted due to ${rejectedReason}.\n\nFor further querie:\nCall: 01320108710\nVisit: www.obtcoxsbazar.com\n\nRegards,\nCox’s Bazar District Police`.trim();
+
+      await sendSMStoPhone(
+        updatedPermission.phone, // Recipient's phone number
+        encodeURIComponent(message) // Encode message
+      );
+    }
 
     return res.status(200).json({
       updatedPermission,
