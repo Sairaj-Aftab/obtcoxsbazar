@@ -5,6 +5,7 @@ import { busData } from "../../features/bus/busSlice";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 import { Link, useParams } from "react-router-dom";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
+import bdTicketLogo from "../../assets/image/bdtickets.png";
 
 const BusServicesByPlace = () => {
   const params = useParams();
@@ -67,6 +68,28 @@ const BusServicesByPlace = () => {
           No bus found for {params?.place?.toUpperCase()}
         </p>
       )}
+      <div className="flex justify-center items-center pt-5 pb-10">
+        {currentDestination?.bdTicketLink && (
+          <div className="text-center">
+            <p className="font-semibold text-lg mb-1 text-primary-color">
+              Click to Buy Your Ticket
+            </p>
+            <a
+              href={currentDestination?.bdTicketLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block shadow-lg shadow-primary-color p-2 rounded-md"
+              title="Click to visit the BD Tickets page for this destination"
+            >
+              <img
+                src={bdTicketLogo}
+                alt="BD Ticket"
+                className="w-32 mx-auto"
+              />
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

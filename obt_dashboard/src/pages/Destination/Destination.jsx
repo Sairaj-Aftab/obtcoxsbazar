@@ -44,6 +44,7 @@ const Destination = () => {
   const [plStatus, setPlStatus] = useState("");
   const [map, setMap] = useState("");
   const [destinationKM, setDestinationKM] = useState("");
+  const [bdTicketLink, setBdTicketLink] = useState("");
   const handleShowPlaceName = (id) => {
     setId(id);
     const place = places.find((pl) => pl.id === id);
@@ -51,6 +52,7 @@ const Destination = () => {
     setPlStatus(place.status);
     setMap(place?.mapLink);
     setDestinationKM(place?.destinationKM);
+    setBdTicketLink(place?.bdTicketLink);
   };
 
   const handleUpdate = (id) => {
@@ -65,6 +67,7 @@ const Destination = () => {
             status: plStatus,
             mapLink: map,
             destinationKM,
+            bdTicketLink,
           },
         })
       );
@@ -270,12 +273,26 @@ const Destination = () => {
                                 className="form-control"
                                 placeholder="Destination KM"
                               />
+                              <input
+                                type="text"
+                                value={bdTicketLink}
+                                onChange={(e) =>
+                                  setBdTicketLink(e.target.value)
+                                }
+                                className="form-control"
+                                placeholder="BD Ticket Link"
+                              />
                             </td>
                           ) : (
                             <td className="d-flex flex-column">
                               <span>{place.placeName}</span>
                               {place?.destinationKM && (
                                 <span>{place?.destinationKM} KM</span>
+                              )}
+                              {place?.bdTicketLink && (
+                                <span>
+                                  {place?.bdTicketLink.split("/").pop()}
+                                </span>
                               )}
                             </td>
                           )}

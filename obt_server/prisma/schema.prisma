@@ -237,6 +237,7 @@ model LeaveDestinationPlace {
     status String
     mapLink String?
     destinationKM String?
+    bdTicketLink  String?
     paribahanUser ParibahanUser[] @relation(fields: [paribahanUserId], references: [id])
     paribahanUserId String[] @db.ObjectId
     trash Boolean @default(false)

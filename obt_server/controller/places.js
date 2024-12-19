@@ -33,7 +33,8 @@ export const createPlace = async (req, res, next) => {
 export const updatePlace = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { placeName, status, mapLink, destinationKM } = req.body;
+    const { placeName, status, mapLink, destinationKM, bdTicketLink } =
+      req.body;
 
     const existingPlace = await prisma.leaveDestinationPlace.findFirst({
       where: {
@@ -56,6 +57,7 @@ export const updatePlace = async (req, res, next) => {
         slug: createSlug(placeName),
         mapLink,
         destinationKM,
+        bdTicketLink,
       },
     });
     return res.status(200).json({ place, message: "Successfully updated" });
