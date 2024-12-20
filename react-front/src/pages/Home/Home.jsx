@@ -7,6 +7,7 @@ import VisitorCountSection from "../../components/VisitorCountSection";
 
 const Home = () => {
   const { rgSchedules, loader } = useSelector(rgSchedulesData);
+
   return (
     <>
       <BusScheduleTable />

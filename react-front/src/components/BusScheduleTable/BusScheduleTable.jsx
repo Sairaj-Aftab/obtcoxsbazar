@@ -8,7 +8,8 @@ import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 
 const BusScheduleTable = () => {
   const navigate = useNavigate();
-  const { todaySchedules, todayScheduleLoader } = useSelector(schedulesData);
+  const { todaySchedules, todayScheduleLoader, destinationPlaces } =
+    useSelector(schedulesData);
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
   const fiveDaysLater = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
@@ -32,7 +33,7 @@ const BusScheduleTable = () => {
       {!todayScheduleLoader && todaySchedules && (
         <>
           <DataTable
-            columns={scheduleColumn(navigate)}
+            columns={scheduleColumn({ navigate, destinationPlaces })}
             data={filteredSchedules?.slice(0, 10)}
             responsive
             customStyles={{

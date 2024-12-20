@@ -16,6 +16,7 @@ import {
   getParibahanRgSchedules,
   rgSchedulesData,
 } from "../../features/regularBusSchedule/regularBusScheduleSlice";
+import { schedulesData } from "../../features/schedules/schedulesSlice";
 
 const BusInformation = () => {
   const params = useParams();
@@ -23,6 +24,7 @@ const BusInformation = () => {
   const dispatch = useDispatch();
   const { busInfo, busInfoLoader } = useSelector(busData);
   const { paribahanRgSchedules, loader } = useSelector(rgSchedulesData);
+  const { destinationPlaces } = useSelector(schedulesData);
   const { paribahanNotices } = useSelector(noticeData);
   const [paribahanNotice, setParibahanNotice] = useState(null);
 
@@ -55,13 +57,16 @@ const BusInformation = () => {
       name: "Guide No",
       selector: (data) => data.guidePhone,
       cell: (data) => {
+        const formattedPhone = data.guidePhone.startsWith("+88")
+          ? data.guidePhone.slice(3)
+          : data.guidePhone;
         return (
           <a
-            href={`tel:+88${data.guidePhone}`}
+            href={`tel:+88${formattedPhone}`}
             className="w-full flex items-center gap-1 text-primary-color"
           >
             <FaPhone size={16} />
-            <span>{data.guidePhone}</span>
+            <span>{formattedPhone}</span>
           </a>
         );
       },
@@ -89,6 +94,22 @@ const BusInformation = () => {
     {
       name: "Destination",
       selector: (data) => data.destinationPlace,
+      cell: (data) => {
+        const matchingPlace = destinationPlaces?.find(
+          (place) => place.placeName === data.destinationPlace
+        );
+        return matchingPlace ? (
+          <div
+            onClick={() =>
+              navigate(`/${matchingPlace.slug}/${matchingPlace.id}`)
+            }
+            className="cursor-pointer flex gap-1 items-center text-red"
+          >
+            <span>&#10132;</span>
+            <span>{data.destinationPlace}</span>
+          </div>
+        ) : null;
+      },
       sortable: true,
       width: "160px",
     },

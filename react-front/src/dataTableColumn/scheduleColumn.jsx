@@ -2,7 +2,7 @@ import { formatDateTime } from "../utils/formatDateTime";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../assets/icon/location.png";
 
-const scheduleColumn = (navigate) => {
+const scheduleColumn = ({ navigate, destinationPlaces }) => {
   return [
     {
       name: "#",
@@ -47,13 +47,16 @@ const scheduleColumn = (navigate) => {
       name: "Guide No",
       selector: (data) => data.guidePhone,
       cell: (data) => {
+        const formattedPhone = data.guidePhone.startsWith("+88")
+          ? data.guidePhone.slice(3)
+          : data.guidePhone;
         return (
           <a
-            href={`tel:+88${data.guidePhone}`}
+            href={`tel:+88${formattedPhone}`}
             className="w-full flex items-center gap-1 text-primary-color"
           >
             <FaPhone size={16} />
-            <span>{data.guidePhone}</span>
+            <span>{formattedPhone}</span>
           </a>
         );
       },
@@ -80,7 +83,22 @@ const scheduleColumn = (navigate) => {
     },
     {
       name: "Destination",
-      selector: (data) => data.destinationPlace,
+      cell: (data) => {
+        const matchingPlace = destinationPlaces?.find(
+          (place) => place.placeName === data.destinationPlace
+        );
+        return matchingPlace ? (
+          <div
+            onClick={() =>
+              navigate(`/${matchingPlace.slug}/${matchingPlace.id}`)
+            }
+            className="cursor-pointer flex gap-1 items-center text-red"
+          >
+            <span>&#10132;</span>
+            <span>{data.destinationPlace}</span>
+          </div>
+        ) : null;
+      },
       sortable: true,
       width: "160px",
     },

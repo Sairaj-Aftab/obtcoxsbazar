@@ -8,7 +8,8 @@ import Skeleton from "react-loading-skeleton";
 
 const AllSchedules = () => {
   const navigate = useNavigate();
-  const { todaySchedules, todayScheduleLoader } = useSelector(schedulesData);
+  const { todaySchedules, todayScheduleLoader, destinationPlaces } =
+    useSelector(schedulesData);
 
   return (
     <div className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
@@ -23,7 +24,7 @@ const AllSchedules = () => {
       )}
       {!todayScheduleLoader && todaySchedules && (
         <DataTable
-          columns={scheduleColumn(navigate)}
+          columns={scheduleColumn({ navigate, destinationPlaces })}
           data={todaySchedules || []}
           responsive
           customStyles={{
