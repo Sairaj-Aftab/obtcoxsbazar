@@ -203,6 +203,8 @@ const ProfileBusInfo = () => {
               <option value="Non-AC">Non-AC</option>
               <option value="Sleeper Coach">Sleeper Coach</option>
               <option value="Double-decker">Double-decker</option>
+              <option value="Suite Class">Suite Class</option>
+              <option value="Hyundai Biz Class">Hyundai Biz Class</option>
             </select>
             {/* <input
               type="text"
