@@ -10,6 +10,7 @@ import driverInfoSlice from "../features/driverInfo/driverInfoSlice";
 import regularScheduleSlice from "../features/regularSchedule/regularScheduleSlice";
 import reviewSlice from "../features/review/reviewSlice";
 import touristBusPermissionSlice from "../features/touristBusPermission/touristBusPermissionSlice";
+import settingSlice from "../features/settings/settingSlice";
 
 const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
     notice: noticeSlice,
     touristBusPermission: touristBusPermissionSlice,
     review: reviewSlice,
+    setting: settingSlice,
   },
   middleware: (getDefaultMiddlewares) => getDefaultMiddlewares(),
   devTools: true,

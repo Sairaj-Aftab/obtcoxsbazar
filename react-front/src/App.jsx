@@ -29,6 +29,7 @@ import {
   getVisitorStats,
   updateVisitorCount,
 } from "./features/visitorCount/visitorCountApiSlice";
+import { getAllSettings } from "./features/settings/settingsApiSlice";
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -43,6 +44,7 @@ function App() {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
     }
+    dispatch(getAllSettings());
     dispatch(getTodaysSchedules({ page: 1, limit: 1000 }));
     dispatch(getAllRgSchedules({ page: 1, limit: 1000 }));
     dispatch(getLeavingPlace());

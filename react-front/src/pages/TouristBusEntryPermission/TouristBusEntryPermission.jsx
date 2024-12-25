@@ -10,11 +10,14 @@ import {
   touristBusPermissionsData,
 } from "../../features/touristBusPermission/touristBusPermissionSlice";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
+import { settingsData } from "../../features/settings/settingsSlice";
 
 const TouristBusEntryPermission = () => {
   const dispatch = useDispatch();
   const { parkingPlaces } = useSelector(schedulesData);
   const { message, error, loader } = useSelector(touristBusPermissionsData);
+  const { settings } = useSelector(settingsData);
+  const [setting, setSetting] = useState({});
   const [formData, setFormData] = useState({
     applicantName: "",
     phone: "",
@@ -112,271 +115,289 @@ const TouristBusEntryPermission = () => {
       dispatch(setMessageEmpty());
     }
   }, [dispatch, error, message]);
+  useEffect(() => {
+    if (settings) {
+      setSetting(
+        settings.find(
+          (setting) => setting.name === "TOURIST-BUS-ENTRY-PERMISSION"
+        )
+      );
+    }
+  }, [settings]);
 
   return (
     <div className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto">
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label
-            htmlFor="applicantName"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Applicant Name (আবেদনকারীর নাম)
-          </label>
-          <input
-            type="text"
-            id="applicantName"
-            name="applicantName"
-            value={formData.applicantName}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="phone"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Mobile No (মোবাইল নাম্বার)
-          </label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="institutionName"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Institution/Address (প্রতিষ্ঠান/ঠিকানা)
-          </label>
-          <input
-            name="institutionName"
-            id="institutionName"
-            value={formData.institutionName}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="arrivalDateTime"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Arrival Date & Time (আগমনের তারিখ ও সময়)
-          </label>
-          <input
-            type="datetime-local"
-            id="arrivalDateTime"
-            name="arrivalDateTime"
-            value={formData.arrivalDateTime}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="numberTourist"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            No of Tourists (পর্যটকের সংখ্যা)
-          </label>
-          <input
-            type="number"
-            id="numberTourist"
-            name="numberTourist"
-            value={formData.numberTourist}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="numberBus"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            No of Bus (বাসের সংখ্যা)
-          </label>
-          <input
-            type="number"
-            id="numberBus"
-            name="numberBus"
-            value={formData.numberBus}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="TransportName"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Name of Transport (পরিবহনের নাম)
-          </label>
-          <input
-            type="text"
-            id="TransportName"
-            name="transportName"
-            value={formData.transportName}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="vehicleRegNo"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Reg No of Vehicle (গাড়ির নং)
-          </label>
-          <input
-            type="text"
-            id="vehicleRegNo"
-            name="vehicleRegNo"
-            value={formData.vehicleRegNo}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="destinationName"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Destination (হোটেলের নাম)
-          </label>
-          <input
-            type="text"
-            id="destinationName"
-            name="destinationName"
-            value={formData.destinationName}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="parkingPlace"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Parking Place (পার্কিং এর স্থান)
-          </label>
-          <select
-            name="parkingPlace"
-            id="parkingPlace"
-            value={formData.parkingPlace}
-            required
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          >
-            <option value="">Select Parking Place</option>
-            {parkingPlaces?.map((place, index) => (
-              <option key={index} value={place?.placeName}>
-                {place?.placeName}
-              </option>
-            ))}
-          </select>
-          <select
-            name="parkingPlaceMapLink"
-            id="parkingPlaceMapLink"
-            value={formData.parkingPlaceMapLink}
-            onChange={handleChange}
-            className="hidden"
-          >
-            <option value="">Parking Map Link</option>
-            {parkingPlaces?.map((place, index) => (
-              <option key={index} value={place?.mapLink}>
-                {place?.mapLink}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="returnDateTime"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Return Date & Time (প্রস্থানের তারিখ ও সময়)
-          </label>
-          <input
-            type="datetime-local"
-            id="returnDateTime"
-            name="returnDateTime"
-            value={formData.returnDateTime}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          />
-        </div>
-        <div className="mb-3">
-          <label
-            htmlFor="description"
-            className="text-sm font-medium text-gray-600 block mb-1"
-          >
-            Description (Optional)
-          </label>
-          <textarea
-            name="description"
-            id="description"
-            rows="4"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
-          ></textarea>
-        </div>
-
-        <div className="mb-3">
-          <div className="flex items-start">
+      {setting?.status && (
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label
+              htmlFor="applicantName"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Applicant Name (আবেদনকারীর নাম)
+            </label>
             <input
-              type="checkbox"
-              id="agree"
-              name="agree"
+              type="text"
+              id="applicantName"
+              name="applicantName"
+              value={formData.applicantName}
+              onChange={handleChange}
               required
-              className="w-fit mt-1 mr-2 focus:ring-primary focus:outline-none peer"
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
             />
-            <div>
-              <label
-                htmlFor="agree"
-                className="text-sm font-medium text-gray-600 peer-checked:text-black"
-              >
-                Terms & Condition (অবশ্যই পালনীয়)
-              </label>
-              <ul className="text-sm text-gray-600 list-disc list-inside mt-2">
-                <li>১) ট্রাফিক আইন মেনে চলতে হবে।</li>
-                <li>
-                  ২) যাত্রী নামার সাথে সাথে বাস সুনির্দিষ্ট পার্কিং এ চলে যেতে
-                  হবে।
-                </li>
-                <li>৩) সড়কের পাশে পার্কিং করা যাবে না।</li>
-                <li>৪) যত্রতত্র আবর্জনা ফেলা যাবে না।</li>
-                <li>৫) মেরিন ড্রাইভে বাস প্রবেশ করা যাবে না।</li>
-              </ul>
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="phone"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Mobile No (মোবাইল নাম্বার)
+            </label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="institutionName"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Institution/Address (প্রতিষ্ঠান/ঠিকানা)
+            </label>
+            <input
+              name="institutionName"
+              id="institutionName"
+              value={formData.institutionName}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="arrivalDateTime"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Arrival Date & Time (আগমনের তারিখ ও সময়)
+            </label>
+            <input
+              type="datetime-local"
+              id="arrivalDateTime"
+              name="arrivalDateTime"
+              value={formData.arrivalDateTime}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="numberTourist"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              No of Tourists (পর্যটকের সংখ্যা)
+            </label>
+            <input
+              type="number"
+              id="numberTourist"
+              name="numberTourist"
+              value={formData.numberTourist}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="numberBus"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              No of Bus (বাসের সংখ্যা)
+            </label>
+            <input
+              type="number"
+              id="numberBus"
+              name="numberBus"
+              value={formData.numberBus}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="TransportName"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Name of Transport (পরিবহনের নাম)
+            </label>
+            <input
+              type="text"
+              id="TransportName"
+              name="transportName"
+              value={formData.transportName}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="vehicleRegNo"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Reg No of Vehicle (গাড়ির নং)
+            </label>
+            <input
+              type="text"
+              id="vehicleRegNo"
+              name="vehicleRegNo"
+              value={formData.vehicleRegNo}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="destinationName"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Destination (হোটেলের নাম)
+            </label>
+            <input
+              type="text"
+              id="destinationName"
+              name="destinationName"
+              value={formData.destinationName}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="parkingPlace"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Parking Place (পার্কিং এর স্থান)
+            </label>
+            <select
+              name="parkingPlace"
+              id="parkingPlace"
+              value={formData.parkingPlace}
+              required
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            >
+              <option value="">Select Parking Place</option>
+              {parkingPlaces?.map((place, index) => (
+                <option key={index} value={place?.placeName}>
+                  {place?.placeName}
+                </option>
+              ))}
+            </select>
+            <select
+              name="parkingPlaceMapLink"
+              id="parkingPlaceMapLink"
+              value={formData.parkingPlaceMapLink}
+              onChange={handleChange}
+              className="hidden"
+            >
+              <option value="">Parking Map Link</option>
+              {parkingPlaces?.map((place, index) => (
+                <option key={index} value={place?.mapLink}>
+                  {place?.mapLink}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="returnDateTime"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Return Date & Time (প্রস্থানের তারিখ ও সময়)
+            </label>
+            <input
+              type="datetime-local"
+              id="returnDateTime"
+              name="returnDateTime"
+              value={formData.returnDateTime}
+              onChange={handleChange}
+              required
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            />
+          </div>
+          <div className="mb-3">
+            <label
+              htmlFor="description"
+              className="text-sm font-medium text-gray-600 block mb-1"
+            >
+              Description (Optional)
+            </label>
+            <textarea
+              name="description"
+              id="description"
+              rows="4"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
+            ></textarea>
+          </div>
+
+          <div className="mb-3">
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                id="agree"
+                name="agree"
+                required
+                className="w-fit mt-1 mr-2 focus:ring-primary focus:outline-none peer"
+              />
+              <div>
+                <label
+                  htmlFor="agree"
+                  className="text-sm font-medium text-gray-600 peer-checked:text-black"
+                >
+                  Terms & Condition (অবশ্যই পালনীয়)
+                </label>
+                <ul className="text-sm text-gray-600 list-disc list-inside mt-2">
+                  <li>১) ট্রাফিক আইন মেনে চলতে হবে।</li>
+                  <li>
+                    ২) যাত্রী নামার সাথে সাথে বাস সুনির্দিষ্ট পার্কিং এ চলে যেতে
+                    হবে।
+                  </li>
+                  <li>৩) সড়কের পাশে পার্কিং করা যাবে না।</li>
+                  <li>৪) যত্রতত্র আবর্জনা ফেলা যাবে না।</li>
+                  <li>৫) মেরিন ড্রাইভে বাস প্রবেশ করা যাবে না।</li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          className="w-full bg-primary-color text-white font-bold py-2 rounded disabled:bg-opacity-80"
-          disabled={loader}
-        >
-          {loader ? "Submitting..." : "Submit"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-primary-color text-white font-bold py-2 rounded disabled:bg-opacity-80"
+            disabled={loader}
+          >
+            {loader ? "Submitting..." : "Submit"}
+          </button>
+        </form>
+      )}
+      {!setting?.status && (
+        <div className="h-[50vh] flex items-center justify-center">
+          <h2 className="text-xl font-semibold text-red text-center">
+            {setting?.description}
+          </h2>
+        </div>
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ import regularBusScheduleSlice from "./regularBusSchedule/regularBusScheduleSlic
 import authReviewSlice from "./authReview/authReviewSlice";
 import touristBusPermissionSlice from "./touristBusPermission/touristBusPermissionSlice";
 import visitorCountSlice from "./visitorCount/visitorCountSlice";
+import settingsSlice from "./settings/settingsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export const store = configureStore({
     touristBusPermission: touristBusPermissionSlice,
     authReview: authReviewSlice,
     visitorCount: visitorCountSlice,
+    settings: settingsSlice,
   },
 });

@@ -31,6 +31,7 @@ import { getAllDriverInfo } from "./features/driverInfo/driverInfoApiSlice";
 import { getAllRgSchedules } from "./features/regularSchedule/regularScheduleApiSlice";
 import { getAllReview } from "./features/review/reviewApiSlice";
 import { authData } from "./features/auth/authSlice";
+import { getAllSettings } from "./features/settings/settingApiSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -40,6 +41,7 @@ function App() {
     if (localStorage.getItem("authUser")) {
       dispatch(getLogedInUser());
     }
+    dispatch(getAllSettings());
     dispatch(getTodaysSchedule({ page: 1, limit: 100 }));
     dispatch(getAllSchedules({ page: 1, limit: 10 }));
     dispatch(getAllRgSchedules({ page: 1, limit: 10 }));

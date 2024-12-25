@@ -15,10 +15,25 @@ import toast from "react-hot-toast";
 import { formatDateAndTime, formatDateTime } from "../../utils/timeAgo";
 import Loading from "../../components/Loading/Loading";
 import ModalPopup from "../../components/ModalPopup/ModalPopup";
+import { getAllSettingData } from "../../features/settings/settingSlice";
+import { updateSetting } from "../../features/settings/settingApiSlice";
 
 const TouristBusPermission = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector(authData);
+  const { settings } = useSelector(getAllSettingData);
+  const [setting, setSetting] = useState({});
+  const [notice, setNotice] = useState("");
+  const [updateNoticeShow, setUpdateNoticeShow] = useState(false);
+
+  useEffect(() => {
+    if (settings) {
+      setSetting(
+        settings?.find((set) => set.name === "TOURIST-BUS-ENTRY-PERMISSION")
+      );
+    }
+  }, [settings]);
+
   const {
     permissions,
     permissionsCount,
@@ -65,6 +80,19 @@ const TouristBusPermission = () => {
       setEditStatusId(null); // Reset the edit mode
       toast.success(`Status updated to ${status}`);
     });
+  };
+
+  const handleOnOffStatusChange = (e) => {
+    const updatedStatus = e.target.checked;
+    // Update the status (e.g., API call, state update)
+    dispatch(
+      updateSetting({ data: { status: updatedStatus }, id: setting.id })
+    );
+  };
+
+  const handleUpdateSettingNotice = () => {
+    dispatch(updateSetting({ data: { description: notice }, id: setting.id }));
+    setUpdateNoticeShow(false);
   };
 
   const handleModalSubmit = (e) => {
@@ -395,7 +423,70 @@ const TouristBusPermission = () => {
           </div>
         </form>
       </ModalPopup>
-      <PageHeader title="Tourist Bus Permission" />
+      {!setting?.status && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          {setting?.description && !updateNoticeShow && (
+            <marquee direction="">{setting?.description}</marquee>
+          )}
+          {(updateNoticeShow || !setting?.description) && (
+            <input
+              type="text"
+              placeholder="Notice"
+              value={notice}
+              onChange={(e) => setNotice(e.target.value)}
+              className="form-control"
+            />
+          )}
+          {setting?.description && !updateNoticeShow && (
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setUpdateNoticeShow(!updateNoticeShow);
+                setNotice(setting?.description);
+              }}
+            >
+              Update
+            </button>
+          )}
+          {(updateNoticeShow || !setting?.description) && (
+            <button
+              className="btn btn-primary"
+              onClick={handleUpdateSettingNotice}
+            >
+              Submit
+            </button>
+          )}
+        </div>
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <PageHeader title="Tourist Bus Permission" />
+        <div className="custom-control custom-switch">
+          <input
+            type="checkbox"
+            className="custom-control-input"
+            id="customSwitch1"
+            checked={!!setting?.status}
+            onChange={handleOnOffStatusChange}
+          />
+          <label className="custom-control-label" htmlFor="customSwitch1">
+            {setting?.status ? "ON" : "OFF"}
+          </label>
+        </div>
+      </div>
+
       <DataTable
         columns={columns}
         data={permissions}
