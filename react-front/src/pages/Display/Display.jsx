@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import "./display.css";
-import { useSelector } from "react-redux";
 import logoImg2 from "../../assets/image/white_yellow.png";
-import { schedulesData } from "../../features/schedules/schedulesSlice";
 import DigitalClock from "../../components/DigitalClock";
 import { formatDateTime } from "../../utils/formatDateTime";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
+import useSchedules from "../../store/useSchedules";
 
 const Display = () => {
-  const { todaySchedules } = useSelector(schedulesData);
+  const { todaySchedules } = useSchedules();
 
   const scrollRef = useRef(null);
 
@@ -57,7 +56,7 @@ const Display = () => {
       // };
       // Function to find schedules within the past 15 minutes and onward
       const findSchedulesInRange = (startTime) => {
-        return todaySchedules?.filter((data) => {
+        return todaySchedules?.schedules?.filter((data) => {
           const scheduleTime = new Date(data.time);
           return scheduleTime >= startTime;
         });
