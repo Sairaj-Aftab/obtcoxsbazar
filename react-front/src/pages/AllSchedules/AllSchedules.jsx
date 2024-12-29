@@ -4,12 +4,13 @@ import DataTable from "react-data-table-component";
 import TodayDate from "../../components/TodayDate";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 import { useNavigate } from "react-router-dom";
-import Skeleton from "react-loading-skeleton";
+import useSchedules from "../../store/useSchedules";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const AllSchedules = () => {
   const navigate = useNavigate();
-  const { todaySchedules, todayScheduleLoader, destinationPlaces } =
-    useSelector(schedulesData);
+  const { destinationPlaces } = useSelector(schedulesData);
+  const { todaySchedules, todayScheduleLoader } = useSchedules();
 
   return (
     <div className="container w-full mx-auto my-8 p-4 bg-white border border-primary-color md:rounded-lg">
@@ -18,14 +19,14 @@ const AllSchedules = () => {
         <TodayDate className="text-base text-primary font-normal" />
       </div>
       {todayScheduleLoader && (
-        <div className="w-full">
-          <Skeleton height={150} />
+        <div className="w-full h-[70vh]">
+          <ComponentLoader />
         </div>
       )}
       {!todayScheduleLoader && todaySchedules && (
         <DataTable
           columns={scheduleColumn({ navigate, destinationPlaces })}
-          data={todaySchedules || []}
+          data={todaySchedules?.schedules || []}
           responsive
           customStyles={{
             headCells: {

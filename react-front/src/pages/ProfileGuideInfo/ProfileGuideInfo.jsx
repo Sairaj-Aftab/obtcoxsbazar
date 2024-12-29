@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  guideInfoData,
-  setGuideInfoMessageEmpty,
-} from "../../features/guideInfo/guideInfoSlice";
-import {
-  createGuideInfo,
-  getGuideInfo,
-  updateGuideInfo,
-} from "../../features/guideInfo/guideInfoApiSlice";
+import { useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createGuideInfo,
+  getGuideInfo,
+  updateGuideInfo,
+} from "../../services/guideInfo.service";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const ProfileGuideInfo = () => {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(500);
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
-  const dispatch = useDispatch();
-  const { guideInfo, totalCount, searchCount, loader, message, error } =
-    useSelector(guideInfoData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({
@@ -29,16 +28,46 @@ const ProfileGuideInfo = () => {
     address: "",
     comment: "",
   });
+  const { data: guide, isLoading: guideLoading } = useQuery({
+    queryKey: ["guide", { id: user.id, page, limit, search }],
+    queryFn: () => getGuideInfo({ id: user.id, page, limit, search }),
+  });
+  const {
+    mutateAsync: createGuide,
+    data: createData,
+    isSuccess: createSuccess,
+    error: createError,
+    isPending: createLoading,
+  } = useMutation({
+    mutationFn: createGuideInfo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guide"] });
+    },
+  });
+  const {
+    mutateAsync: updateGuide,
+    data: updateData,
+    isSuccess: updateSuccess,
+    error: updateError,
+    isPending: updateLoading,
+  } = useMutation({
+    mutationFn: updateGuideInfo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guide"] });
+      setShowUpdateModal(false);
+    },
+  });
+
   const changeInputValue = (e) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
-  const handleSubmitInfo = (e) => {
+  const handleSubmitInfo = async (e) => {
     e.preventDefault();
     if (!input.name || !input.phone) {
       toast.error("Name & Phone is required!");
     } else {
-      dispatch(createGuideInfo({ id: user.id, data: input }));
+      await createGuide({ id: user.id, data: input });
     }
   };
 
@@ -49,54 +78,29 @@ const ProfileGuideInfo = () => {
     setInfoData({ ...infoData, [name]: value });
   };
   const handleOpenUpdateForm = (id) => {
-    const data = guideInfo.find((info) => info.id === id);
+    const data = guide?.guideInfo.find((info) => info.id === id);
     setId(data.id);
     setInfoData({
       ...data,
     });
     setShowUpdateModal(true);
   };
-  const handleUpdateInfo = (e) => {
+  const handleUpdateInfo = async (e) => {
     e.preventDefault();
     if (!infoData.name || !infoData.phone) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateGuideInfo({ id, data: infoData }));
+      await updateGuide({ id, data: infoData });
     }
   };
 
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getGuideInfo({ id: user.id, page, limit: rowPage, search }));
-  };
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getGuideInfo({ id: user.id, page, limit: newPerPage, search }));
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getGuideInfo({
-        id: user.id,
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    ); // Fetch schedules with the search term
-  };
-
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const column = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (data, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -141,9 +145,8 @@ const ProfileGuideInfo = () => {
   ];
 
   useEffect(() => {
-    dispatch(getGuideInfo({ id: user.id, page: 1, limit: 500 }));
-    if (message) {
-      toast.success(message);
+    if (createSuccess && createData?.message) {
+      toast.success(createData?.message);
       setInput({
         name: "",
         phone: "",
@@ -152,13 +155,20 @@ const ProfileGuideInfo = () => {
       });
       setShowUpdateModal(false);
     }
-    if (error) {
-      toast.error(error);
+    if (updateSuccess && updateData?.message) {
+      toast.success(updateData?.message);
     }
-    return () => {
-      dispatch(setGuideInfoMessageEmpty());
-    };
-  }, [message, loader, error, dispatch, user.id]);
+    if (createError || updateError) {
+      toast.error(createError.message || updateError.message);
+    }
+  }, [
+    createSuccess,
+    createData?.message,
+    createError,
+    updateSuccess,
+    updateData?.message,
+    updateError,
+  ]);
   return (
     <>
       <Toaster />
@@ -199,9 +209,9 @@ const ProfileGuideInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={loader}
+              disabled={createLoading}
             >
-              {loader ? "Adding..." : "Add"}
+              {createLoading ? "Adding..." : "Add"}
             </button>
           </form>
         </Modal>
@@ -243,9 +253,9 @@ const ProfileGuideInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={loader}
+              disabled={updateLoading}
             >
-              {loader ? "Editing..." : "Edit"}
+              {updateLoading ? "Updating..." : "Edit"}
             </button>
           </form>
         </Modal>
@@ -258,7 +268,7 @@ const ProfileGuideInfo = () => {
               type="text"
               placeholder="Search"
               className="w-full sm:w-60"
-              onChange={handleSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <button
               onClick={() => setShowModal(true)}
@@ -270,15 +280,21 @@ const ProfileGuideInfo = () => {
         </div>
         <DataTable
           columns={column}
-          data={guideInfo?.slice().sort((a, b) => a.name.localeCompare(b.name))}
+          data={guide?.guideInfo
+            ?.slice()
+            .sort((a, b) => a.name.localeCompare(b.name))}
           responsive
-          // progressPending={todayLoader}
-          // progressComponent={<Loading />}
+          progressPending={guideLoading}
+          progressComponent={
+            <div className="w-full py-4">
+              <ComponentLoader />
+            </div>
+          }
           pagination
           paginationServer
-          paginationTotalRows={totalCount ? totalCount : searchCount}
-          onChangeRowsPerPage={handlePerRowsChange}
-          onChangePage={handlePageChange}
+          paginationTotalRows={guide?.count ? guide?.count : guide?.searchCount}
+          onChangeRowsPerPage={(newPerPage) => setLimit(newPerPage)}
+          onChangePage={(page) => setPage(page)}
           paginationRowsPerPageOptions={[100, 150, 200]}
           customStyles={{
             headCells: {

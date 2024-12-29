@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import {
-  createTouristBusPermission,
-  getAllTouristBusPermission,
-} from "../../features/touristBusPermission/touristBusPermissionApiSlice";
-import {
-  setMessageEmpty,
-  touristBusPermissionsData,
-} from "../../features/touristBusPermission/touristBusPermissionSlice";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
-import { settingsData } from "../../features/settings/settingsSlice";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createTouristBusPermission } from "../../services/touristBusPermission.service";
+import { getSingleSettingByName } from "../../services/settings.service";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const TouristBusEntryPermission = () => {
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { parkingPlaces } = useSelector(schedulesData);
-  const { message, error, loader } = useSelector(touristBusPermissionsData);
-  const { settings } = useSelector(settingsData);
-  const [setting, setSetting] = useState({});
   const [formData, setFormData] = useState({
     applicantName: "",
     phone: "",
@@ -32,6 +24,24 @@ const TouristBusEntryPermission = () => {
     parkingPlaceMapLink: "",
     returnDateTime: "",
     description: "",
+  });
+
+  const { data: settingData, isLoading: settingLoading } = useQuery({
+    queryKey: ["touristSetting", { name: "TOURIST-BUS-ENTRY-PERMISSION" }],
+    queryFn: () => getSingleSettingByName("TOURIST-BUS-ENTRY-PERMISSION"),
+  });
+
+  const {
+    mutateAsync: create,
+    data,
+    isSuccess,
+    error: createError,
+    isPending,
+  } = useMutation({
+    mutationFn: createTouristBusPermission,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["touristBusPermissions"] });
+    },
   });
 
   const handleChange = (e) => {
@@ -53,7 +63,7 @@ const TouristBusEntryPermission = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const {
       applicantName,
@@ -84,17 +94,13 @@ const TouristBusEntryPermission = () => {
     ) {
       toast.error("All fields are required!");
     } else {
-      dispatch(createTouristBusPermission(formData));
+      await create(formData);
     }
   };
 
   useEffect(() => {
-    dispatch(getAllTouristBusPermission({ page: 1, limit: 10 }));
-    if (error) {
-      toast.error(error);
-    }
-    if (message) {
-      toast.success(message);
+    if (isSuccess && data?.message) {
+      toast.success(data?.message);
       setFormData({
         applicantName: "",
         phone: "",
@@ -111,23 +117,19 @@ const TouristBusEntryPermission = () => {
         description: "",
       });
     }
-    if (message || error) {
-      dispatch(setMessageEmpty());
+    if (createError) {
+      toast.error(createError.message);
     }
-  }, [dispatch, error, message]);
-  useEffect(() => {
-    if (settings) {
-      setSetting(
-        settings.find(
-          (setting) => setting.name === "TOURIST-BUS-ENTRY-PERMISSION"
-        )
-      );
-    }
-  }, [settings]);
+  }, [data?.message, isSuccess, createError]);
 
   return (
     <div className="bg-white p-6 rounded-lg sm:shadow-lg max-w-3xl w-full mx-auto">
-      {setting?.status && (
+      {settingLoading && (
+        <div className="h-[70vh]">
+          <ComponentLoader />
+        </div>
+      )}
+      {settingData?.setting?.status && (
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label
@@ -376,7 +378,7 @@ const TouristBusEntryPermission = () => {
                   </li>
                   <li>৩) সড়কের পাশে পার্কিং করা যাবে না।</li>
                   <li>৪) যত্রতত্র আবর্জনা ফেলা যাবে না।</li>
-                  <li>৫) মেরিন ড্রাইভে বাস প্রবেশ করা যাবে না।</li>
+                  <li>৫) মেরিন ড্রাইভে বাস প্রবেশ করা যাবে না।</li>
                 </ul>
               </div>
             </div>
@@ -385,16 +387,16 @@ const TouristBusEntryPermission = () => {
           <button
             type="submit"
             className="w-full bg-primary-color text-white font-bold py-2 rounded disabled:bg-opacity-80"
-            disabled={loader}
+            disabled={isPending}
           >
-            {loader ? "Submitting..." : "Submit"}
+            {isPending ? "Submitting..." : "Submit"}
           </button>
         </form>
       )}
-      {!setting?.status && (
+      {!settingData?.setting?.status && (
         <div className="h-[50vh] flex items-center justify-center">
           <h2 className="text-xl font-semibold text-red text-center">
-            {setting?.description}
+            {settingData?.setting?.description}
           </h2>
         </div>
       )}

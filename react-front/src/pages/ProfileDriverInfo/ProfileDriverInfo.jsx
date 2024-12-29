@@ -1,26 +1,25 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
 import avatar from "../../assets/image/avatar.png";
-import {
-  driverInfoData,
-  setDriverInfoMessageEmpty,
-} from "../../features/driverInfo/driverInfoSlice";
-import {
-  createDriverInfo,
-  getDriverInfo,
-  updateDriverInfo,
-} from "../../features/driverInfo/driverInfoApiSlice";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
+import {
+  createDriverInfo,
+  getDriverInfo,
+  updateDriverInfo,
+} from "../../services/driverInof.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const ProfileDriverInfo = () => {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(100);
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
-  const dispatch = useDispatch();
-  const { driverInfo, totalCount, searchCount, loader, message, error } =
-    useSelector(driverInfoData);
 
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -33,17 +32,46 @@ const ProfileDriverInfo = () => {
     address: "",
     comment: "",
   });
+  const { data: driver, isLoading: getDriverLoading } = useQuery({
+    queryKey: ["driverInfo", { id: user.id, page, limit, search }],
+    queryFn: () => getDriverInfo({ id: user?.id, page, limit, search }),
+  });
+  const {
+    mutateAsync: createDriver,
+    data: createData,
+    isSuccess: createSuccess,
+    error: createError,
+    isPending: createLoading,
+  } = useMutation({
+    mutationFn: createDriverInfo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["driverInfo"] });
+    },
+  });
+  const {
+    mutateAsync: updateDriver,
+    data: updateData,
+    isSuccess: updateSuccess,
+    error: updateError,
+    isPending: updateLoading,
+  } = useMutation({
+    mutationFn: updateDriverInfo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["driverInfo"] });
+      setShowUpdateModal(false);
+    },
+  });
   const changeInputValue = (e) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
-  const handleSubmitInfo = (e) => {
+  const handleSubmitInfo = async (e) => {
     e.preventDefault();
     if (!input.name || !input.fatherName) {
       !input.name && toast.error("Name is required!");
       !input.fatherName && toast.error("Father Name is required!");
     } else {
-      dispatch(createDriverInfo({ id: user.id, data: input }));
+      await createDriver({ id: user.id, data: input });
     }
   };
 
@@ -54,56 +82,31 @@ const ProfileDriverInfo = () => {
     setInfoData({ ...infoData, [name]: value });
   };
   const handleOpenUpdateForm = (id) => {
-    const data = driverInfo.find((info) => info.id === id);
+    const data = driver?.driverInfo.find((info) => info.id === id);
     setId(data.id);
     setInfoData({
       ...data,
     });
     setShowUpdateModal(true);
   };
-  const handleUpdateInfo = (e) => {
+  const handleUpdateInfo = async (e) => {
     e.preventDefault();
     if (!infoData.name) {
       toast.error("Name is required");
     } else if (!infoData.fatherName) {
       toast.error("Father Name is required");
     } else {
-      dispatch(updateDriverInfo({ id, data: infoData }));
+      await updateDriver({ id, data: infoData });
     }
   };
 
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getDriverInfo({ id: user.id, page, limit: rowPage, search }));
-  };
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getDriverInfo({ id: user.id, page, limit: newPerPage, search }));
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getDriverInfo({
-        id: user.id,
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    ); // Fetch schedules with the search term
-  };
-
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const column = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (data, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -171,9 +174,13 @@ const ProfileDriverInfo = () => {
     },
   ];
   useEffect(() => {
-    dispatch(getDriverInfo({ id: user?.id, page: 1, limit: 100 }));
-    if (message) {
-      toast.success(message);
+    if (
+      createSuccess ||
+      updateSuccess ||
+      createData?.message ||
+      updateData?.message
+    ) {
+      toast.success(createData?.message || updateData?.message);
       setInput({
         name: "",
         fatherName: "",
@@ -182,15 +189,20 @@ const ProfileDriverInfo = () => {
         address: "",
         comment: "",
       });
+      setShowModal(false);
       setShowUpdateModal(false);
     }
-    if (error) {
-      toast.error(error);
+    if (createError || updateError) {
+      toast.error(createError?.message || updateError?.message);
     }
-    return () => {
-      dispatch(setDriverInfoMessageEmpty());
-    };
-  }, [message, error, dispatch, user?.id]);
+  }, [
+    createData?.message,
+    createError,
+    createSuccess,
+    updateData?.message,
+    updateError,
+    updateSuccess,
+  ]);
   return (
     <>
       <Toaster />
@@ -245,9 +257,9 @@ const ProfileDriverInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={loader}
+              disabled={createLoading}
             >
-              {loader ? "Adding..." : "Add"}
+              {createLoading ? "Adding..." : "Add Driver"}
             </button>
           </form>
         </Modal>
@@ -303,8 +315,9 @@ const ProfileDriverInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
+              disabled={updateLoading}
             >
-              {loader ? "Editing..." : "Edit"}
+              {updateLoading ? "Updating..." : "Edit"}
             </button>
           </form>
         </Modal>
@@ -317,7 +330,7 @@ const ProfileDriverInfo = () => {
               type="text"
               placeholder="Search"
               className="w-full sm:w-60"
-              onChange={handleSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <button
               onClick={() => setShowModal(true)}
@@ -329,17 +342,23 @@ const ProfileDriverInfo = () => {
         </div>
         <DataTable
           columns={column}
-          data={driverInfo
+          data={driver?.driverInfo
             ?.slice()
             .sort((a, b) => a.name.localeCompare(b.name))}
           responsive
-          // progressPending={todayLoader}
-          // progressComponent={<Loading />}
+          progressPending={getDriverLoading}
+          progressComponent={
+            <div className="w-full py-4">
+              <ComponentLoader />
+            </div>
+          }
           pagination
           paginationServer
-          paginationTotalRows={totalCount ? totalCount : searchCount}
-          onChangeRowsPerPage={handlePerRowsChange}
-          onChangePage={handlePageChange}
+          paginationTotalRows={
+            driver?.totalCount ? driver?.totalCount : driver?.searchCount
+          }
+          onChangeRowsPerPage={(rowsPerPage) => setLimit(rowsPerPage)}
+          onChangePage={(page) => setPage(page)}
           paginationRowsPerPageOptions={[100, 150, 200]}
           customStyles={{
             headCells: {

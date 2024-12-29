@@ -1,19 +1,18 @@
 import BusScheduleTable from "../../components/BusScheduleTable/BusScheduleTable";
 import RegularSchedule from "../../components/RegularSchedule/RegularSchedule";
 import WhereYouGoSec from "../../components/WhereYouGoSec/WhereYouGoSec";
-import { useSelector } from "react-redux";
-import { rgSchedulesData } from "../../features/regularBusSchedule/regularBusScheduleSlice";
 import VisitorCountSection from "../../components/VisitorCountSection";
+import useSchedules from "../../store/useSchedules";
 
 const Home = () => {
-  const { rgSchedules, loader } = useSelector(rgSchedulesData);
+  const { regularSchedules, regularScheduleLoader: loader } = useSchedules();
 
   return (
     <>
       <BusScheduleTable />
       <WhereYouGoSec />
       <RegularSchedule
-        data={rgSchedules
+        data={regularSchedules?.schedules
           ?.slice(0, 10)
           .sort((a, b) => new Date(a.time) - new Date(b.time))}
         loader={loader}

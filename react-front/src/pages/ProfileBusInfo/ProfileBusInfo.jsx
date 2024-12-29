@@ -1,27 +1,55 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  createBusInfo,
-  getBusInfo,
-  updateBusInfo,
-} from "../../features/busInfo/busInfoApiSlice";
+import { useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
-import { formatDateTime } from "../../utils/formatDateTime";
-import {
-  busInfoData,
-  setBusInfoMessageEmpty,
-} from "../../features/busInfo/busInfoSlice";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createBusRegNo,
+  getBusRegNo,
+  updateBusRegNo,
+} from "../../services/busRegNo.service";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const ProfileBusInfo = () => {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
-  const dispatch = useDispatch();
-  const { busInfo, totalCount, searchCount, loader, message, error } =
-    useSelector(busInfoData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const { data: busRegNo, isLoading: busRegNoLoading } = useQuery({
+    queryKey: ["busRegNo", { id: user.id, page, limit, search }],
+    queryFn: () => getBusRegNo({ id: user.id, page, limit, search }),
+  });
+  const {
+    mutateAsync: createRegNo,
+    data: createData,
+    isSuccess: createSuccess,
+    error: createError,
+    isPending: createLoading,
+  } = useMutation({
+    mutationFn: createBusRegNo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["busRegNo"] });
+    },
+  });
+  // Update bus info
+  const {
+    mutateAsync: updateBusReg,
+    data: updateData,
+    isSuccess: updateSuccess,
+    error: updateError,
+    isPending: updateLoading,
+  } = useMutation({
+    mutationFn: updateBusRegNo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["busRegNo"] });
+      setShowUpdateModal(false);
+    },
+  });
   const [input, setInput] = useState({
     paribahanName: user?.paribahanName,
     regNo: "",
@@ -32,12 +60,12 @@ const ProfileBusInfo = () => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
-  const handleSubmitInfo = (e) => {
+  const handleSubmitInfo = async (e) => {
     e.preventDefault();
     if (!input.regNo || !input.type) {
       toast.error("Fields are required!");
     } else {
-      dispatch(createBusInfo({ id: user.id, data: input }));
+      await createRegNo({ id: user.id, data: input });
     }
   };
 
@@ -48,54 +76,29 @@ const ProfileBusInfo = () => {
     setInfoData({ ...infoData, [name]: value });
   };
   const handleOpenUpdateForm = (id) => {
-    const data = busInfo.find((info) => info.id === id);
+    const data = busRegNo?.busInfo.find((info) => info.id === id);
     setId(data.id);
     setInfoData({
       ...data,
     });
     setShowUpdateModal(true);
   };
-  const handleUpdateInfo = (e) => {
+  const handleUpdateInfo = async (e) => {
     e.preventDefault();
     if (!infoData.regNo || !infoData.type) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateBusInfo({ id, data: infoData }));
+      await updateBusReg({ id, data: infoData });
     }
   };
 
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getBusInfo({ id: user.id, page, limit: rowPage, search }));
-  };
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getBusInfo({ id: user.id, page, limit: newPerPage, search }));
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getBusInfo({
-        id: user.id,
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    ); // Fetch schedules with the search term
-  };
-
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const column = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (data, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -160,23 +163,32 @@ const ProfileBusInfo = () => {
   ];
 
   useEffect(() => {
-    dispatch(getBusInfo({ id: user?.id, page: 1, limit: 100 }));
-    if (message) {
-      toast.success(message);
+    if (
+      createSuccess ||
+      createData?.message ||
+      updateData?.message ||
+      updateSuccess
+    ) {
+      toast.success(createData?.message || updateData?.message);
       setInput({
         regNo: "",
         type: "",
         comment: "",
       });
+      setShowModal(false);
       setShowUpdateModal(false);
     }
-    if (error) {
-      toast.error(error);
+    if (createError || updateError) {
+      toast.error(createError.message || updateError.message);
     }
-    return () => {
-      dispatch(setBusInfoMessageEmpty());
-    };
-  }, [dispatch, message, loader, error, user?.id]);
+  }, [
+    createData?.message,
+    createError,
+    createSuccess,
+    updateData?.message,
+    updateError,
+    updateSuccess,
+  ]);
   return (
     <>
       {showModal && (
@@ -216,9 +228,9 @@ const ProfileBusInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded disabled:cursor-not-allowed disabled:opacity-80"
-              disabled={loader}
+              disabled={createLoading}
             >
-              {loader ? "Adding..." : "Add"}
+              {createLoading ? "Adding..." : "Add"}
             </button>
           </form>
         </Modal>
@@ -258,9 +270,9 @@ const ProfileBusInfo = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={loader}
+              disabled={updateLoading}
             >
-              {loader ? "Editing..." : "Edit"}
+              {updateLoading ? "Updating..." : "Update"}
             </button>
           </form>
         </Modal>
@@ -273,7 +285,7 @@ const ProfileBusInfo = () => {
               type="text"
               placeholder="Search"
               className="w-full sm:w-60"
-              onChange={handleSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <button
               onClick={() => setShowModal(true)}
@@ -285,17 +297,23 @@ const ProfileBusInfo = () => {
         </div>
         <DataTable
           columns={column}
-          data={busInfo
+          data={busRegNo?.busInfo
             ?.slice() // Create a shallow copy of the array
             .sort((a, b) => a.regNo.localeCompare(b.regNo))}
           responsive
-          // progressPending={todayLoader}
-          // progressComponent={<Loading />}
+          progressPending={busRegNoLoading}
+          progressComponent={
+            <div className="w-full py-4">
+              <ComponentLoader />
+            </div>
+          }
           pagination
           paginationServer
-          paginationTotalRows={totalCount ? totalCount : searchCount}
-          onChangeRowsPerPage={handlePerRowsChange}
-          onChangePage={handlePageChange}
+          paginationTotalRows={
+            busRegNo?.totalCount ? busRegNo?.totalCount : busRegNo?.searchCount
+          }
+          onChangeRowsPerPage={(perRow) => setLimit(perRow)}
+          onChangePage={(page) => setPage(page)}
           paginationRowsPerPageOptions={[100, 150, 200]}
           customStyles={{
             headCells: {

@@ -1,79 +1,39 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
-import { useEffect } from "react";
 import Modal from "../../components/Modal/Modal";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
-import { formatDateTime } from "../../utils/formatDateTime";
-import Skeleton from "react-loading-skeleton";
-import PageLoader from "../../components/Loader/PageLoader";
-import {
-  rgSchedulesData,
-  setRgScheduleMessageEmpty,
-} from "../../features/regularBusSchedule/regularBusScheduleSlice";
-import { getSchedulesByParibahanId } from "../../features/regularBusSchedule/regularBusScheduleApiSlice";
+import { useQuery } from "@tanstack/react-query";
+import { getRgSchedulesByParibahanId } from "../../services/schedules.service";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const ProfileRegSchedule = () => {
-  const dispatch = useDispatch();
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
-  const {
-    authParibahanRgSchedules,
-    totalAuthParCount,
-    searchAuthParCount,
-    loader,
-    message,
-    error,
-  } = useSelector(rgSchedulesData);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["userRegularSchedules", { id: user.id, page, limit, search }],
+    queryFn: () =>
+      getRgSchedulesByParibahanId({ id: user.id, page, limit, search }),
+  });
 
   const handleHideShowRgSchedule = () => {
     // dispatch(setRgScheduleMessageEmpty());
   };
 
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(
-      getSchedulesByParibahanId({ id: user.id, page, limit: rowPage, search })
-    );
-  };
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(
-      getSchedulesByParibahanId({
-        id: user.id,
-        page,
-        limit: newPerPage,
-        search,
-      })
-    );
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getSchedulesByParibahanId({
-        id: user.id,
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    ); // Fetch schedules with the search term
-  };
-
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const column = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (data, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -125,23 +85,6 @@ const ProfileRegSchedule = () => {
       right: true,
     },
   ];
-
-  useEffect(() => {
-    if (user) {
-      dispatch(getSchedulesByParibahanId({ id: user.id, page: 1, limit: 100 }));
-    }
-    if (message) {
-      toast.success(message);
-
-      setShowUpdateModal(false);
-    }
-    if (error) {
-      toast.error(error);
-    }
-    if (message || error) {
-      dispatch(setRgScheduleMessageEmpty());
-    }
-  }, [dispatch, message, error, user]);
   return (
     <>
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
@@ -156,7 +99,7 @@ const ProfileRegSchedule = () => {
                 type="text"
                 placeholder="Search"
                 className="w-full sm:w-60"
-                onChange={handleSearchChange}
+                onChange={(e) => setSearch(e.target.value)}
               />
               <button
                 onClick={() => setShowModal(true)}
@@ -168,21 +111,19 @@ const ProfileRegSchedule = () => {
           </div>
           <DataTable
             columns={column}
-            data={authParibahanRgSchedules}
+            data={data?.schedules}
             responsive
-            // progressPending={loader}
-            // progressComponent={
-            //   <div className="w-full">
-            //     <Skeleton height={200} />
-            //   </div>
-            // }
+            progressPending={isLoading}
+            progressComponent={
+              <div className="w-full py-4">
+                <ComponentLoader />
+              </div>
+            }
             pagination
             paginationServer
-            paginationTotalRows={
-              totalAuthParCount ? totalAuthParCount : searchAuthParCount
-            }
-            onChangeRowsPerPage={handlePerRowsChange}
-            onChangePage={handlePageChange}
+            paginationTotalRows={data?.count}
+            onChangeRowsPerPage={(perPage) => setLimit(perPage)}
+            onChangePage={(page) => setPage(page)}
             paginationRowsPerPageOptions={[100, 150, 200]}
             customStyles={{
               headCells: {

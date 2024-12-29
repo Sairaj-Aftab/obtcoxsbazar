@@ -5,17 +5,18 @@ import { Link, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import TodayDate from "../TodayDate";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
+import useSchedules from "../../store/useSchedules";
 
 const BusScheduleTable = () => {
   const navigate = useNavigate();
-  const { todaySchedules, todayScheduleLoader, destinationPlaces } =
-    useSelector(schedulesData);
+  const { destinationPlaces } = useSelector(schedulesData);
+  const { todaySchedules, todayScheduleLoader } = useSchedules();
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
   const fiveDaysLater = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
   // Filter schedules within the next hour
-  const filteredSchedules = todaySchedules?.filter((data) => {
+  const filteredSchedules = todaySchedules?.schedules?.filter((data) => {
     const scheduleTime = new Date(data.time);
     return scheduleTime >= fifteenMinutesAgo && scheduleTime <= fiveDaysLater;
   });

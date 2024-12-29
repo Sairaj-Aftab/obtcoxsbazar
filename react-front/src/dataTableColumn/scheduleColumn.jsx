@@ -1,6 +1,7 @@
 import { formatDateTime } from "../utils/formatDateTime";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../assets/icon/location.png";
+import arrowRightIcon from "../assets/icon/arrow-right.png";
 
 const scheduleColumn = ({ navigate, destinationPlaces }) => {
   return [
@@ -92,9 +93,9 @@ const scheduleColumn = ({ navigate, destinationPlaces }) => {
             onClick={() =>
               navigate(`/${matchingPlace.slug}/${matchingPlace.id}`)
             }
-            className="cursor-pointer flex gap-1 items-center text-red"
+            className="cursor-pointer flex gap-1 items-center text-primary-color"
           >
-            <span>&#10132;</span>
+            <img src={arrowRightIcon} alt="" className="w-5" />
             <span>{data.destinationPlace}</span>
           </div>
         ) : null;

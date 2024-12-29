@@ -23,6 +23,16 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
       description,
     } = req.body;
 
+    const existPending = await prisma.touristBusEntryPermission.findFirst({
+      where: {
+        vehicleRegNo,
+        pending: true,
+      },
+    });
+    if (existPending) {
+      return next(createError(400, "Already exist! Please wait for response."));
+    }
+
     // Get the last entry and increment the serial number
     const lastEntry = await prisma.touristBusEntryPermission.findFirst({
       orderBy: {

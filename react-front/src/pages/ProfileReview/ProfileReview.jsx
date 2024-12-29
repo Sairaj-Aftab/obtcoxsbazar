@@ -1,54 +1,30 @@
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { formatDateTime } from "../../utils/formatDateTime";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
-import {
-  authReviewsData,
-  setMessageEmpty,
-} from "../../features/authReview/authReviewSlice";
-import { getAuthReviews } from "../../features/authReview/authReviewApiSlice";
+import { useQuery } from "@tanstack/react-query";
+import { getAuthReviews } from "../../services/authReview.service";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const ProfileReview = () => {
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
-  const dispatch = useDispatch();
-  const { authReviews, totalCount, searchCount, error } =
-    useSelector(authReviewsData);
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getAuthReviews({ id: user.id, page, limit: rowPage, search }));
-  };
+  const [limit, setLimit] = useState(10);
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
+  const { data: reviews, isLoading: reviewsLoading } = useQuery({
+    queryKey: ["authReviews", { id: user.id, page, limit, search }],
+    queryFn: () => getAuthReviews({ id: user.id, page, limit, search }),
+  });
 
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getAuthReviews({ id: user.id, page, limit: newPerPage, search }));
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getAuthReviews({
-        id: user.id,
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    ); // Fetch schedules with the search term
-  };
-
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const column = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (data, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -106,16 +82,6 @@ const ProfileReview = () => {
     },
   ];
 
-  useEffect(() => {
-    dispatch(getAuthReviews({ id: user?.id, page: 1, limit: 100 }));
-
-    if (error) {
-      toast.error(error);
-    }
-    return () => {
-      dispatch(setMessageEmpty());
-    };
-  }, [dispatch, error, user?.id]);
   return (
     <>
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
@@ -126,21 +92,25 @@ const ProfileReview = () => {
               type="text"
               placeholder="Search"
               className="w-full sm:w-60"
-              onChange={handleSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
         <DataTable
           columns={column}
-          data={authReviews}
+          data={reviews?.reviews || []}
           responsive
-          // progressPending={todayLoader}
-          // progressComponent={<Loading />}
+          progressPending={reviewsLoading}
+          progressComponent={
+            <div className="w-full p-4">
+              <ComponentLoader />
+            </div>
+          }
           pagination
           paginationServer
-          paginationTotalRows={totalCount ? totalCount : searchCount}
-          onChangeRowsPerPage={handlePerRowsChange}
-          onChangePage={handlePageChange}
+          paginationTotalRows={reviews?.count}
+          onChangeRowsPerPage={(perRow) => setLimit(perRow)}
+          onChangePage={(page) => setPage(page)}
           paginationRowsPerPageOptions={[100, 150, 200]}
           customStyles={{
             headCells: {

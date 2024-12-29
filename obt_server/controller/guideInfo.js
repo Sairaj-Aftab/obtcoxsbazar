@@ -155,12 +155,11 @@ export const getAllGuideInfo = async (req, res, next) => {
       },
     });
 
-    const totalCount = await prisma.guideInfo.count();
-    const searchCount = await prisma.guideInfo.count({
+    const count = await prisma.guideInfo.count({
       where,
     });
 
-    return res.status(200).json({ guideInfo, totalCount, searchCount });
+    return res.status(200).json({ guideInfo, count });
   } catch (error) {
     return next(error);
   }

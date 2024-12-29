@@ -5,7 +5,11 @@ import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSli
 
 const Login = () => {
   const { loader } = useSelector(paribahanAuthData);
-  return <div>{loader ? <PageLoader /> : <LoginForm />}</div>;
+  return (
+    <div className="bg-gradient-to-br to-primary-color/70 via-transparent from-yellow/70">
+      {loader ? <PageLoader /> : <LoginForm />}
+    </div>
+  );
 };
 
 export default Login;

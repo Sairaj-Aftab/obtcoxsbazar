@@ -4,46 +4,107 @@ import { useDispatch, useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
 import locationIcon from "../../assets/icon/location.png";
-import {
-  schedulesData,
-  setMessageEmpty,
-} from "../../features/schedules/schedulesSlice";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { schedulesData } from "../../features/schedules/schedulesSlice";
+import { useEffect } from "react";
+import Modal from "../../components/Modal/Modal";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
+import { formatDateTime } from "../../utils/formatDateTime";
 import {
   createSchedule,
   deleteSchedule,
   getSchedulesDataByAuthId,
   updateSchedule,
-} from "../../features/schedules/schedulesApiSlice";
-import { useEffect } from "react";
-import Modal from "../../components/Modal/Modal";
-import { getGuideInfo } from "../../features/guideInfo/guideInfoApiSlice";
-import { getBusInfo } from "../../features/busInfo/busInfoApiSlice";
-import { guideInfoData } from "../../features/guideInfo/guideInfoSlice";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
-import { busInfoData } from "../../features/busInfo/busInfoSlice";
-import { formatDateTime } from "../../utils/formatDateTime";
-import Skeleton from "react-loading-skeleton";
-import PageLoader from "../../components/Loader/PageLoader";
+} from "../../services/schedules.service";
+import { getBusRegNo } from "../../services/busRegNo.service";
+import { getGuideInfo } from "../../services/guideInfo.service";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
+import { getDriverInfo } from "../../services/driverInof.service";
 
 const BusProfile = () => {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
-  // const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const { paribahanAuth: user, loader } = useSelector(paribahanAuthData);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(100);
+  const { paribahanAuth: user } = useSelector(paribahanAuthData);
+  const { data: schedules, isLoading: schedulesLoading } = useQuery({
+    queryKey: ["authSchedules", { id: user.id, page, limit, search }],
+    queryFn: () =>
+      getSchedulesDataByAuthId({ id: user.id, page, limit, search }),
+  });
+
+  const { data: busRegNo } = useQuery({
+    queryKey: ["busRegNo", { id: user.id, page, limit }],
+    queryFn: () => getBusRegNo({ id: user.id, page: 1, limit: 200 }),
+  });
+  const { data: guide } = useQuery({
+    queryKey: ["guide", { id: user.id, page, limit }],
+    queryFn: () => getGuideInfo({ id: user.id, page: 1, limit: 200 }),
+  });
+  const { data: driver } = useQuery({
+    queryKey: ["driverInfo", { id: user.id, page: 1, limit: 200 }],
+    queryFn: () => getDriverInfo({ id: user.id, page: 1, limit: 200 }),
+  });
 
   const {
-    authSchedules: schedules,
+    mutateAsync: create,
+    data: createData,
+    isSuccess: createSuccess,
+    error: createError,
+    isPending: createLoading,
+  } = useMutation({
+    mutationFn: createSchedule,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["authSchedules"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["schedules"],
+      });
+    },
+  });
+  const {
+    mutateAsync: updateData,
+    data: updatedData,
+    isSuccess: updateSuccess,
+    isPending: updateLoading,
+    error: updateError,
+  } = useMutation({
+    mutationFn: updateSchedule,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["authSchedules"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["schedules"],
+      });
+      setShowUpdateModal(false);
+    },
+  });
+
+  const { mutateAsync: deleteData } = useMutation({
+    mutationFn: deleteSchedule,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["authSchedules"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["schedules"],
+      });
+    },
+  });
+
+  const {
     authSchedulesCount,
     authSearchCount,
     leavingPlaces,
     destinationPlaces,
-    authScheduleLoader,
     message,
     error,
   } = useSelector(schedulesData);
-  const { busInfo } = useSelector(busInfoData);
-  const { guideInfo } = useSelector(guideInfoData);
   const [input, setInput] = useState({
     busName: user?.paribahanName,
     time: "",
@@ -55,6 +116,8 @@ const BusProfile = () => {
     destinationMapLink: "",
     guideName: "",
     guidePhone: "",
+    driverName: "",
+    driverPhone: "",
     rent: "",
     discountRent: "",
     seatStatus: null,
@@ -64,7 +127,9 @@ const BusProfile = () => {
     const { name, value } = e.target;
 
     if (name === "guideName") {
-      const selectedGuide = guideInfo.find((guide) => guide.name === value);
+      const selectedGuide = guide?.guideInfo.find(
+        (guide) => guide.name === value
+      );
       if (selectedGuide) {
         setInput({
           ...input,
@@ -73,6 +138,19 @@ const BusProfile = () => {
         });
       } else {
         setInput({ ...input, guideName: value, guidePhone: "" });
+      }
+    } else if (name === "driverName") {
+      const selectedDriver = driver?.driverInfo.find(
+        (driver) => driver.name === value
+      );
+      if (selectedDriver) {
+        setInput({
+          ...input,
+          driverName: selectedDriver.name,
+          driverPhone: selectedDriver.phone,
+        });
+      } else {
+        setInput({ ...input, driverName: value, driverPhone: "" });
       }
     } else if (name === "leavingPlace") {
       const selectedPlace = leavingPlaces.find(
@@ -88,7 +166,7 @@ const BusProfile = () => {
     }
   };
 
-  const handleSubmitSchedule = (e) => {
+  const handleSubmitSchedule = async (e) => {
     e.preventDefault();
     if (
       !input.busName ||
@@ -104,7 +182,7 @@ const BusProfile = () => {
     ) {
       toast.error("All fields are required");
     } else {
-      dispatch(createSchedule({ id: user.id, data: input }));
+      await create({ id: user.id, data: input });
     }
   };
 
@@ -128,7 +206,7 @@ const BusProfile = () => {
   };
 
   const handleOpenUpdateForm = (id) => {
-    const data = schedules.find((schedule) => schedule.id === id);
+    const data = schedules?.schedules?.find((schedule) => schedule.id === id);
     setId(data.id);
     setUpdateInput({
       ...data,
@@ -136,7 +214,7 @@ const BusProfile = () => {
     setShowUpdateModal(true);
   };
 
-  const handleUpdateSchedule = (e) => {
+  const handleUpdateSchedule = async (e) => {
     e.preventDefault();
     if (
       !updateInput.time ||
@@ -150,50 +228,21 @@ const BusProfile = () => {
     ) {
       toast.error("All fields are required");
     } else {
-      dispatch(updateSchedule({ id, data: updateInput }));
+      await updateData({ id, data: updateInput });
     }
   };
 
-  const handleDeleteSchedule = (id) => {
-    dispatch(deleteSchedule(id));
+  const handleDeleteSchedule = async (id) => {
+    await deleteData(id);
   };
 
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(
-      getSchedulesDataByAuthId({ id: user.id, page, limit: rowPage, search })
-    );
-  };
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(
-      getSchedulesDataByAuthId({ id: user.id, page, limit: newPerPage, search })
-    );
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(
-      getSchedulesDataByAuthId({
-        id: user.id,
-        page,
-        limit: rowPage,
-        search: e.target.value,
-      })
-    ); // Fetch schedules with the search term
-  };
-
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const column = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (data, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -219,6 +268,17 @@ const BusProfile = () => {
     {
       name: "Guide Phone",
       selector: (data) => data.guidePhone,
+      width: "125px",
+      sortable: true,
+    },
+    {
+      name: "Driver Name",
+      selector: (data) => data.driverName,
+      sortable: true,
+    },
+    {
+      name: "Driver Phone",
+      selector: (data) => data.driverPhone,
       width: "125px",
       sortable: true,
     },
@@ -290,13 +350,8 @@ const BusProfile = () => {
   ];
 
   useEffect(() => {
-    if (user) {
-      dispatch(getSchedulesDataByAuthId({ id: user.id, page: 1, limit: 100 }));
-      dispatch(getBusInfo({ id: user.id, page: 1, limit: 100 }));
-      dispatch(getGuideInfo({ id: user.id, page: 1, limit: 100 }));
-    }
-    if (message) {
-      toast.success(message);
+    if (createSuccess && createData?.message) {
+      toast.success(createData?.message);
       setInput({
         busName: user?.paribahanName,
         time: "",
@@ -308,23 +363,35 @@ const BusProfile = () => {
         destinationMapLink: "",
         guideName: "",
         guidePhone: "",
+        driverName: "",
+        driverPhone: "",
         rent: "",
         discountRent: "",
         seatStatus: "",
       });
       setShowUpdateModal(false);
     }
-    if (error) {
-      toast.error(error);
+    if (updateSuccess && updatedData?.message) {
+      toast.success(updatedData?.message);
     }
-    if (message || error) {
-      dispatch(setMessageEmpty());
+    if (createError || updateError) {
+      toast.error(createError?.message || updateError?.message);
     }
-  }, [dispatch, message, error, user]);
+  }, [
+    dispatch,
+    message,
+    error,
+    user,
+    createData?.message,
+    createError,
+    createSuccess,
+    updatedData?.message,
+    updateSuccess,
+    updateError,
+  ]);
 
   return (
     <>
-      {loader && <PageLoader />}
       {showModal && (
         <Modal title="Add Schedule" close={() => setShowModal(false)}>
           <form
@@ -345,7 +412,7 @@ const BusProfile = () => {
               onChange={changeInputValue}
             >
               <option value="">Reg No.</option>
-              {busInfo?.map((data, index) => (
+              {busRegNo?.busInfo?.map((data, index) => (
                 <option key={index} value={data.regNo}>
                   {data.regNo}
                 </option>
@@ -358,7 +425,7 @@ const BusProfile = () => {
               onChange={changeInputValue}
             >
               <option value="">Guide Name</option>
-              {guideInfo?.map((data, index) => (
+              {guide?.guideInfo?.map((data, index) => (
                 <option key={index} value={data.name}>
                   {data.name}
                 </option>
@@ -371,7 +438,33 @@ const BusProfile = () => {
               disabled
             >
               <option value="">Guide Phone</option>
-              {guideInfo?.map((data, index) => (
+              {guide?.guideInfo?.map((data, index) => (
+                <option key={index} value={data.phone}>
+                  {data.phone}
+                </option>
+              ))}
+            </select>
+            <select
+              name="driverName"
+              id="driverName"
+              value={input.driverName}
+              onChange={changeInputValue}
+            >
+              <option value="">Driver Name</option>
+              {driver?.driverInfo?.map((data, index) => (
+                <option key={index} value={data.name}>
+                  {data.name}
+                </option>
+              ))}
+            </select>
+            <select
+              name="driverPhone"
+              id="driverPhone"
+              value={input.driverPhone}
+              disabled
+            >
+              <option value="">Driver Phone</option>
+              {driver?.driverInfo?.map((data, index) => (
                 <option key={index} value={data.phone}>
                   {data.phone}
                 </option>
@@ -507,9 +600,9 @@ const BusProfile = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={authScheduleLoader}
+              disabled={createLoading}
             >
-              {authScheduleLoader ? "Adding" : "Submit"}
+              {createLoading ? "Loading..." : "Submit"}
             </button>
           </form>
         </Modal>
@@ -582,6 +675,29 @@ const BusProfile = () => {
                   value={updateInput.guidePhone}
                   onChange={changeUpdateInputValue}
                   placeholder="Guide Phone"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-between items-center">
+              <div className="w-1/2">
+                <label htmlFor="driverName">Driver Name</label>
+                <input
+                  type="text"
+                  name="driverName"
+                  value={updateInput.driverName}
+                  onChange={changeUpdateInputValue}
+                  placeholder="Driver Name"
+                />
+              </div>
+              <div className="w-1/2">
+                <label htmlFor="driverPhone">Driver Phone</label>
+                <input
+                  type="text"
+                  name="driverPhone"
+                  value={updateInput.driverPhone}
+                  onChange={changeUpdateInputValue}
+                  placeholder="Driver Phone"
                 />
               </div>
             </div>
@@ -684,8 +800,9 @@ const BusProfile = () => {
             <button
               type="submit"
               className="bg-primary-color py-1 text-base font-medium text-white rounded"
+              disabled={updateLoading}
             >
-              Edit
+              {updateLoading ? "Updating..." : "Update"}
             </button>
           </form>
         </Modal>
@@ -702,7 +819,7 @@ const BusProfile = () => {
                 type="text"
                 placeholder="Search"
                 className="w-full sm:w-60"
-                onChange={handleSearchChange}
+                onChange={(e) => setSearch(e.target.value)}
               />
               <button
                 onClick={() => setShowModal(true)}
@@ -714,12 +831,12 @@ const BusProfile = () => {
           </div>
           <DataTable
             columns={column}
-            data={schedules}
+            data={schedules?.schedules}
             responsive
-            progressPending={authScheduleLoader}
+            progressPending={schedulesLoading}
             progressComponent={
-              <div className="w-full">
-                <Skeleton height={200} />
+              <div className="w-full py-4">
+                <ComponentLoader />
               </div>
             }
             pagination
@@ -727,8 +844,8 @@ const BusProfile = () => {
             paginationTotalRows={
               authSchedulesCount ? authSchedulesCount : authSearchCount
             }
-            onChangeRowsPerPage={handlePerRowsChange}
-            onChangePage={handlePageChange}
+            onChangeRowsPerPage={(rowsPerPage) => setLimit(rowsPerPage)}
+            onChangePage={(page) => setPage(page)}
             paginationRowsPerPageOptions={[100, 150, 200]}
             customStyles={{
               headCells: {

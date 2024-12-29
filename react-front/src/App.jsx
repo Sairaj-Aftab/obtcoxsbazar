@@ -10,9 +10,7 @@ import {
   getDestinationPlace,
   getLeavingPlace,
   getParkingPlace,
-  getTodaysSchedules,
 } from "./features/schedules/schedulesApiSlice";
-import { getAllBusServices } from "./features/bus/busApiSlice";
 import {
   getAllParibahanNotice,
   getNoticeFromAdmin,
@@ -23,15 +21,55 @@ import {
   updateScheduleSocket,
 } from "./features/schedules/schedulesSlice";
 import { getLogedInUser } from "./features/paribahanAuth/paribahanAuthApiSlice";
-import { getAllRgSchedules } from "./features/regularBusSchedule/regularBusScheduleApiSlice";
 import GoogleAnalytics from "./components/GoogleAnalytics";
 import {
   getVisitorStats,
   updateVisitorCount,
 } from "./features/visitorCount/visitorCountApiSlice";
-import { getAllSettings } from "./features/settings/settingsApiSlice";
+import { useQuery } from "@tanstack/react-query";
+import { getAllBus } from "./services/bus.service";
+import {
+  getAllRgSchedules,
+  getTodaysSchedules,
+} from "./services/schedules.service";
+import useBusServices from "./store/useBusServices";
+import useSchedules from "./store/useSchedules";
 function App() {
   const dispatch = useDispatch();
+  const { setBusData } = useBusServices();
+  const { setTodaySchedules, setRegularSchedules } = useSchedules();
+  const {
+    data: bus,
+    isLoading: busLoading,
+    error: busError,
+  } = useQuery({
+    queryKey: ["busServices"],
+    queryFn: getAllBus,
+  });
+
+  const { data: todaysSchedules, isLoading: todaySchedulesLoading } = useQuery({
+    queryKey: ["schedules"],
+    queryFn: () => getTodaysSchedules(),
+  });
+
+  const { data: rgSchedules, isLoading: rgSchedulesLoading } = useQuery({
+    queryKey: ["regularSchedules"],
+    queryFn: () => getAllRgSchedules(),
+  });
+
+  // Update Zustand state based on query results
+  useEffect(() => {
+    setBusData({ data: bus, loader: busLoading, error: busError });
+  }, [bus, busLoading, busError, setBusData]);
+
+  useEffect(() => {
+    setTodaySchedules({ data: todaysSchedules, loader: todaySchedulesLoading });
+  }, [todaysSchedules, todaySchedulesLoading, setTodaySchedules]);
+  // Regular Schedule
+  useEffect(() => {
+    setRegularSchedules({ data: rgSchedules, loader: rgSchedulesLoading });
+  }, [rgSchedules, rgSchedulesLoading, setRegularSchedules]);
+
   useEffect(() => {
     dispatch(getVisitorStats());
   }, [dispatch]);
@@ -44,13 +82,9 @@ function App() {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
     }
-    dispatch(getAllSettings());
-    dispatch(getTodaysSchedules({ page: 1, limit: 1000 }));
-    dispatch(getAllRgSchedules({ page: 1, limit: 1000 }));
     dispatch(getLeavingPlace());
     dispatch(getDestinationPlace());
     dispatch(getParkingPlace());
-    dispatch(getAllBusServices());
     dispatch(getNoticeFromAdmin());
     dispatch(getAllParibahanNotice());
     // Listen for updates

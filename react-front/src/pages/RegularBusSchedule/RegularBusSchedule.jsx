@@ -1,12 +1,11 @@
-import { rgSchedulesData } from "../../features/regularBusSchedule/regularBusScheduleSlice";
-import { useSelector } from "react-redux";
 import RegularSchedule from "../../components/RegularSchedule/RegularSchedule";
+import useSchedules from "../../store/useSchedules";
 
 const RegularBusSchedule = () => {
-  const { rgSchedules, loader } = useSelector(rgSchedulesData);
+  const { regularSchedules, regularSchedulesLoader: loader } = useSchedules();
   return (
     <RegularSchedule
-      data={rgSchedules
+      data={regularSchedules?.schedules
         ?.slice()
         .sort((a, b) => new Date(a.time) - new Date(b.time))}
       loader={loader}

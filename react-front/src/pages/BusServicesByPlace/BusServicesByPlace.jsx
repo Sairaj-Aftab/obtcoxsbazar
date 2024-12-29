@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { LiaBusSolid } from "react-icons/lia";
 import { useSelector } from "react-redux";
-import { busData } from "../../features/bus/busSlice";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 import { Link, useParams } from "react-router-dom";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
 import bdTicketLogo from "../../assets/image/bdtickets.png";
+import useBusServices from "../../store/useBusServices";
+import ComponentLoader from "../../components/Loader/ComponentLoader";
 
 const BusServicesByPlace = () => {
   const params = useParams();
-  const { bus } = useSelector(busData);
+  // const { bus } = useSelector(busData);
+  const { busData, loader } = useBusServices();
   const { destinationPlaces } = useSelector(schedulesData);
 
   const [busByPlace, setBusByPlace] = useState([]);
@@ -17,7 +19,7 @@ const BusServicesByPlace = () => {
 
   useEffect(() => {
     const getBusesByDestinationId = (destinationId) => {
-      return bus?.filter((bus) =>
+      return busData?.paribahanUsers?.filter((bus) =>
         bus.destination.some((dest) => dest.id === destinationId)
       );
     };
@@ -30,7 +32,7 @@ const BusServicesByPlace = () => {
 
     setBusByPlace(buses);
     setCurrentDestination(destination);
-  }, [bus, destinationPlaces, params.id]);
+  }, [busData, destinationPlaces, params.id]);
 
   return (
     <div className="container mx-auto bg-white rounded-lg my-5">
@@ -48,25 +50,33 @@ const BusServicesByPlace = () => {
       <p className="text-base font-medium text-black mb-3">
         <NoticeFromAdmin status="Passenger" />
       </p>
-      {busByPlace.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-5">
-          {busByPlace?.map((data, index) => (
-            <Link
-              to={`/all-bus-services/${data.slug}/${data.id}`}
-              className="p-2 rounded shadow flex flex-col gap-1 items-center justify-center hover:shadow-lg"
-              key={index}
-            >
-              <LiaBusSolid className="text-5xl" />
-              <p className="text-lg font-semibold text-primary-color text-center">
-                {data.paribahanName}
-              </p>
-            </Link>
-          ))}
+      {loader ? (
+        <div className="h-[60vh]">
+          <ComponentLoader />
         </div>
       ) : (
-        <p className="text-center text-red font-medium">
-          No bus found for {params?.place?.toUpperCase()}
-        </p>
+        <>
+          {busByPlace?.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 p-5">
+              {busByPlace?.map((data, index) => (
+                <Link
+                  to={`/all-bus-services/${data.slug}/${data.id}`}
+                  className="p-2 rounded shadow flex flex-col gap-1 items-center justify-center hover:shadow-lg"
+                  key={index}
+                >
+                  <LiaBusSolid className="text-5xl" />
+                  <p className="text-lg font-semibold text-primary-color text-center">
+                    {data.paribahanName}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-red font-medium">
+              No bus found for {params?.place?.toUpperCase()}
+            </p>
+          )}
+        </>
       )}
       <div className="flex justify-center items-center pt-5 pb-10">
         {currentDestination?.bdTicketLink && (

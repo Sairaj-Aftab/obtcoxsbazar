@@ -14,6 +14,8 @@ export const createSchedule = async (req, res, next) => {
       busNo,
       guideName,
       guidePhone,
+      driverName,
+      driverPhone,
       leavingPlace,
       leavingMapLink,
       destinationPlace,
@@ -43,6 +45,8 @@ export const createSchedule = async (req, res, next) => {
         busNo,
         guideName,
         guidePhone,
+        driverName,
+        driverPhone,
         leavingPlace,
         leavingMapLink,
         destinationPlace,
@@ -79,6 +83,8 @@ export const updateSchedule = async (req, res, next) => {
       busNo,
       guideName,
       guidePhone,
+      driverName,
+      driverPhone,
       leavingPlace,
       leavingMapLink,
       destinationPlace,
@@ -98,6 +104,8 @@ export const updateSchedule = async (req, res, next) => {
         busNo,
         guideName,
         guidePhone,
+        driverName,
+        driverPhone,
         leavingPlace,
         leavingMapLink,
         destinationPlace,
@@ -177,9 +185,6 @@ export const getAllSchedules = async (req, res, next) => {
 
 export const getTodaysSchedules = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
-    const offset = (page - 1) * limit;
     const searchQuery = req.query.search;
 
     // Calculate the start and end of today
@@ -226,8 +231,6 @@ export const getTodaysSchedules = async (req, res, next) => {
       : {};
 
     const schedules = await prisma.busSchedule.findMany({
-      skip: offset,
-      take: limit,
       where: {
         AND: [baseFilter, searchFilter],
       },
@@ -249,10 +252,6 @@ export const getTodaysSchedules = async (req, res, next) => {
         AND: [baseFilter, searchFilter],
       },
     });
-
-    if (schedules.length < 1) {
-      return next(createError(400, "No Schedule!"));
-    }
 
     return res.status(200).json({ schedules, count, searchCount });
   } catch (error) {

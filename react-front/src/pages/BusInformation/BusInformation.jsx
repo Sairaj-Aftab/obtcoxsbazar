@@ -4,29 +4,30 @@ import { FaStar } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
+import arrowRighIcon from "../../assets/icon/arrow-right.png";
 import { useNavigate, useParams } from "react-router-dom";
-import { busData } from "../../features/bus/busSlice";
 import { noticeData } from "../../features/notice/noticeSlice";
-import { getBusInfoData } from "../../features/bus/busApiSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 import DataTable from "react-data-table-component";
 import Skeleton from "react-loading-skeleton";
 import TodayDate from "../../components/TodayDate";
-import {
-  getParibahanRgSchedules,
-  rgSchedulesData,
-} from "../../features/regularBusSchedule/regularBusScheduleSlice";
 import { schedulesData } from "../../features/schedules/schedulesSlice";
+import { useQuery } from "@tanstack/react-query";
+import { getSingleBusData } from "../../services/bus.service";
+import useSchedules from "../../store/useSchedules";
 
 const BusInformation = () => {
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { busInfo, busInfoLoader } = useSelector(busData);
-  const { paribahanRgSchedules, loader } = useSelector(rgSchedulesData);
+  const { regularSchedules, regularScheduleLoader: loader } = useSchedules();
   const { destinationPlaces } = useSelector(schedulesData);
   const { paribahanNotices } = useSelector(noticeData);
   const [paribahanNotice, setParibahanNotice] = useState(null);
+  const { data: busInfo, isLoading } = useQuery({
+    queryKey: ["singleBusData", { id: params.id }],
+    queryFn: () => getSingleBusData(params.id),
+  });
 
   const handleGoReviewPage = () => {
     navigate(`/bus/comp/${params.slug}/${params.id}`);
@@ -103,9 +104,9 @@ const BusInformation = () => {
             onClick={() =>
               navigate(`/${matchingPlace.slug}/${matchingPlace.id}`)
             }
-            className="cursor-pointer flex gap-1 items-center text-red"
+            className="cursor-pointer flex gap-1 items-center text-primary-color"
           >
-            <span>&#10132;</span>
+            <img src={arrowRighIcon} alt="" className="w-5" />
             <span>{data.destinationPlace}</span>
           </div>
         ) : null;
@@ -166,8 +167,6 @@ const BusInformation = () => {
   ];
 
   useEffect(() => {
-    dispatch(getBusInfoData(params.id));
-    dispatch(getParibahanRgSchedules(params.id));
     const getParibahanNotice = () => {
       return paribahanNotices?.find(
         (notice) => notice.paribahanUserId === params.id
@@ -183,15 +182,15 @@ const BusInformation = () => {
         {/* Heading */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-primary-color rounded-t-lg text-white py-2 px-3">
           <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-center">
-            {busInfoLoader && (
+            {isLoading && (
               <div className="w-full sm:w-96">
                 <Skeleton height={30} baseColor="#008B8B" />
               </div>
             )}
-            {!busInfoLoader && (
+            {!isLoading && (
               <>
                 <h1 className="text-xl font-medium">
-                  {busInfo?.paribahanName}
+                  {busInfo?.paribahanUser?.paribahanName}
                 </h1>{" "}
                 <div className="flex justify-between items-center gap-6">
                   {busInfo?.totalReviewCount > 0 && (
@@ -205,20 +204,20 @@ const BusInformation = () => {
                               <FaStar
                                 key={index}
                                 className={`${
-                                  index < Math.round(busInfo.averageRating)
+                                  index < Math.round(busInfo?.averageRating)
                                     ? "text-yellow"
                                     : "text-gray-300"
                                 }`}
                               />
                             ))}
                           </div>
-                          <span>({busInfo.totalReviewCount})</span>
+                          <span>({busInfo?.totalReviewCount})</span>
                         </div>
                       </div>
                     </>
                   )}
                   <a
-                    href={`tel:+88${busInfo?.salesNumber}`}
+                    href={`tel:+88${busInfo?.paribahanUser?.salesNumber}`}
                     className="flex gap-3 items-center text-base font-semibold sm:hidden"
                   >
                     <span>Call for Ticket</span>
@@ -230,19 +229,19 @@ const BusInformation = () => {
             )}
           </div>
 
-          {busInfoLoader && (
+          {isLoading && (
             <div className="w-full sm:w-96">
               <Skeleton height={30} baseColor="#008B8B" />
             </div>
           )}
-          {!busInfoLoader && (
+          {!isLoading && (
             <p className="text-sm md:text-base font-medium hidden sm:block">
               টিকেট এর জন্য যোগাযোগ করুন :{" "}
               <a
-                href={`tel:+88${busInfo?.salesNumber}`}
+                href={`tel:+88${busInfo?.paribahanUser?.salesNumber}`}
                 className="font-semibold underline"
               >
-                {busInfo?.salesNumber}
+                {busInfo?.paribahanUser?.salesNumber}
               </a>
             </p>
           )}
@@ -254,15 +253,15 @@ const BusInformation = () => {
             </marquee>
           </p>
         )}
-        {busInfoLoader && (
+        {isLoading && (
           <div className="w-full">
             <Skeleton height={200} baseColor="#ffffff" highlightColor="#ddd" />
           </div>
         )}
-        {!busInfoLoader && busInfo && (
+        {!isLoading && busInfo && (
           <DataTable
             columns={column}
-            data={busInfo?.busSchedule
+            data={busInfo?.paribahanUser?.busSchedule
               ?.slice()
               .sort((a, b) => new Date(a.time) - new Date(b.time))}
             responsive
@@ -315,16 +314,20 @@ const BusInformation = () => {
             Regular Schedule
           </h3>
         </div>
-        {busInfoLoader && loader && (
+        {isLoading && loader && (
           <div className="w-full">
             <Skeleton height={150} />
           </div>
         )}
-        {!busInfoLoader && !loader && (
+        {!isLoading && !loader && (
           <>
             <DataTable
               columns={scheduleColumn}
-              data={paribahanRgSchedules}
+              data={
+                regularSchedules?.schedules?.filter(
+                  (schedule) => schedule?.paribahanUserId === params?.id
+                ) || []
+              }
               responsive
               customStyles={{
                 headCells: {
@@ -345,18 +348,21 @@ const BusInformation = () => {
         )}
       </section>
       <section className="mb-8">
-        {busInfo?.counterLocation && (
+        {busInfo?.paribahanUser?.counterLocation && (
           <div className="w-fit mx-auto flex flex-col items-center">
             <h3 className="text-base font-semibold text-black">
               Counter Location
             </h3>
             <span className="text-lg text-primary-color">&#8681;</span>
-            <a href={busInfo?.counterLocationMap} className="flex gap-1">
-              {busInfo?.counterLocationMap && (
+            <a
+              href={busInfo?.paribahanUser?.counterLocationMap}
+              className="flex gap-1"
+            >
+              {busInfo?.paribahanUser?.counterLocationMap && (
                 <img src={locationIcon} alt="" className="w-6" />
               )}
               <span className="text-base font-semibold text-primary-color">
-                {busInfo?.counterLocation}
+                {busInfo?.paribahanUser?.counterLocation}
               </span>
             </a>
           </div>

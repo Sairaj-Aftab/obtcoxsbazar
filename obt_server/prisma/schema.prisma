@@ -195,8 +195,10 @@ model BusSchedule {
     type String
     time String
     busNo String
-    guideName String
-    guidePhone String
+    guideName String?
+    guidePhone String?
+    driverName String?
+    driverPhone String?
     leavingPlace String
     leavingMapLink String?
     destinationPlace String

@@ -152,12 +152,9 @@ export const getReviewsByParibahanUserId = async (req, res, next) => {
     });
 
     const count = await prisma.busReview.count({
-      where: whereClause.OR[0],
+      where: whereClause,
     });
-    const searchCount = searchQuery
-      ? await prisma.busReview.count({ where: whereClause })
-      : count;
-    return res.status(200).json({ reviews, count, searchCount });
+    return res.status(200).json({ reviews, count });
   } catch (error) {
     return next(error);
   }

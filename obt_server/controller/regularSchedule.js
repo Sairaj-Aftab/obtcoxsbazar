@@ -59,9 +59,6 @@ export const updateSchedule = async (req, res, next) => {
 
 export const getAllSchedules = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
     const searchQuery = req.query.search;
 
     const where = searchQuery
@@ -78,8 +75,6 @@ export const getAllSchedules = async (req, res, next) => {
       : {};
 
     const schedules = await prisma.regularBusSchedule.findMany({
-      skip: offset,
-      take: limit,
       where,
       orderBy: {
         time: "asc",
@@ -105,18 +100,20 @@ export const getSchedulesByParibahanId = async (req, res, next) => {
     const offset = (page - 1) * limit;
     const searchQuery = req.query.search;
 
+    // Construct where clause
     const whereClause = {
-      OR: [{ paribahanUserId: String(id) }],
+      paribahanUserId: String(id),
+      OR: searchQuery
+        ? [
+            { busName: { contains: searchQuery, mode: "insensitive" } },
+            { time: { contains: searchQuery, mode: "insensitive" } },
+            { type: { contains: searchQuery, mode: "insensitive" } },
+            {
+              destinationPlace: { contains: searchQuery, mode: "insensitive" },
+            },
+          ]
+        : undefined,
     };
-
-    if (searchQuery) {
-      whereClause.OR = [
-        { busName: { contains: searchQuery, mode: "insensitive" } },
-        { time: { contains: searchQuery, mode: "insensitive" } },
-        { type: { contains: searchQuery, mode: "insensitive" } },
-        { destinationPlace: { contains: searchQuery, mode: "insensitive" } },
-      ];
-    }
 
     const schedules = await prisma.regularBusSchedule.findMany({
       skip: offset,
@@ -128,12 +125,9 @@ export const getSchedulesByParibahanId = async (req, res, next) => {
     });
 
     const count = await prisma.regularBusSchedule.count({
-      where: whereClause.OR[0],
+      where: whereClause,
     });
-    const searchCount = searchQuery
-      ? await prisma.regularBusSchedule.count({ where: whereClause })
-      : count;
-    return res.status(200).json({ schedules, count, searchCount });
+    return res.status(200).json({ schedules, count });
   } catch (error) {
     return next(error);
   }

@@ -107,6 +107,16 @@ const TodayScheduleTableList = () => {
       sortable: true,
     },
     {
+      name: "Driver Name",
+      selector: (data) => data.driverName,
+      sortable: true,
+    },
+    {
+      name: "Driver Phone",
+      selector: (data) => data.driverPhone,
+      sortable: true,
+    },
+    {
       name: "Departure Place",
       selector: (data) => data.leavingPlace,
       sortable: true,

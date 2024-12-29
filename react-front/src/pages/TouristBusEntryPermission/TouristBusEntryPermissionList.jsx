@@ -1,46 +1,38 @@
 import DataTable from "react-data-table-component";
 import { formatDateTime } from "../../utils/formatDateTime";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import locationIcon from "../../assets/icon/location.png";
 import Modal from "../../components/Modal/Modal";
-import { useDispatch, useSelector } from "react-redux";
-import { touristBusPermissionsData } from "../../features/touristBusPermission/touristBusPermissionSlice";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
-import { getAllTouristBusPermission } from "../../features/touristBusPermission/touristBusPermissionApiSlice";
+import { useQuery } from "@tanstack/react-query";
+import { getTouristBusPermissions } from "../../services/touristBusPermission.service";
 
 const TouristBusEntryPermissionList = () => {
-  const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [reviewPermission, setReviewPermission] = useState({});
-  const { permissions, count, permissionLoader } = useSelector(
-    touristBusPermissionsData
-  );
+  const { data, isLoading } = useQuery({
+    queryKey: ["touristBusPermissions", { page, limit }],
+    queryFn: () => getTouristBusPermissions({ page, limit }),
+  });
+
   const handleShowViewPermission = (id) => {
-    const selectedReview = permissions?.find((per) => per.id === id);
+    const selectedReview = data?.permissions?.find((per) => per.id === id);
     if (selectedReview) {
       setReviewPermission(selectedReview);
     }
     setShowModal(true);
   };
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getAllTouristBusPermission({ page, limit: rowPage }));
-  };
 
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getAllTouristBusPermission({ page, limit: newPerPage }));
-  };
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
+  const calculateItemIndex = (page, limit, index) => {
+    return (page - 1) * limit + index + 1;
   };
   const columns = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      selector: (_, index) => calculateItemIndex(page, limit, index),
       width: "60px",
     },
     {
@@ -132,9 +124,6 @@ const TouristBusEntryPermissionList = () => {
       selector: (data) => data.description,
     },
   ];
-  useEffect(() => {
-    dispatch(getAllTouristBusPermission({ page: 1, limit: 10 }));
-  }, [dispatch]);
   let styles = "flex flex-col gap-1 border border-primary-color rounded-md p-2";
   return (
     <>
@@ -215,9 +204,9 @@ const TouristBusEntryPermissionList = () => {
       <div className="container mx-auto bg-white rounded-lg">
         <DataTable
           columns={columns}
-          data={permissions || []}
+          data={data?.permissions || []}
           responsive
-          progressPending={permissionLoader}
+          progressPending={isLoading}
           progressComponent={
             <div className="bg-white h-[70vh]">
               <ComponentLoader />
@@ -225,9 +214,9 @@ const TouristBusEntryPermissionList = () => {
           }
           pagination
           paginationServer
-          paginationTotalRows={count}
-          onChangeRowsPerPage={handlePerRowsChange}
-          onChangePage={handlePageChange}
+          paginationTotalRows={data?.count}
+          onChangeRowsPerPage={(rowPerPage) => setLimit(rowPerPage)}
+          onChangePage={(page) => setPage(page)}
           paginationRowsPerPageOptions={[10, 20, 50, 100]}
         />
         <h1 className="bg-primary-color p-2 text-white text-sm font-normal text-center sm:text-start">

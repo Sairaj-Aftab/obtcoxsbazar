@@ -1,13 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  createSchedule,
-  deleteSchedule,
   getDestinationPlace,
   getLeavingPlace,
   getParkingPlace,
-  getSchedulesDataByAuthId,
-  getTodaysSchedules,
-  updateSchedule,
 } from "./schedulesApiSlice";
 const schedulesSlice = createSlice({
   name: "schedules",
@@ -54,102 +49,6 @@ const schedulesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createSchedule.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.loader = false;
-      })
-      .addCase(createSchedule.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(createSchedule.fulfilled, (state, action) => {
-        state.schedules = state.schedules ?? [];
-        state.todaySchedules = state.todaySchedules ?? [];
-        state.authSchedules.unshift(action.payload.busSchedule);
-        state.schedules.unshift(action.payload.busSchedule);
-        state.todaySchedules.unshift(action.payload.busSchedule);
-        state.authSchedulesCount++;
-        state.message = action.payload.message;
-        state.loader = false;
-      })
-      .addCase(updateSchedule.rejected, (state, action) => {
-        state.error = action.error.message;
-      })
-      .addCase(updateSchedule.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(updateSchedule.fulfilled, (state, action) => {
-        const authSchedulesArray = state.authSchedules || [];
-        const schedulesArray = state.schedules || [];
-        const todaySchedulesArray = state.todaySchedules || [];
-
-        const authScheduleIndex = authSchedulesArray.findIndex(
-          (schedule) => schedule.id === action.payload.busSchedule.id
-        );
-        if (authScheduleIndex !== -1) {
-          state.authSchedules[authScheduleIndex] = action.payload.busSchedule;
-        }
-
-        const scheduleIndex = schedulesArray.findIndex(
-          (schedule) => schedule.id === action.payload.busSchedule.id
-        );
-        if (scheduleIndex !== -1) {
-          state.schedules[scheduleIndex] = action.payload.busSchedule;
-        }
-
-        const todayScheduleIndex = todaySchedulesArray.findIndex(
-          (schedule) => schedule.id === action.payload.busSchedule.id
-        );
-        if (todayScheduleIndex !== -1) {
-          state.todaySchedules[todayScheduleIndex] = action.payload.busSchedule;
-        }
-        state.loader = false;
-        state.message = action.payload.message;
-      })
-      .addCase(getTodaysSchedules.rejected, (state) => {
-        // state.error = action.error.message;
-        state.todayScheduleLoader = false;
-      })
-      .addCase(getTodaysSchedules.pending, (state) => {
-        state.todayScheduleLoader = true;
-      })
-      .addCase(getTodaysSchedules.fulfilled, (state, action) => {
-        state.todaySchedules = action.payload.schedules;
-        state.todayScheduleLoader = false;
-      })
-      .addCase(getSchedulesDataByAuthId.rejected, (state) => {
-        // state.error = action.error.message;
-        state.authScheduleLoader = false;
-      })
-      .addCase(getSchedulesDataByAuthId.pending, (state) => {
-        state.authScheduleLoader = true;
-      })
-      .addCase(getSchedulesDataByAuthId.fulfilled, (state, action) => {
-        state.authSchedules = action.payload.schedules;
-        state.authSchedulesCount = action.payload.count;
-        state.authSearchCount = action.payload.searchCount;
-        state.authScheduleLoader = false;
-      })
-      .addCase(deleteSchedule.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.loader = false;
-      })
-      .addCase(deleteSchedule.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(deleteSchedule.fulfilled, (state, action) => {
-        state.authSchedules = state.authSchedules.filter(
-          (item) => item.id !== action.payload.schedule.id
-        );
-        state.schedules = state.schedules.filter(
-          (item) => item.id !== action.payload.schedule.id
-        );
-        state.todaySchedules = state.todaySchedules.filter(
-          (item) => item.id !== action.payload.schedule.id
-        );
-        state.authSchedulesCount--;
-        state.message = action.payload.message;
-        state.loader = false;
-      })
       .addCase(getLeavingPlace.rejected, (state, action) => {
         state.error = action.error.message;
         state.placesLoader = false;

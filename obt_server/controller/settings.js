@@ -24,7 +24,7 @@ export const createSetting = async (req, res, next) => {
 
     return res.status(200).json({ setting: newSetting, success: true });
   } catch (error) {
-    next(createError(500, "Failed to fetch visitor stats", error));
+    return next(error);
   }
 };
 export const updateSetting = async (req, res, next) => {
@@ -50,7 +50,7 @@ export const updateSetting = async (req, res, next) => {
     });
     return res.status(200).json({ setting: updateSetting, success: true });
   } catch (error) {
-    next(createError(500, "Failed to fetch visitor stats", error));
+    return next(error);
   }
 };
 
@@ -59,6 +59,21 @@ export const getAllSettings = async (req, res, next) => {
     const settings = await prisma.settings.findMany();
     return res.status(200).json({ settings });
   } catch (error) {
-    next(createError(500, "Failed to fetch visitor stats"));
+    return next(error);
+  }
+};
+
+export const getSetting = async (req, res, next) => {
+  try {
+    const { name } = req.params;
+    const setting = await prisma.settings.findUnique({
+      where: {
+        name,
+      },
+    });
+
+    return res.status(200).json({ setting, success: true });
+  } catch (error) {
+    return next(error);
   }
 };
