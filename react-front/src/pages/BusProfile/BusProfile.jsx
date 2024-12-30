@@ -1,11 +1,10 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
 import locationIcon from "../../assets/icon/location.png";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { schedulesData } from "../../features/schedules/schedulesSlice";
 import { useEffect } from "react";
 import Modal from "../../components/Modal/Modal";
 import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
@@ -20,16 +19,17 @@ import { getBusRegNo } from "../../services/busRegNo.service";
 import { getGuideInfo } from "../../services/guideInfo.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
 import { getDriverInfo } from "../../services/driverInof.service";
+import usePlaces from "../../store/usePlaces";
 
 const BusProfile = () => {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
+  const { leavingPlaces, destinationPlaces } = usePlaces();
   const { data: schedules, isLoading: schedulesLoading } = useQuery({
     queryKey: ["authSchedules", { id: user.id, page, limit, search }],
     queryFn: () =>
@@ -97,14 +97,6 @@ const BusProfile = () => {
     },
   });
 
-  const {
-    authSchedulesCount,
-    authSearchCount,
-    leavingPlaces,
-    destinationPlaces,
-    message,
-    error,
-  } = useSelector(schedulesData);
   const [input, setInput] = useState({
     busName: user?.paribahanName,
     time: "",
@@ -153,7 +145,7 @@ const BusProfile = () => {
         setInput({ ...input, driverName: value, driverPhone: "" });
       }
     } else if (name === "leavingPlace") {
-      const selectedPlace = leavingPlaces.find(
+      const selectedPlace = leavingPlaces?.places?.find(
         (place) => place.placeName === value
       );
       setInput({
@@ -192,7 +184,7 @@ const BusProfile = () => {
     const { name, value } = e.target;
 
     if (name === "leavingPlace") {
-      const selectedPlace = leavingPlaces.find(
+      const selectedPlace = leavingPlaces?.places?.find(
         (place) => place.placeName === value
       );
       setUpdateInput({
@@ -378,9 +370,6 @@ const BusProfile = () => {
       toast.error(createError?.message || updateError?.message);
     }
   }, [
-    dispatch,
-    message,
-    error,
     user,
     createData?.message,
     createError,
@@ -504,7 +493,7 @@ const BusProfile = () => {
               onChange={changeInputValue}
             >
               <option value="">Departure Place</option>
-              {leavingPlaces?.map((place, index) => (
+              {leavingPlaces?.places?.map((place, index) => (
                 <option key={index} value={place?.placeName}>
                   {place?.placeName}
                 </option>
@@ -518,7 +507,7 @@ const BusProfile = () => {
               className="hidden"
             >
               <option value="">Leaving Map Link</option>
-              {leavingPlaces?.map((place, index) => (
+              {leavingPlaces?.places?.map((place, index) => (
                 <option key={index} value={place?.mapLink}>
                   {place?.mapLink}
                 </option>
@@ -531,7 +520,7 @@ const BusProfile = () => {
               onChange={changeInputValue}
             >
               <option value="">Destination</option>
-              {destinationPlaces?.map((place, index) => (
+              {destinationPlaces?.places?.map((place, index) => (
                 <option key={index} value={place?.placeName}>
                   {place?.placeName}
                 </option>
@@ -712,7 +701,7 @@ const BusProfile = () => {
                   onChange={changeUpdateInputValue}
                 >
                   <option value="">Leaving Place</option>
-                  {leavingPlaces?.map((place, index) => (
+                  {leavingPlaces?.places?.map((place, index) => (
                     <option key={index} value={place?.placeName}>
                       {place?.placeName}
                     </option>
@@ -726,7 +715,7 @@ const BusProfile = () => {
                   className="hidden"
                 >
                   <option value="">Leaving Map Link</option>
-                  {leavingPlaces?.map((place, index) => (
+                  {leavingPlaces?.places?.map((place, index) => (
                     <option key={index} value={place?.mapLink}>
                       {place?.mapLink}
                     </option>
@@ -742,7 +731,7 @@ const BusProfile = () => {
                   onChange={changeUpdateInputValue}
                 >
                   <option value="">Destination</option>
-                  {destinationPlaces?.map((place, index) => (
+                  {destinationPlaces?.places?.map((place, index) => (
                     <option key={index} value={place?.placeName}>
                       {place?.placeName}
                     </option>
@@ -842,7 +831,7 @@ const BusProfile = () => {
             pagination
             paginationServer
             paginationTotalRows={
-              authSchedulesCount ? authSchedulesCount : authSearchCount
+              schedules?.count ? schedules?.count : schedules?.searchCount
             }
             onChangeRowsPerPage={(rowsPerPage) => setLimit(rowsPerPage)}
             onChangePage={(page) => setPage(page)}

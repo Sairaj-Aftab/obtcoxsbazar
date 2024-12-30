@@ -6,27 +6,9 @@ import { useDispatch } from "react-redux";
 import "./App.css";
 import { useEffect } from "react";
 import socket from "./utils/socket";
-import {
-  getDestinationPlace,
-  getLeavingPlace,
-  getParkingPlace,
-} from "./features/schedules/schedulesApiSlice";
-import {
-  getAllParibahanNotice,
-  getNoticeFromAdmin,
-} from "./features/notice/noticeApiSlice";
-import {
-  addScheduleSocket,
-  deleteScheduleSocket,
-  updateScheduleSocket,
-} from "./features/schedules/schedulesSlice";
 import { getLogedInUser } from "./features/paribahanAuth/paribahanAuthApiSlice";
 import GoogleAnalytics from "./components/GoogleAnalytics";
-import {
-  getVisitorStats,
-  updateVisitorCount,
-} from "./features/visitorCount/visitorCountApiSlice";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllBus } from "./services/bus.service";
 import {
   getAllRgSchedules,
@@ -34,10 +16,38 @@ import {
 } from "./services/schedules.service";
 import useBusServices from "./store/useBusServices";
 import useSchedules from "./store/useSchedules";
+import {
+  getDestinationPlace,
+  getLeavingPlace,
+  getParkingPlace,
+} from "./services/place.service";
+import usePlaces from "./store/usePlaces";
+import useNotice from "./store/useNotice";
+import {
+  getAllParibahanNotice,
+  getNoticeFromAdmin,
+} from "./services/notice.service";
+import {
+  getVisitorStats,
+  updateVisitorCount,
+} from "./services/visitorCount.service";
+import useVisitorCount from "./store/useVisitorCount";
 function App() {
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
-  const { setBusData } = useBusServices();
+  const { setLeavingPlaces, setDestinationPlaces, setParkingPlaces } =
+    usePlaces();
   const { setTodaySchedules, setRegularSchedules } = useSchedules();
+  const { setBusData } = useBusServices();
+  const { setAdminNotices, setParibahanNotices } = useNotice();
+  const { setVisitorCount } = useVisitorCount();
+
+  // Get Todays Schedules
+  const { data: todaysSchedules, isLoading: todaySchedulesLoading } = useQuery({
+    queryKey: ["schedules"],
+    queryFn: () => getTodaysSchedules(),
+  });
+  // Get All Bus
   const {
     data: bus,
     isLoading: busLoading,
@@ -46,60 +56,141 @@ function App() {
     queryKey: ["busServices"],
     queryFn: getAllBus,
   });
-
-  const { data: todaysSchedules, isLoading: todaySchedulesLoading } = useQuery({
-    queryKey: ["schedules"],
-    queryFn: () => getTodaysSchedules(),
+  // Get Leaving Places
+  const { data: leavingPlaces, isLoading: leavingPlacesLoading } = useQuery({
+    queryKey: ["leavingPlaces"],
+    queryFn: getLeavingPlace,
+  });
+  // Get Destination Places
+  const { data: destinationPlaces, isLoading: destinationPlacesLoading } =
+    useQuery({
+      queryKey: ["destinationPlaces"],
+      queryFn: getDestinationPlace,
+    });
+  // Get Parking Places
+  const { data: parkingPlaces, isLoading: parkingPlacesLoading } = useQuery({
+    queryKey: ["parkingPlaces"],
+    queryFn: getParkingPlace,
   });
 
+  // Get All Regular Schedules
   const { data: rgSchedules, isLoading: rgSchedulesLoading } = useQuery({
     queryKey: ["regularSchedules"],
     queryFn: () => getAllRgSchedules(),
   });
+  // Get Admin Notices
+  const { data: adminNotices, isLoading: adminNoticesLoading } = useQuery({
+    queryKey: ["adminNotices"],
+    queryFn: () => getNoticeFromAdmin(),
+  });
+  // Get Paribahan Notices
+  const { data: paribahanNotices, isLoading: paribahanNoticesLoading } =
+    useQuery({
+      queryKey: ["paribahanNotices"],
+      queryFn: () => getAllParibahanNotice(),
+    });
+  // Get Visitor Count Stats
+  const { data: visitorStats, isLoading: visitorStatsLoading } = useQuery({
+    queryKey: ["visitorCount"],
+    queryFn: () => getVisitorStats(),
+  });
 
-  // Update Zustand state based on query results
+  // Get Leaving Place
+  useEffect(() => {
+    setLeavingPlaces({ data: leavingPlaces, loader: leavingPlacesLoading });
+  }, [leavingPlaces, leavingPlacesLoading, setLeavingPlaces]);
+  // Get Destination Place
+  useEffect(() => {
+    setDestinationPlaces({
+      data: destinationPlaces,
+      loader: destinationPlacesLoading,
+    });
+  }, [destinationPlaces, destinationPlacesLoading, setDestinationPlaces]);
+  // Get Parking Place
+  useEffect(() => {
+    setParkingPlaces({ data: parkingPlaces, loader: parkingPlacesLoading });
+  }, [parkingPlaces, parkingPlacesLoading, setParkingPlaces]);
+  // Todays Schedule
+  useEffect(() => {
+    setTodaySchedules({ data: todaysSchedules, loader: todaySchedulesLoading });
+  }, [todaysSchedules, todaySchedulesLoading, setTodaySchedules]);
+  // Get Bus Data
   useEffect(() => {
     setBusData({ data: bus, loader: busLoading, error: busError });
   }, [bus, busLoading, busError, setBusData]);
 
-  useEffect(() => {
-    setTodaySchedules({ data: todaysSchedules, loader: todaySchedulesLoading });
-  }, [todaysSchedules, todaySchedulesLoading, setTodaySchedules]);
   // Regular Schedule
   useEffect(() => {
     setRegularSchedules({ data: rgSchedules, loader: rgSchedulesLoading });
   }, [rgSchedules, rgSchedulesLoading, setRegularSchedules]);
+  // Get Admin Notices
+  useEffect(() => {
+    setAdminNotices({ data: adminNotices, loader: adminNoticesLoading });
+  }, [adminNotices, adminNoticesLoading, setAdminNotices]);
+  // Get Paribahan Notices
+  useEffect(() => {
+    setParibahanNotices({
+      data: paribahanNotices,
+      loader: paribahanNoticesLoading,
+    });
+  }, [paribahanNotices, paribahanNoticesLoading, setParibahanNotices]);
 
   useEffect(() => {
-    dispatch(getVisitorStats());
-  }, [dispatch]);
+    setVisitorCount({
+      data: visitorStats,
+      loader: visitorStatsLoading,
+    });
+  }, [setVisitorCount, visitorStats, visitorStatsLoading]);
+  const { mutateAsync: updateCount } = useMutation({
+    mutationFn: updateVisitorCount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["visitorCount"] });
+    },
+  });
   useEffect(() => {
-    if (import.meta.env.MODE === "production") {
-      dispatch(updateVisitorCount());
+    if (import.meta.env.VITE_NODE_ENV !== "Development") {
+      updateCount();
     }
-  }, [dispatch]);
+  }, [updateCount]);
   useEffect(() => {
     if (localStorage.getItem("paribahanAuth")) {
       dispatch(getLogedInUser());
     }
-    dispatch(getLeavingPlace());
-    dispatch(getDestinationPlace());
-    dispatch(getParkingPlace());
-    dispatch(getNoticeFromAdmin());
-    dispatch(getAllParibahanNotice());
     // Listen for updates
     socket.on("data-updated", (updatedData) => {
-      dispatch(updateScheduleSocket(updatedData));
+      queryClient.setQueryData(
+        ["schedules"],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.map((item) =>
+            item.id === updatedData.id ? updatedData : item
+          ),
+        })
+      );
     });
 
     // Listen for new data
     socket.on("data-created", (newData) => {
-      dispatch(addScheduleSocket(newData));
+      queryClient.setQueryData(
+        ["schedules"],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: [...oldData.schedules, newData],
+        })
+      );
     });
 
     // Listen for deletions
     socket.on("data-deleted", (deletedId) => {
-      dispatch(deleteScheduleSocket(deletedId));
+      queryClient.setQueryData(
+        ["schedules"],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.filter(
+            (item) => item.id !== deletedId.id
+          ),
+        })
+      );
     });
 
     // Clean up socket listeners on component unmount
@@ -108,7 +199,7 @@ function App() {
       socket.off("data-created");
       socket.off("data-deleted");
     };
-  }, [dispatch]);
+  }, [dispatch, queryClient]);
   return (
     <>
       <Helmet>

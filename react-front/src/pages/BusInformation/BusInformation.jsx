@@ -1,28 +1,29 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
 import arrowRighIcon from "../../assets/icon/arrow-right.png";
 import { useNavigate, useParams } from "react-router-dom";
-import { noticeData } from "../../features/notice/noticeSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 import DataTable from "react-data-table-component";
 import Skeleton from "react-loading-skeleton";
 import TodayDate from "../../components/TodayDate";
-import { schedulesData } from "../../features/schedules/schedulesSlice";
 import { useQuery } from "@tanstack/react-query";
 import { getSingleBusData } from "../../services/bus.service";
 import useSchedules from "../../store/useSchedules";
+import usePlaces from "../../store/usePlaces";
+import useNotice from "../../store/useNotice";
 
 const BusInformation = () => {
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { regularSchedules, regularScheduleLoader: loader } = useSchedules();
-  const { destinationPlaces } = useSelector(schedulesData);
-  const { paribahanNotices } = useSelector(noticeData);
+  const { destinationPlaces } = usePlaces();
+  const { paribahanNotices } = useNotice();
+
   const [paribahanNotice, setParibahanNotice] = useState(null);
   const { data: busInfo, isLoading } = useQuery({
     queryKey: ["singleBusData", { id: params.id }],
@@ -96,7 +97,7 @@ const BusInformation = () => {
       name: "Destination",
       selector: (data) => data.destinationPlace,
       cell: (data) => {
-        const matchingPlace = destinationPlaces?.find(
+        const matchingPlace = destinationPlaces?.places?.find(
           (place) => place.placeName === data.destinationPlace
         );
         return matchingPlace ? (
@@ -168,7 +169,7 @@ const BusInformation = () => {
 
   useEffect(() => {
     const getParibahanNotice = () => {
-      return paribahanNotices?.find(
+      return paribahanNotices?.notices?.find(
         (notice) => notice.paribahanUserId === params.id
       );
     };

@@ -85,7 +85,7 @@ const scheduleColumn = ({ navigate, destinationPlaces }) => {
     {
       name: "Destination",
       cell: (data) => {
-        const matchingPlace = destinationPlaces?.find(
+        const matchingPlace = destinationPlaces?.places?.find(
           (place) => place.placeName === data.destinationPlace
         );
         return matchingPlace ? (

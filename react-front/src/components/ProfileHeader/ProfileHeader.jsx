@@ -4,30 +4,49 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import NoticeFromAdmin from "../NoticeFromAdmin";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import {
-  noticeData,
-  setNoticeMessageEmpty,
-} from "../../features/notice/noticeSlice";
+import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
+import { logoutAuthUser } from "../../features/paribahanAuth/paribahanAuthApiSlice";
+import useNotice from "../../store/useNotice";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createParibahanNotice,
   deleteNotice,
-} from "../../features/notice/noticeApiSlice";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
-import { logoutAuthUser } from "../../features/paribahanAuth/paribahanAuthApiSlice";
+} from "../../services/notice.service";
 
 const ProfileHeader = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const { pathname: pathName } = useLocation();
   const dispatch = useDispatch();
-  const { paribahanNotices, loader, error, message } = useSelector(noticeData);
+  const { paribahanNotices } = useNotice();
   const [notice, setNotice] = useState("");
-  const handleSubmitNotice = (e) => {
+  const {
+    mutateAsync: createNotice,
+    data: createData,
+    isSuccess: createSuccess,
+    error: createError,
+    isPending: createLoading,
+  } = useMutation({
+    mutationFn: createParibahanNotice,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["paribahanNotices"] });
+    },
+  });
+  const { mutateAsync: deleteNoticeData } = useMutation({
+    mutationFn: deleteNotice,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["paribahanNotices"],
+      });
+    },
+  });
+  const handleSubmitNotice = async (e) => {
     e.preventDefault();
     if (!notice) {
       toast.error("All field is required");
     } else {
-      dispatch(createParibahanNotice({ id: user.id, data: { title: notice } }));
+      await createNotice({ id: user.id, data: { title: notice } });
     }
   };
 
@@ -40,7 +59,7 @@ const ProfileHeader = () => {
 
   useEffect(() => {
     const getParibahanNotice = () => {
-      return paribahanNotices?.find(
+      return paribahanNotices?.notices?.find(
         (notice) => notice.paribahanUserId === user.id
       );
     };
@@ -49,24 +68,21 @@ const ProfileHeader = () => {
     setParibahanNotice(notice);
   }, [paribahanNotices, user]);
 
-  const deleteSingleNotice = () => {
-    dispatch(deleteNotice(paribahanNotice.id));
+  const deleteSingleNotice = async () => {
+    await deleteNoticeData(paribahanNotice.id);
   };
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
+    if (createError) {
+      toast.error(createError?.message);
     }
-    if (message) {
-      toast.success(message);
+    if (createSuccess || createData) {
+      toast.success(createData?.message);
     }
     if (!user) {
       navigate("/login");
     }
-    if (error || message) {
-      dispatch(setNoticeMessageEmpty());
-    }
-  }, [user, dispatch, error, message, navigate]);
+  }, [createData, createError, createSuccess, navigate, user]);
 
   return (
     <>
@@ -124,9 +140,9 @@ const ProfileHeader = () => {
               <button
                 type="submit"
                 className="bg-primary-color py-1 px-2 rounded text-white text-base font-medium"
-                disabled={loader}
+                disabled={createLoading}
               >
-                {loader ? "Submiting..." : "Submit"}
+                {createLoading ? "Submiting..." : "Submit"}
               </button>
             </form>
           )}

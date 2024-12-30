@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { schedulesData } from "../../features/schedules/schedulesSlice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTouristBusPermission } from "../../services/touristBusPermission.service";
 import { getSingleSettingByName } from "../../services/settings.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import usePlaces from "../../store/usePlaces";
 
 const TouristBusEntryPermission = () => {
   const queryClient = useQueryClient();
-  const { parkingPlaces } = useSelector(schedulesData);
+  const { parkingPlaces } = usePlaces();
   const [formData, setFormData] = useState({
     applicantName: "",
     phone: "",
@@ -47,7 +46,7 @@ const TouristBusEntryPermission = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "parkingPlace") {
-      const selectedPlace = parkingPlaces.find(
+      const selectedPlace = parkingPlaces?.places?.find(
         (place) => place.placeName === value
       );
       setFormData({
@@ -299,7 +298,7 @@ const TouristBusEntryPermission = () => {
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-color"
             >
               <option value="">Select Parking Place</option>
-              {parkingPlaces?.map((place, index) => (
+              {parkingPlaces?.places?.map((place, index) => (
                 <option key={index} value={place?.placeName}>
                   {place?.placeName}
                 </option>
@@ -313,7 +312,7 @@ const TouristBusEntryPermission = () => {
               className="hidden"
             >
               <option value="">Parking Map Link</option>
-              {parkingPlaces?.map((place, index) => (
+              {parkingPlaces?.places?.map((place, index) => (
                 <option key={index} value={place?.mapLink}>
                   {place?.mapLink}
                 </option>

@@ -1,9 +1,9 @@
-import { useSelector } from "react-redux";
 import bizman from "../assets/image/bizman.jpg";
-import { visitorCountData } from "../features/visitorCount/visitorCountSlice";
+import useVisitorCount from "../store/useVisitorCount";
 
 const VisitorCountSection = () => {
-  const { visitorStats } = useSelector(visitorCountData);
+  const { visitorStats } = useVisitorCount();
+
   return (
     <div className="bg-primary-color mt-8">
       <div className="container mx-auto p-4 grid grid-cols-2 md:grid-cols-none md:flex flex-col md:flex-row gap-5 justify-center md:justify-between">
@@ -12,7 +12,7 @@ const VisitorCountSection = () => {
             Daily Visitors
           </p>
           <p className="text-yellow text-2xl md:text-4xl font-medium">
-            {visitorStats.daily}
+            {visitorStats?.daily}
           </p>
         </div>
 
@@ -21,7 +21,7 @@ const VisitorCountSection = () => {
             Total Visitors
           </p>
           <p className="text-yellow text-2xl md:text-4xl font-medium">
-            {visitorStats.total}
+            {visitorStats?.total}
           </p>
         </div>
 

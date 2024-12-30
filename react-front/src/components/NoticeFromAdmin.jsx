@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { noticeData } from "../features/notice/noticeSlice";
+import useNotice from "../store/useNotice";
 
 // eslint-disable-next-line react/prop-types
 const NoticeFromAdmin = ({ status }) => {
-  const { adminNotices } = useSelector(noticeData);
+  const { adminNotices } = useNotice();
   const [findNotice, setFindNotice] = useState(null);
 
   useEffect(() => {
     const getNotice = () => {
-      return adminNotices?.find((notice) => notice.status === status);
+      return adminNotices?.notices?.find((notice) => notice.status === status);
     };
 
     const notice = getNotice();

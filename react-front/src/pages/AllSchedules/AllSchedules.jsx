@@ -1,15 +1,14 @@
-import { useSelector } from "react-redux";
-import { schedulesData } from "../../features/schedules/schedulesSlice";
 import DataTable from "react-data-table-component";
 import TodayDate from "../../components/TodayDate";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 import { useNavigate } from "react-router-dom";
 import useSchedules from "../../store/useSchedules";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import usePlaces from "../../store/usePlaces";
 
 const AllSchedules = () => {
   const navigate = useNavigate();
-  const { destinationPlaces } = useSelector(schedulesData);
+  const { destinationPlaces } = usePlaces();
   const { todaySchedules, todayScheduleLoader } = useSchedules();
 
   return (

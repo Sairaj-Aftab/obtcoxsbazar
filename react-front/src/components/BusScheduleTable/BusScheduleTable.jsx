@@ -1,15 +1,14 @@
-import { schedulesData } from "../../features/schedules/schedulesSlice";
-import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { Link, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import TodayDate from "../TodayDate";
 import scheduleColumn from "../../dataTableColumn/scheduleColumn";
 import useSchedules from "../../store/useSchedules";
+import usePlaces from "../../store/usePlaces";
 
 const BusScheduleTable = () => {
   const navigate = useNavigate();
-  const { destinationPlaces } = useSelector(schedulesData);
+  const { destinationPlaces } = usePlaces();
   const { todaySchedules, todayScheduleLoader } = useSchedules();
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);

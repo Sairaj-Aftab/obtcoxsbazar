@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 import { LiaBusSolid } from "react-icons/lia";
-import { useSelector } from "react-redux";
 import NoticeFromAdmin from "../../components/NoticeFromAdmin";
 import { Link, useParams } from "react-router-dom";
-import { schedulesData } from "../../features/schedules/schedulesSlice";
 import bdTicketLogo from "../../assets/image/bdtickets.png";
 import useBusServices from "../../store/useBusServices";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import usePlaces from "../../store/usePlaces";
 
 const BusServicesByPlace = () => {
   const params = useParams();
-  // const { bus } = useSelector(busData);
   const { busData, loader } = useBusServices();
-  const { destinationPlaces } = useSelector(schedulesData);
+  const { destinationPlaces } = usePlaces();
 
   const [busByPlace, setBusByPlace] = useState([]);
   const [currentDestination, setCurrentDestination] = useState(null);
@@ -25,7 +23,9 @@ const BusServicesByPlace = () => {
     };
     // Get destination place by ID
     const getDestinationById = (destinationId) => {
-      return destinationPlaces?.find((place) => place.id === destinationId);
+      return destinationPlaces?.places?.find(
+        (place) => place.id === destinationId
+      );
     };
     const buses = getBusesByDestinationId(String(params.id));
     const destination = getDestinationById(String(params.id));
