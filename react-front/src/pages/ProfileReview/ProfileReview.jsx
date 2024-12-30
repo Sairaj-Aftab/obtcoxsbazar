@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { formatDateTime } from "../../utils/formatDateTime";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
 import { useQuery } from "@tanstack/react-query";
 import { getAuthReviews } from "../../services/authReview.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const ProfileReview = () => {
+  const { paribahanAuth: user } = useParibahanAuth();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const { data: reviews, isLoading: reviewsLoading } = useQuery({
     queryKey: ["authReviews", { id: user.id, page, limit, search }],
     queryFn: () => getAuthReviews({ id: user.id, page, limit, search }),

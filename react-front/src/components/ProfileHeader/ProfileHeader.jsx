@@ -1,24 +1,27 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
 import NoticeFromAdmin from "../NoticeFromAdmin";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
-import { logoutAuthUser } from "../../features/paribahanAuth/paribahanAuthApiSlice";
 import useNotice from "../../store/useNotice";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createParibahanNotice,
   deleteNotice,
 } from "../../services/notice.service";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const ProfileHeader = () => {
   const queryClient = useQueryClient();
+  const {
+    paribahanAuth: user,
+    setLogout,
+    loader,
+    error,
+    message,
+  } = useParibahanAuth();
   const navigate = useNavigate();
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const { pathname: pathName } = useLocation();
-  const dispatch = useDispatch();
   const { paribahanNotices } = useNotice();
   const [notice, setNotice] = useState("");
   const {
@@ -51,8 +54,8 @@ const ProfileHeader = () => {
   };
 
   // handle logout
-  const handleLogout = () => {
-    dispatch(logoutAuthUser());
+  const handleLogout = async () => {
+    await setLogout();
   };
 
   const [paribahanNotice, setParibahanNotice] = useState(null);
@@ -73,16 +76,16 @@ const ProfileHeader = () => {
   };
 
   useEffect(() => {
-    if (createError) {
-      toast.error(createError?.message);
+    if (createError || error) {
+      toast.error(createError?.message || error);
     }
-    if (createSuccess || createData) {
-      toast.success(createData?.message);
+    if (createSuccess || createData || message) {
+      toast.success(createData?.message || message);
     }
     if (!user) {
       navigate("/login");
     }
-  }, [createData, createError, createSuccess, navigate, user]);
+  }, [createData, createError, createSuccess, error, message, navigate, user]);
 
   return (
     <>
@@ -102,7 +105,7 @@ const ProfileHeader = () => {
             onClick={handleLogout}
             className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
           >
-            Logout
+            {loader ? "Loading..." : "Logout"}
           </button>
         </div>
 

@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { useDispatch } from "react-redux";
 import { FaPhone } from "react-icons/fa6";
 import locationIcon from "../../assets/icon/location.png";
 import arrowRighIcon from "../../assets/icon/arrow-right.png";
@@ -19,7 +18,6 @@ import useNotice from "../../store/useNotice";
 const BusInformation = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { regularSchedules, regularScheduleLoader: loader } = useSchedules();
   const { destinationPlaces } = usePlaces();
   const { paribahanNotices } = useNotice();
@@ -176,7 +174,7 @@ const BusInformation = () => {
 
     const notice = getParibahanNotice();
     setParibahanNotice(notice);
-  }, [dispatch, paribahanNotices, params.id]);
+  }, [paribahanNotices, params.id]);
   return (
     <>
       <div className="container mx-auto bg-white rounded-lg my-5">

@@ -1,21 +1,20 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
 import Modal from "../../components/Modal/Modal";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import { useQuery } from "@tanstack/react-query";
 import { getRgSchedulesByParibahanId } from "../../services/schedules.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const ProfileRegSchedule = () => {
   const [search, setSearch] = useState("");
+  const { paribahanAuth: user } = useParibahanAuth();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
 
   const { data, isLoading } = useQuery({
     queryKey: ["userRegularSchedules", { id: user.id, page, limit, search }],

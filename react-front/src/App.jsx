@@ -2,11 +2,9 @@ import { RouterProvider } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import router from "./routes/router";
 import { Toaster } from "react-hot-toast";
-import { useDispatch } from "react-redux";
 import "./App.css";
 import { useEffect } from "react";
 import socket from "./utils/socket";
-import { getLogedInUser } from "./features/paribahanAuth/paribahanAuthApiSlice";
 import GoogleAnalytics from "./components/GoogleAnalytics";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllBus } from "./services/bus.service";
@@ -32,9 +30,10 @@ import {
   updateVisitorCount,
 } from "./services/visitorCount.service";
 import useVisitorCount from "./store/useVisitorCount";
+import useParibahanAuth from "./store/useParibahanAuth";
 function App() {
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
+  const { setLogedInUser } = useParibahanAuth();
   const { setLeavingPlaces, setDestinationPlaces, setParkingPlaces } =
     usePlaces();
   const { setTodaySchedules, setRegularSchedules } = useSchedules();
@@ -153,9 +152,12 @@ function App() {
     }
   }, [updateCount]);
   useEffect(() => {
-    if (localStorage.getItem("paribahanAuth")) {
-      dispatch(getLogedInUser());
-    }
+    const fetchUser = async () => {
+      await setLogedInUser();
+    };
+    fetchUser();
+  }, [setLogedInUser]);
+  useEffect(() => {
     // Listen for updates
     socket.on("data-updated", (updatedData) => {
       queryClient.setQueryData(
@@ -199,7 +201,7 @@ function App() {
       socket.off("data-created");
       socket.off("data-deleted");
     };
-  }, [dispatch, queryClient]);
+  }, [queryClient]);
   return (
     <>
       <Helmet>

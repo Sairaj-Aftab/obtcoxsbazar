@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,13 +9,14 @@ import {
   updateBusRegNo,
 } from "../../services/busRegNo.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const ProfileBusInfo = () => {
   const queryClient = useQueryClient();
+  const { paribahanAuth: user } = useParibahanAuth();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const { data: busRegNo, isLoading: busRegNoLoading } = useQuery({

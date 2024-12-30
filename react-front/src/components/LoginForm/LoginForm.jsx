@@ -1,28 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { loginAuthUser } from "../../features/paribahanAuth/paribahanAuthApiSlice";
-import {
-  paribahanAuthData,
-  setParibahanAuthMessageEmpty,
-} from "../../features/paribahanAuth/paribahanAuthSlice";
 import logo from "../../assets/image/red_yellow.png";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { paribahanAuth, loader, error, message } =
-    useSelector(paribahanAuthData);
+  const {
+    paribahanAuth,
+    setParibahanAuthMessageEmpty,
+    setLogin,
+    loader,
+    error,
+    message,
+  } = useParibahanAuth();
   const [paribahanName, setParibahanName] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmitLogin = (e) => {
+  const handleSubmitLogin = async (e) => {
     e.preventDefault();
     if (!paribahanName || !password) {
       toast.error("All fields are required!");
     } else {
-      dispatch(loginAuthUser({ paribahanName, password }));
+      await setLogin({ paribahanName, password });
     }
   };
 
@@ -35,13 +35,13 @@ const LoginForm = () => {
       setParibahanName("");
       setPassword("");
     }
+    if (error || message) {
+      setParibahanAuthMessageEmpty();
+    }
     if (paribahanAuth) {
       navigate("/profile");
     }
-    if (error || message || paribahanAuth) {
-      dispatch(setParibahanAuthMessageEmpty());
-    }
-  }, [dispatch, error, message, navigate, paribahanAuth]);
+  }, [error, message, navigate, paribahanAuth, setParibahanAuthMessageEmpty]);
   return (
     <>
       <Toaster />

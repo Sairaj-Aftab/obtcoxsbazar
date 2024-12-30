@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -12,13 +10,14 @@ import {
   updateGuideInfo,
 } from "../../services/guideInfo.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const ProfileGuideInfo = () => {
   const queryClient = useQueryClient();
+  const { paribahanAuth: user } = useParibahanAuth();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(500);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [input, setInput] = useState({

@@ -1,13 +1,11 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
 import locationIcon from "../../assets/icon/location.png";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import Modal from "../../components/Modal/Modal";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import { formatDateTime } from "../../utils/formatDateTime";
 import {
   createSchedule,
@@ -20,15 +18,16 @@ import { getGuideInfo } from "../../services/guideInfo.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
 import { getDriverInfo } from "../../services/driverInof.service";
 import usePlaces from "../../store/usePlaces";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const BusProfile = () => {
   const queryClient = useQueryClient();
+  const { paribahanAuth: user } = useParibahanAuth();
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
   const { leavingPlaces, destinationPlaces } = usePlaces();
   const { data: schedules, isLoading: schedulesLoading } = useQuery({
     queryKey: ["authSchedules", { id: user.id, page, limit, search }],

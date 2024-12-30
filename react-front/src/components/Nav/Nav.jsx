@@ -1,13 +1,12 @@
 import { BiMenu, BiX } from "react-icons/bi";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import logo from "../../assets/image/white_yellow.png";
 import policeLogo from "../../assets/image/police_logo.png";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const Nav = () => {
-  const { paribahanAuth } = useSelector(paribahanAuthData);
+  const { paribahanAuth } = useParibahanAuth();
   const [open, setOpen] = useState(false);
   const { pathname: pathName } = useLocation();
   return (

@@ -393,7 +393,12 @@ export const logedInUser = async (req, res, next) => {
 export const logout = async (req, res, next) => {
   try {
     res
-      .clearCookie("auth_token")
+      .clearCookie("paribahan_auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV == "Development" ? false : true,
+        sameSite: "none",
+        path: "/",
+      })
       .status(200)
       .json({ message: "Successfully log out" });
   } catch (error) {

@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import avatar from "../../assets/image/avatar.png";
 import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
-import { paribahanAuthData } from "../../features/paribahanAuth/paribahanAuthSlice";
 import DataTable from "react-data-table-component";
 import {
   createDriverInfo,
@@ -13,13 +11,14 @@ import {
 } from "../../services/driverInof.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
+import useParibahanAuth from "../../store/useParibahanAuth";
 
 const ProfileDriverInfo = () => {
   const queryClient = useQueryClient();
+  const { paribahanAuth: user } = useParibahanAuth();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
-  const { paribahanAuth: user } = useSelector(paribahanAuthData);
 
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
