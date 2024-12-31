@@ -140,16 +140,30 @@ const AllBusServices = ({ title }) => {
                 <span className="text-sm">Hyundai Biz Class</span>
               </label>
               <label
+                htmlFor="mercedes-benz"
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  id="mercedes-benz"
+                  value={"7"}
+                  className="accent-blue-600 h-4 w-4 rounded-sm"
+                  onChange={handleRadioChange}
+                  checked={selectedDigit === "7"}
+                />
+                <span className="text-sm">Mercedes-Benz</span>
+              </label>
+              <label
                 htmlFor="local-services"
                 className="flex items-center space-x-2 cursor-pointer"
               >
                 <input
                   type="radio"
                   id="local-services"
-                  value={"7"}
+                  value={"8"}
                   className="accent-blue-600 h-4 w-4 rounded-sm"
                   onChange={handleRadioChange}
-                  checked={selectedDigit === "7"}
+                  checked={selectedDigit === "8"}
                 />
                 <span className="text-sm">Local Service</span>
               </label>

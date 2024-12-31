@@ -330,6 +330,16 @@ const ParibahanUsers = () => {
                   onChange={handleChangeType}
                   checked={type.includes("7")}
                 />{" "}
+                Mercedes-Benz
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={8}
+                  onChange={handleChangeType}
+                  checked={type.includes("8")}
+                />{" "}
                 Local Service
               </label>
             </div>
@@ -566,6 +576,16 @@ const ParibahanUsers = () => {
                   value={7}
                   onChange={handleChangeType}
                   checked={type.includes("7")}
+                />{" "}
+                Mercedes-Benz
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="type"
+                  value={8}
+                  onChange={handleChangeType}
+                  checked={type.includes("8")}
                 />{" "}
                 Local Service
               </label>

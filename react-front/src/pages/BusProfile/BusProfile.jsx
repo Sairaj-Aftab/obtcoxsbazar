@@ -56,13 +56,21 @@ const BusProfile = () => {
     isPending: createLoading,
   } = useMutation({
     mutationFn: createSchedule,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["authSchedules"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["schedules"],
-      });
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["authSchedules", { id: user.id, page, limit, search }],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: [data?.busSchedule, ...oldData.schedules],
+        })
+      );
+      queryClient.setQueryData(
+        ["schedules"],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: [data?.busSchedule, ...oldData.schedules],
+        })
+      );
     },
   });
   const {
@@ -73,26 +81,50 @@ const BusProfile = () => {
     error: updateError,
   } = useMutation({
     mutationFn: updateSchedule,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["authSchedules"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["schedules"],
-      });
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["authSchedules", { id: user.id, page, limit, search }],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.map((item) =>
+            item.id === data?.busSchedule.id ? data?.busSchedule : item
+          ),
+        })
+      );
+      queryClient.setQueryData(
+        ["schedules"],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.map((item) =>
+            item.id === data?.busSchedule.id ? data?.busSchedule : item
+          ),
+        })
+      );
       setShowUpdateModal(false);
     },
   });
 
   const { mutateAsync: deleteData } = useMutation({
     mutationFn: deleteSchedule,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["authSchedules"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["schedules"],
-      });
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["authSchedules", { id: user.id, page, limit, search }],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.filter(
+            (item) => item.id !== data?.schedule.id
+          ),
+        })
+      );
+      queryClient.setQueryData(
+        ["schedules"],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.filter(
+            (item) => item.id !== data?.schedule.id
+          ),
+        })
+      );
     },
   });
 
@@ -484,6 +516,7 @@ const BusProfile = () => {
               <option value="Double Decker">Double Decker</option>
               <option value="Suite Class">Suite Class</option>
               <option value="Hyundai Biz Class">Hyundai Biz Class</option>
+              <option value="Mercedes-Benz">Mercedes-Benz</option>
             </select>
             <select
               name="leavingPlace"
@@ -640,6 +673,7 @@ const BusProfile = () => {
                   <option value="Double Decker">Double Decker</option>
                   <option value="Suite Class">Suite Class</option>
                   <option value="Hyundai Biz Class">Hyundai Biz Class</option>
+                  <option value="Mercedes-Benz">Mercedes-Benz</option>
                 </select>
               </div>
             </div>
