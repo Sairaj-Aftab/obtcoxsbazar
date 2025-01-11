@@ -67,10 +67,7 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
     if (touristBusEntryPermission) {
       const message =
         `Dear OBT Admin,\n\nMr. ${applicantName} (App. No. ${newApplicationNumber}) has applied for "Tourist Bus Entry Permission".\n\nPlease review and reply ASAP.\n\nRegards\nOBT`.trim();
-      await sendSMStoPhone(
-        "01320108710,01320108405",
-        encodeURIComponent(message)
-      );
+      await sendSMStoPhone("01320108710", encodeURIComponent(message));
     }
     if (!touristBusEntryPermission) {
       return next(createError(400, "Please try again!"));
