@@ -24,7 +24,7 @@ const GuideInfo = () => {
   const dispatch = useDispatch();
   const { paribahanUsers } = useSelector(getAllData);
   const { authUser } = useSelector(authData);
-  const { guideInfo, totalCount, searchCount, loader, message, error } =
+  const { guideInfo, count, loader, message, error } =
     useSelector(guideInfoData);
 
   const [input, setInput] = useState({
@@ -428,7 +428,7 @@ const GuideInfo = () => {
         progressComponent={<Loading />}
         pagination
         paginationServer
-        paginationTotalRows={searchCount ? searchCount : totalCount}
+        paginationTotalRows={count}
         onChangeRowsPerPage={handlePerRowsChange}
         onChangePage={handlePageChange}
         paginationRowsPerPageOptions={[10, 20, 50, 100]}

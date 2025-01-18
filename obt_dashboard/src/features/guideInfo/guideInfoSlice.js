@@ -12,8 +12,7 @@ const guideInfoSlice = createSlice({
   initialState: {
     guideInfo: [],
     userGuideInfo: [],
-    totalCount: 0,
-    searchCount: 0,
+    count: 0,
     error: null,
     message: null,
     success: false,
@@ -37,8 +36,7 @@ const guideInfoSlice = createSlice({
       })
       .addCase(getAllGuideInfo.fulfilled, (state, action) => {
         state.guideInfo = action.payload.guideInfo;
-        state.totalCount = action.payload.totalCount;
-        state.searchCount = action.payload.searchCount;
+        state.count = action.payload.count;
         state.success = true;
         state.loader = false;
       })
