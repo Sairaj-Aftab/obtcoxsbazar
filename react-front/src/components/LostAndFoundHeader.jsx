@@ -1,14 +1,14 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import NoticeFromAdmin from "./NoticeFromAdmin";
+// import NoticeFromAdmin from "./NoticeFromAdmin";
 
 const LostAndFoundHeader = () => {
   const { pathname } = useLocation();
 
   return (
     <div>
-      <div className="bg-white text-base font-semibold pt-1">
+      {/* <div className="bg-white text-base font-semibold pt-1">
         <NoticeFromAdmin status="Tourist-Bus-Permission" />
-      </div>
+      </div> */}
       <div className="bg-white rounded-t-md flex gap-3 w-fit mx-auto mt-1 sm:mt-3 p-2">
         <Link
           to="/lost-found"
