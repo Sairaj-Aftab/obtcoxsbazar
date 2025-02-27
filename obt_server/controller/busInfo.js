@@ -88,16 +88,6 @@ export const updateBusInfo = async (req, res, next) => {
       },
     });
 
-    // Generate QR code with unique ID
-    // const qrData = JSON.stringify({ id: busInfo.id }); // Only include unique ID
-    // const qrCodeDataURL = await qr.toDataURL(qrData);
-
-    // // Save QR code data URL in database
-    // await prisma.busInfo.update({
-    //   where: { id: busInfo.id },
-    //   data: { qrCode: qrCodeDataURL },
-    // });
-
     return res.status(200).json({ busInfo, message: "Updated successfully" });
   } catch (error) {
     return next(error);

@@ -1,0 +1,28 @@
+enum ReportType {
+    LOST
+    FOUND
+}
+
+enum Status {
+    PENDING
+    RESOLVED
+}
+
+model LostAndFound {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    applicationNo Int @unique
+    name String
+    phone String
+    address String?
+    reportType ReportType
+    statusType String
+    place String
+    dateTime DateTime
+    goods String
+    policeReport String?
+    description String?
+    images String[]
+    status Status @default(PENDING)
+    createdAt      DateTime   @default(now())
+    updatedAt      DateTime   @updatedAt
+}

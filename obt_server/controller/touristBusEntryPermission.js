@@ -85,7 +85,7 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
 export const updateTouristBusEntryPermission = async (req, res, next) => {
   try {
     const { id } = req.params; // Get the ID of the permission to be updated
-    const { approved, rejected, rejectedReason } = req.body;
+    const { status, rejectedReason } = req.body;
 
     // Fetch the existing permission entry
     const existingPermission =
@@ -100,13 +100,13 @@ export const updateTouristBusEntryPermission = async (req, res, next) => {
     // Prepare updated data based on the admin's action (approval or rejection)
     const updatedData = {};
 
-    if (approved) {
+    if (status === "approved") {
       updatedData.approved = true;
       updatedData.rejected = false;
       updatedData.pending = false;
       updatedData.approvalDate = new Date();
       updatedData.permissionReason = "";
-    } else if (rejected) {
+    } else if (status === "rejected") {
       updatedData.approved = false;
       updatedData.rejected = true;
       updatedData.pending = false;

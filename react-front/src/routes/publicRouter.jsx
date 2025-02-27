@@ -1,3 +1,4 @@
+import LostAndFoundList from "@/pages/LostAndFound/LostAndFoundList";
 import Nav from "../components/Nav/Nav";
 import TouristBusEntryPerHeader from "../components/TouristBusEntryPerHeader";
 import AboutPage from "../pages/AboutPage/AboutPage";
@@ -15,6 +16,8 @@ import Login from "../pages/Login/Login";
 import RegularBusSchedule from "../pages/RegularBusSchedule/RegularBusSchedule";
 import TouristBusEntryPermission from "../pages/TouristBusEntryPermission/TouristBusEntryPermission";
 import TouristBusEntryPermissionList from "../pages/TouristBusEntryPermission/TouristBusEntryPermissionList";
+import LostAndFoundEntry from "@/pages/LostAndFound/LostAndFoundEntry";
+import LostAndFoundHeader from "@/components/LostAndFoundHeader";
 
 const publicRoutes = [
   {
@@ -55,6 +58,19 @@ const publicRoutes = [
           {
             path: "/tourist-bus-entry-permission/form",
             element: <TouristBusEntryPermission />,
+          },
+        ],
+      },
+      {
+        element: <LostAndFoundHeader />,
+        children: [
+          {
+            path: "/lost-found",
+            element: <LostAndFoundList />,
+          },
+          {
+            path: "/lost-found/form",
+            element: <LostAndFoundEntry />,
           },
         ],
       },

@@ -1,5 +1,4 @@
 import PrivateRouteGird from "./PrivateRouteGrid";
-import PageLayout from "../components/PageLayout/PageLayout";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Destination from "../pages/Destination/Destination";
 import Notice from "../pages/Notice/Notice";
@@ -14,10 +13,12 @@ import GuideInfo from "../pages/GuideInfo/GuideInfo";
 import DriverInfo from "../pages/DriverInfo/DriverInfo";
 import Review from "../pages/Review/Review";
 import TouristBusPermission from "../pages/TouristBusPermission/TouristBusPermission";
+import Layout from "@/components/Layout";
+import LostFound from "@/pages/LostFound/LostFound";
 
 const privateRoutes = [
   {
-    element: <PageLayout />,
+    element: <Layout />,
     children: [
       {
         element: <PrivateRouteGird />,
@@ -73,6 +74,10 @@ const privateRoutes = [
           {
             path: "/tourist-bus-permission",
             element: <TouristBusPermission />,
+          },
+          {
+            path: "/lost-found",
+            element: <LostFound />,
           },
           {
             path: "/review",

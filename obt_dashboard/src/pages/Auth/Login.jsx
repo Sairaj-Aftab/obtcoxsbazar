@@ -1,103 +1,142 @@
-import { useEffect, useState } from "react";
-import { loginAuthUser } from "../../features/auth/authApiSlice";
-import { authData, setMessageEmpty } from "../../features/auth/authSlice";
+import { useEffect } from "react";
+import logoImg from "../../assets/img/red_yellow.png";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import WhiteLogo from "../../components/Logo/WhiteLogo";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import useAuth from "@/store/useAuth";
+import { useForm } from "react-hook-form";
+
+const formSchema = z.object({
+  userName: z.string().min(3, {
+    message: "User name is required!",
+  }),
+  password: z.string().min(4, {
+    message: "Password is required!",
+  }),
+});
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { error, message, authUser, loader } = useSelector(authData);
-  const [input, setInput] = useState({
-    userName: "",
-    password: "",
+  const {
+    isAuthenticated,
+    setLogin,
+    loader,
+    message,
+    error,
+    setAuthMessageEmpty,
+  } = useAuth();
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userName: "",
+      password: "",
+    },
   });
 
-  const handleChange = (e) => {
-    setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmitForm = (e) => {
-    e.preventDefault();
-    if (!input.userName || !input.password) {
-      toast.error("All fields are required");
-    } else {
-      dispatch(
-        loginAuthUser({ userName: input.userName, password: input.password })
-      );
-    }
+  const onSubmit = async (data) => {
+    await setLogin({ userName: data.userName, password: data.password });
   };
 
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
-    if (message) {
-      toast.success(message);
-      setInput({
-        userName: "",
-        password: "",
-      });
-    }
-    if (authUser) {
+    if (isAuthenticated) {
+      form.reset();
       navigate("/");
     }
-    return () => {
-      dispatch(setMessageEmpty());
-    };
-  }, [authUser, dispatch, error, message, navigate]);
+    if (error || message) {
+      setAuthMessageEmpty();
+    }
+  }, [error, form, isAuthenticated, message, navigate, setAuthMessageEmpty]);
   return (
-    <div className="main-wrapper login-body">
-      <div className="login-wrapper">
-        <div className="container">
-          <div className="loginbox">
-            <div className="login-left">
-              {/* <h1 className="text-light">OBTCOXSBAZAR</h1> */}
-              <WhiteLogo />
-            </div>
-            <div className="login-right">
-              <div className="login-right-wrap">
-                <h1>Login</h1>
-                <p className="account-subtitle">Access to our dashboard</p>
-
-                <form onSubmit={handleSubmitForm}>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="userName"
-                      placeholder="Username"
-                      value={input.userName}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      value={input.password}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <button
-                      className="btn btn-primary btn-block"
-                      type="submit"
-                      disabled={loader}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/70 via-transparent to-red-500/70 p-4">
+      <Card className={cn("w-full max-w-md shadow-md")}>
+        <CardHeader className="space-y-1 flex flex-col items-center">
+          <img src={logoImg} alt="COXSCAB" className="w-32 object-cover" />
+          {/* <div className="w-32 h-32 relative mb-4"></div> */}
+          <h2 className="text-2xl font-bold tracking-tight text-primary text-center">
+            Welcome back
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Enter your credentials to access your account
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Form {...form} className="w-full">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-1 sm:space-y-2"
+            >
+              <FormField
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel
+                      className={`${
+                        loader && "cursor-not-allowed text-gray-400"
+                      }`}
                     >
-                      {loader ? "Login..." : "Login"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                      User name
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled={loader} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel
+                      className={`${
+                        loader && "cursor-not-allowed text-gray-400"
+                      }`}
+                    >
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} disabled={loader} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={loader} className="w-full">
+                {loader ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                    wait...
+                  </>
+                ) : (
+                  "Sign in"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

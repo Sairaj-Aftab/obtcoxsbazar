@@ -32,29 +32,46 @@ export const deleteExistingFile = async (fileKey) => {
   await s3Client.send(new DeleteObjectCommand(deleteParams));
 };
 
-export async function uploadFile(file, fileNameWithFolder, fileKey = null) {
-  if (!file) return;
-
-  if (file.size > 300 * 1024) {
-    throw new Error("Max file size: 300 KB");
+export async function uploadFile(files, fileNamesWithFolders, fileKeys = []) {
+  if (!files || !fileNamesWithFolders) {
+    throw new Error("No files provided for upload.");
   }
 
-  if (fileKey) {
-    await deleteExistingFile(fileKey);
+  // Normalize inputs to arrays
+  const fileArray = Array.isArray(files) ? files : [files];
+  const fileNameArray = Array.isArray(fileNamesWithFolders)
+    ? fileNamesWithFolders
+    : [fileNamesWithFolders];
+  const fileKeyArray = Array.isArray(fileKeys) ? fileKeys : [fileKeys];
+
+  if (fileArray.length !== fileNameArray.length) {
+    throw new Error("Each file must have a corresponding filename.");
   }
-  // Generate a unique filename
 
-  // Read the file as a stream
-  const fileStream = fs.createReadStream(file.path);
+  // Delete existing files if fileKeys are provided
+  if (fileKeyArray.length > 0) {
+    await Promise.all(fileKeyArray.map((key) => deleteExistingFile(key)));
+  }
 
-  const uploadParams = {
-    Bucket: bucketName,
-    Body: fileStream,
-    Key: fileNameWithFolder,
-    ContentType: file.mimetype,
-  };
+  // Upload each file
+  const uploadPromises = fileArray.map(async (file, index) => {
+    if (file.size > 300 * 1024) {
+      throw new Error(`Max file size exceeded for ${file.originalname}`);
+    }
 
-  const res = await s3Client.send(new PutObjectCommand(uploadParams));
+    const fileStream = fs.createReadStream(file.path);
+
+    const uploadParams = {
+      Bucket: bucketName,
+      Body: fileStream,
+      Key: fileNameArray[index],
+      ContentType: file.mimetype,
+    };
+
+    return s3Client.send(new PutObjectCommand(uploadParams));
+  });
+
+  const res = await Promise.all(uploadPromises);
   return res;
 }
 

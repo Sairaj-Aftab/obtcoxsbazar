@@ -1,151 +1,160 @@
-import { useDispatch, useSelector } from "react-redux";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { authData } from "../../features/auth/authSlice";
-import {
-  busInfoData,
-  setBusInfoMessageEmpty,
-} from "../../features/busInfo/busInfoSlice";
 import { formatDate } from "../../utils/timeAgo";
-import ModalPopup from "../../components/ModalPopup/ModalPopup";
 import { useEffect, useState } from "react";
-import {
-  createBusInfo,
-  deleteBusInfo,
-  getAllBusInfo,
-  updateBusInfo,
-} from "../../features/busInfo/busInfoApiSlice";
-import { toast } from "react-hot-toast";
-import { getAllData } from "../../features/user/userSlice";
-import swal from "sweetalert";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading/Loading";
+import useAuth from "@/store/useAuth";
+import {
+  useCreateBusInfo,
+  useDeleteBusInfo,
+  useGetAllBusInfo,
+  useUpdateBusInfo,
+} from "@/services/busInfo.service";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { busInfoFormSchema } from "@/lib/schemas";
+import { useParibahanUsers } from "@/services/paribahan.service";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Edit, Eye, Loader2, Trash } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { busTypes } from "@/config/busType";
 
 const BusInfo = () => {
-  const dispatch = useDispatch();
-  const { paribahanUsers } = useSelector(getAllData);
-  const { authUser } = useSelector(authData);
-  const { busInfo, totalCount, searchCount, loader, message, error } =
-    useSelector(busInfoData);
-
-  const [input, setInput] = useState({
-    id: "",
-    paribahanName: "",
-    regNo: "",
-    type: "",
-    comment: "",
-    report: "",
-    fcExpire: "",
-  });
-  const changeInputValue = (e) => {
-    const { name, value } = e.target;
-    if (name === "paribahanName") {
-      const selectedParibahan = paribahanUsers.find(
-        (paribahan) => paribahan.paribahanName === value
-      );
-      if (selectedParibahan) {
-        setInput({
-          ...input,
-          paribahanName: selectedParibahan.paribahanName,
-          id: selectedParibahan.id,
-        });
-      } else {
-        setInput({ ...input, paribahanName: value, id: "" });
-      }
-    } else {
-      setInput({ ...input, [name]: value });
-    }
-  };
-  const handleSubmitInfo = (e) => {
-    e.preventDefault();
-    if (!input.paribahanName || !input.regNo || !input.type) {
-      toast.error("Fields are required!");
-    } else {
-      dispatch(createBusInfo({ id: input.id, data: input }));
-    }
-  };
-  const [id, setId] = useState();
-  const [infoData, setInfoData] = useState();
-
-  const changeInfoData = (e) => {
-    const { name, value } = e.target;
-    if (name === "paribahanName") {
-      const selectedParibahan = paribahanUsers.find(
-        (paribahan) => paribahan.paribahanName === value
-      );
-      if (selectedParibahan) {
-        setInfoData({
-          ...infoData,
-          paribahanName: selectedParibahan.paribahanName,
-          id: selectedParibahan.id,
-        });
-      } else {
-        setInfoData({ ...infoData, paribahanName: value, id: "" });
-      }
-    } else {
-      setInfoData({ ...infoData, [name]: value });
-    }
-  };
-  const handleOpenUpdateForm = (id) => {
-    const data = busInfo.find((info) => info.id === id);
-    setId(data.id);
-    setInfoData({
-      ...data,
-    });
-  };
-  const handleUpdateInfo = (e) => {
-    e.preventDefault();
-    if (!infoData.paribahanName || !infoData.regNo || !infoData.type) {
-      toast.error("All fields are required");
-    } else {
-      dispatch(updateBusInfo({ id, data: infoData }));
-    }
-  };
-
-  const [infoDetails, setInfoDetails] = useState({});
-
-  const handleShowBusInfo = (id) => {
-    const selectedDetails = busInfo?.find((det) => det.id === id);
-    if (selectedDetails) {
-      setInfoDetails(selectedDetails);
-    }
-  };
-  const handleDeleteBusInfo = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
-          icon: "success",
-        });
-        dispatch(deleteBusInfo(id));
-        dispatch(setBusInfoMessageEmpty());
-      } else {
-        swal("Your imaginary file is safe!");
-      }
-    });
-  };
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getAllBusInfo({ page, limit: rowPage, search }));
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
+  const { authUser } = useAuth();
+  const { data: users, isLoading: paribahanLoading } = useParibahanUsers({});
+  const { data: busInfoData, isLoading: busInfoLoading } = useGetAllBusInfo({
+    page,
+    limit: rowPage,
+    search,
+  });
+  const [isViewMode, setIsViewMode] = useState(false);
+
+  const createInfo = useCreateBusInfo();
+  const updateInfo = useUpdateBusInfo();
+  const deleteInfo = useDeleteBusInfo();
+  const form = useForm({
+    resolver: zodResolver(busInfoFormSchema),
+    defaultValues: {
+      paribahanName: "",
+      regNo: "",
+      type: undefined,
+      comment: "",
+      report: "",
+      fcExpire: "",
+    },
+  });
+
+  const handleEdit = (data) => {
+    setIsEditing(true);
+    setCurrentData(data);
+    form.setValue("paribahanName", data?.paribahanUser?.paribahanName);
+    form.setValue("regNo", data.regNo);
+    form.setValue("type", data.type);
+    form.setValue("comment", data.comment);
+    form.setValue("report", data.report);
+    form.setValue("fcExpire", data.fcExpire);
+    setIsDialogOpen(true);
+  };
+  const handleView = (data) => {
+    setCurrentData(data);
+    setIsViewMode(true);
+    setIsDialogOpen(true);
   };
 
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getAllBusInfo({ page, limit: newPerPage, search }));
-  };
+  async function handleSubmit(data) {
+    const paribahanUser = users?.paribahanUsers?.find(
+      (user) => user.paribahanName === data.paribahanName
+    );
+    if (!paribahanUser) {
+      toast("Error", {
+        description: "Invalid Paribahan Name selected.",
+      });
+      return;
+    }
+    if (isEditing) {
+      updateInfo.mutate({ id: currentData.id, data });
+    } else {
+      createInfo.mutate({ id: paribahanUser.id, data });
+    }
+  }
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(getAllBusInfo({ page, limit: rowPage, search: e.target.value })); // Fetch schedules with the search term
-  };
+  useEffect(() => {
+    if (createInfo.isSuccess || updateInfo.isSuccess || deleteInfo.isSuccess) {
+      toast("Success", {
+        description: `${
+          createInfo?.data?.message ||
+          updateInfo?.data?.message ||
+          deleteInfo?.data?.message
+        }`,
+      });
+      setIsDialogOpen(false);
+      form.reset();
+    }
+    if (createInfo.error || updateInfo.error || deleteInfo.error) {
+      toast("Error", {
+        description: `${
+          createInfo?.error?.response?.data?.message ||
+          updateInfo?.error?.response?.data?.message ||
+          deleteInfo?.error?.response?.data?.message ||
+          createInfo?.error?.message ||
+          updateInfo?.error?.message ||
+          deleteInfo?.error?.message
+        }`,
+      });
+    }
+  }, [
+    createInfo?.data?.message,
+    createInfo.error,
+    createInfo.isSuccess,
+    deleteInfo?.data?.message,
+    deleteInfo.error,
+    deleteInfo.isSuccess,
+    form,
+    updateInfo?.data?.message,
+    updateInfo.error,
+    updateInfo.isSuccess,
+  ]);
 
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
@@ -158,26 +167,28 @@ const BusInfo = () => {
       width: "60px",
     },
     {
-      name: "View",
+      name: "Actions",
       cell: (data) => (
-        <a
-          data-target="#showdetails"
-          data-toggle="modal"
-          href="#edit_specialities_details"
-          rel="noreferrer"
-          onClick={() => handleShowBusInfo(data.id)}
-        >
-          <i
-            className="fa fa-eye"
-            style={{ color: "#00d0f1", fontSize: "17px" }}
-          ></i>
-        </a>
+        <div className="flex">
+          <Button variant="ghost" size="icon" onClick={() => handleView(data)}>
+            <Eye className="h-4 w-4 text-primary" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setIsViewMode(false);
+              handleEdit(data);
+            }}
+          >
+            <Edit className="h-4 w-4 text-primary" />
+          </Button>
+        </div>
       ),
-      width: "60px",
     },
     {
       name: "Paribahan",
-      selector: (data) => data.paribahanName,
+      selector: (data) => data?.paribahanUser?.paribahanName,
       sortable: true,
     },
     {
@@ -229,325 +240,314 @@ const BusInfo = () => {
       selector: (data) => data.report,
       sortable: true,
     },
-
     {
-      name: "Entry Date",
-      selector: (data) => formatDate(data.createdAt),
+      name: "Updated At",
+      selector: (data) => formatDate(data.updatedAt),
       sortable: true,
     },
     {
+      name: "Created At",
+      selector: (data) => formatDate(data.createdAt),
+      sortable: true,
+    },
+
+    {
       name: "Actions",
       cell: (data) => (
-        <div className="actions">
-          <a
-            className="btn btn-sm bg-success-light mr-2"
-            data-target="#busInfoEditPopup"
-            data-toggle="modal"
-            href="#edit_specialities_details"
-            onClick={() => handleOpenUpdateForm(data.id)}
-          >
-            <i className="fe fe-pencil"></i>
-          </a>
-          <button
-            onClick={() => handleDeleteBusInfo(data.id)}
-            className="btn btn-sm bg-danger-light"
-            disabled={authUser?.role?.name === "VIEWER" && true}
-          >
-            <i className="fe fe-trash"></i>
-          </button>
-        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={authUser?.role?.name === "VIEWER"}
+            >
+              <Trash className="h-4 w-4 text-red-500" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                Bus info and remove it from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => deleteInfo.mutate(data.id)}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       ),
       right: true, // Align the column to the right
     },
   ];
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-    if (message) {
-      toast.success(message);
-    }
-    return () => {
-      dispatch(setBusInfoMessageEmpty());
-    };
-  }, [dispatch, error, message]);
-  return (
-    <>
-      <ModalPopup title={infoDetails.paribahanName} target="showdetails">
-        <div>
-          {infoDetails?.regNo && (
-            <p>
-              <b>Registration No : </b> {infoDetails?.regNo}
-            </p>
-          )}
-          {infoDetails?.type && (
-            <p>
-              <b>Type : </b> {infoDetails?.type}
-            </p>
-          )}
-          {infoDetails?.fcExpire && (
-            <p>
-              <b>Fitness Expire : </b>
-              <span
-                style={{
-                  color:
-                    new Date(infoDetails.fcExpire) < new Date()
-                      ? "red"
-                      : "inherit",
-                  textDecoration:
-                    new Date(infoDetails.fcExpire) < new Date()
-                      ? "line-through"
-                      : "none",
-                }}
-              >
-                {infoDetails.fcExpire}
-              </span>
-            </p>
-          )}
-          {infoDetails?.comment && (
-            <p>
-              <b>Route Permit : </b> {infoDetails?.comment}
-            </p>
-          )}
-          {infoDetails?.report && (
-            <p>
-              <b>Report : </b> {infoDetails?.report}
-            </p>
-          )}
-        </div>
-      </ModalPopup>
-      {/* Create  Bus Info */}
-      <ModalPopup title="Create Bus Info" target="createBusInfoModal">
-        <form onSubmit={handleSubmitInfo}>
-          <div className="form-group mb-2">
-            <select
-              name="id"
-              id="id"
-              value={input.id}
-              onChange={changeInputValue}
-              className="form-control d-none"
-            >
-              <option value="">Paribahan Id</option>
-              {paribahanUsers?.map((data, index) => (
-                <option key={index} value={data.id}>
-                  {data.id}
-                </option>
-              ))}
-            </select>
-            <select
-              name="paribahanName"
-              id="paribahanName"
-              value={input.paribahanName}
-              onChange={changeInputValue}
-              className="form-control"
-            >
-              <option value="">Paribahan Name</option>
-              {paribahanUsers?.map((data, index) => (
-                <option key={index} value={data.paribahanName}>
-                  {data.paribahanName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group mb-2">
-            <input
-              type="text"
-              name="regNo"
-              value={input.regNo}
-              onChange={changeInputValue}
-              className="form-control"
-              placeholder="Reg No"
-            />
-          </div>
-          <div className="form-group mb-2">
-            <select
-              name="type"
-              id="type"
-              value={input.type}
-              onChange={changeInputValue}
-              className="form-control"
-            >
-              <option value="">Bus Type</option>
-              <option value="AC">AC</option>
-              <option value="Non-AC">Non-AC</option>
-              <option value="Sleeper Coach">Sleeper Coach</option>
-              <option value="Double-decker">Double-decker</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              name="comment"
-              value={input.comment}
-              onChange={changeInputValue}
-              className="form-control"
-              placeholder="Remark"
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              name="report"
-              value={input.report}
-              onChange={changeInputValue}
-              className="form-control"
-              placeholder="Report"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="fcExpire">Fitness Certificate Expire</label>
-            <input
-              type="date"
-              id="fcExpire"
-              name="fcExpire"
-              value={input.fcExpire}
-              onChange={changeInputValue}
-              className="form-control"
-            />
-          </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={
-              authUser?.role?.name === "VIEWER" || loader ? true : false
-            }
-          >
-            {loader ? "Creating..." : "Create"}
-          </button>
-        </form>
-      </ModalPopup>
-      {/* Update Bus Info */}
-      <ModalPopup title="Edit Bus Info" target="busInfoEditPopup">
-        <form onSubmit={handleUpdateInfo}>
-          <div className="form-group mb-2">
-            {/* <select
-              name="id"
-              id="id"
-              value={infoData?.id}
-              onChange={changeInfoData}
-              className="form-control d-none"
-            >
-              <option value="">Paribahan Id</option>
-              {paribahanUsers?.map((data, index) => (
-                <option key={index} value={data.id}>
-                  {data.id}
-                </option>
-              ))}
-            </select>
-            <select
-              name="paribahanName"
-              id="paribahanName"
-              value={infoData?.paribahanName}
-              onChange={changeInfoData}
-              className="form-control"
-            >
-              <option value="">Paribahan Name</option>
-              {paribahanUsers?.map((data, index) => (
-                <option key={index} value={data.paribahanName}>
-                  {data.paribahanName}
-                </option>
-              ))}
-            </select> */}
-          </div>
-          <div className="form-group mb-2">
-            <input
-              type="text"
-              name="regNo"
-              value={infoData?.regNo}
-              onChange={changeInfoData}
-              className="form-control"
-              placeholder="Reg No"
-            />
-          </div>
-          <div className="form-group mb-2">
-            <select
-              name="type"
-              id="type"
-              value={infoData?.type}
-              onChange={changeInfoData}
-              className="form-control"
-            >
-              <option value="">Bus Type</option>
-              <option value="AC">AC</option>
-              <option value="Non-AC">Non-AC</option>
-              <option value="Sleeper Coach">Sleeper Coach</option>
-              <option value="Double-decker">Double-decker</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              name="comment"
-              value={infoData?.comment}
-              onChange={changeInfoData}
-              className="form-control"
-              placeholder="Remark"
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              name="report"
-              value={infoData?.report}
-              onChange={changeInfoData}
-              className="form-control"
-              placeholder="Report"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="fcExpire">Fitness Certificate Expire</label>
-            <input
-              type="date"
-              id="fcExpire"
-              name="fcExpire"
-              value={infoData?.fcExpire ? infoData?.fcExpire : ""}
-              onChange={changeInfoData}
-              className="form-control"
-            />
-          </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={
-              authUser?.role?.name === "VIEWER" || loader ? true : false
-            }
-          >
-            {loader ? "Editing..." : "Edit"}
-          </button>
-        </form>
-      </ModalPopup>
-      <PageHeader title="Bus Info" />
-      <button
-        data-target="#createBusInfoModal"
-        data-toggle="modal"
-        className="btn btn-primary btn-sm mb-2"
-        disabled={authUser?.role?.name === "VIEWER" && true}
-      >
-        Add new
-      </button>
-      <input
-        type="text"
-        placeholder="Search"
-        className="form-control table-search-box"
-        onChange={handleSearchChange}
-      />
+  const renderViewContent = () => {
+    if (!currentData) return null;
 
+    const currentDate = new Date();
+    const fcExpireDate = new Date(currentData.fcExpire);
+    const isExpired = fcExpireDate < currentDate;
+
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <InfoItem
+            label="Paribahan"
+            value={currentData.paribahanUser?.paribahanName}
+          />
+          <InfoItem label="Registration No" value={currentData.regNo} />
+          <InfoItem label="Type" value={currentData.type} />
+          <InfoItem
+            label="FC Expire"
+            value={currentData.fcExpire}
+            customStyle={{
+              color: isExpired ? "red" : "inherit",
+              textDecoration: isExpired ? "line-through" : "none",
+            }}
+          />
+          <InfoItem
+            label="Updated At"
+            value={formatDate(currentData.updatedAt)}
+          />
+          <InfoItem
+            label="Entry Date"
+            value={formatDate(currentData.createdAt)}
+          />
+        </div>
+        <div className="space-y-2">
+          <InfoItem label="Comment" value={currentData.comment} fullWidth />
+          <InfoItem label="Report" value={currentData.report} fullWidth />
+        </div>
+        <div className="flex justify-center">
+          <img
+            src={currentData.qrCode || "/placeholder.svg?height=128&width=128"}
+            alt="QR Code"
+            className="w-32 h-32"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // eslint-disable-next-line react/prop-types
+  const InfoItem = ({ label, value, fullWidth = false, customStyle = {} }) => (
+    <div className={fullWidth ? "col-span-2" : ""}>
+      <p className="text-sm font-medium text-gray-500">{label}</p>
+      <p className="mt-1 text-sm text-gray-900" style={customStyle}>
+        {value || "N/A"}
+      </p>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="flex justify-between items-center">
+        <PageHeader title="Bus Info" />
+        <Button
+          onClick={() => {
+            setIsViewMode(false);
+            setIsEditing(false); // Reset editing mode
+            form.reset(); // Reset form
+            setIsDialogOpen(true);
+          }}
+        >
+          Add New
+        </Button>
+      </div>
+      <Input
+        type="text"
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search..."
+        className="my-3"
+      />
       <DataTable
         // title="Regular Schedules"
         columns={columns}
-        data={busInfo}
+        data={busInfoData?.busInfo || []}
         responsive
-        progressPending={loader}
-        progressComponent={<Loading />}
+        progressPending={busInfoLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
+          </div>
+        }
         pagination
         paginationServer
-        paginationTotalRows={searchCount ? searchCount : totalCount}
-        onChangeRowsPerPage={handlePerRowsChange}
-        onChangePage={handlePageChange}
+        paginationTotalRows={
+          busInfoData?.searchCount
+            ? busInfoData?.searchCount
+            : busInfoData?.totalCount
+        }
+        onChangeRowsPerPage={(value) => setRowPage(value)}
+        onChangePage={(page) => setPage(page)}
         paginationRowsPerPageOptions={[10, 20, 50, 100]}
       />
-    </>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent
+          className="max-h-[95vh] sm:max-w-[625px] overflow-y-auto"
+          // onClick={(e) => e.stopPropagation()}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>
+              {isViewMode
+                ? "Bus Information"
+                : isEditing
+                ? "Update Bus"
+                : "Create Bus"}
+            </DialogTitle>
+          </DialogHeader>
+          {isViewMode ? (
+            renderViewContent()
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-2"
+              >
+                <FormField
+                  control={form.control}
+                  name="paribahanName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Paribahan Name</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Paribahan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {paribahanLoading && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          {users?.paribahanUsers?.map((data) => (
+                            <SelectItem
+                              key={data.id}
+                              value={data.paribahanName}
+                            >
+                              {data.paribahanName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="regNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Registration Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bus Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select bus type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {busTypes?.map((data) => (
+                            <SelectItem key={data.id} value={data.label}>
+                              {data.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="comment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Comment</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="report"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Report</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fcExpire"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fitness Certificate Expiry Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    disabled={
+                      createInfo.isPending ||
+                      updateInfo.isPending ||
+                      authUser?.role?.name === "VIEWER" ||
+                      authUser?.role?.name === "DEMO"
+                    }
+                  >
+                    {createInfo.isPending || updateInfo.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                        wait...
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

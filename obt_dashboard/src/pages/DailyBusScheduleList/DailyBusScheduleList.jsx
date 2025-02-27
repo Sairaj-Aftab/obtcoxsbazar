@@ -1,63 +1,27 @@
-import { useDispatch, useSelector } from "react-redux";
-import {
-  schedulesData,
-  setMessageEmpty,
-} from "../../features/schedules/schedulesSlice";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { authData } from "../../features/auth/authSlice";
+import { useState } from "react";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading/Loading";
 import { formatDateTime } from "../../utils/timeAgo";
-import swal from "sweetalert";
-import {
-  deleteSchedule,
-  getAllSchedules,
-} from "../../features/schedules/schedulesApiSlice";
 import PageHeader from "../../components/PageHeader/PageHeader";
+import useAuth from "@/store/useAuth";
+import { Button } from "@/components/ui/button";
+import { Trash } from "lucide-react";
+import { useGetAllSchedules } from "@/services/schedule.service";
+import { Input } from "@/components/ui/input";
 
 const DailyBusScheduleList = () => {
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(authData);
-  const { schedules, totalScheduleCount, searchCount, message, error, loader } =
-    useSelector(schedulesData);
-
-  const handleDeleteSchedule = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
-          icon: "success",
-        });
-        dispatch(deleteSchedule(id));
-      } else {
-        swal("Your imaginary file is safe!");
-      }
-    });
-  };
+  const { authUser } = useAuth();
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getAllSchedules({ page, limit: rowPage, search }));
-  };
+  const { data, isLoading } = useGetAllSchedules({
+    page,
+    limit: rowPage,
+    search,
+  });
 
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getAllSchedules({ page, limit: newPerPage, search }));
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(getAllSchedules({ page, limit: rowPage, search: e.target.value })); // Fetch schedules with the search term
-  };
+  const handleDeleteSchedule = () => {};
 
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
@@ -132,54 +96,46 @@ const DailyBusScheduleList = () => {
     {
       name: "Actions",
       cell: (data) => (
-        <div className="text-right actions">
-          <button
-            className="btn btn-sm bg-danger-light"
-            onClick={() => handleDeleteSchedule(data.id)}
-            disabled={authUser?.role?.name === "VIEWER" && true}
-          >
-            <i className="fe fe-trash"></i> Delete
-          </button>
-        </div>
+        <Button
+          className="bg-red-500"
+          onClick={() => handleDeleteSchedule(data.id)}
+          disabled={authUser?.role?.name === "VIEWER" && true}
+        >
+          <Trash className="mr-1 h-4 w-4" /> Delete
+        </Button>
       ),
       right: true, // Align the column to the right
     },
   ];
-
-  useEffect(() => {
-    if (message) {
-      toast.success(message);
-    }
-    if (error) {
-      toast.error(error);
-    }
-    return () => {
-      dispatch(setMessageEmpty());
-    };
-  }, [dispatch, loader, error, message]);
   return (
-    <>
+    <div>
       <PageHeader title="Schedule Log Book" />
-      <input
+      <Input
         type="text"
-        placeholder="Search"
-        className="form-control table-search-box"
-        onChange={handleSearchChange}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search..."
+        className="my-3"
       />
       <DataTable
         columns={columns}
-        data={schedules}
+        data={data?.schedules || []}
         responsive
-        progressPending={loader}
-        progressComponent={<Loading />}
+        progressPending={isLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
+          </div>
+        }
         pagination
         paginationServer
-        paginationTotalRows={searchCount ? searchCount : totalScheduleCount}
-        onChangeRowsPerPage={handlePerRowsChange}
-        onChangePage={handlePageChange}
+        paginationTotalRows={
+          data?.searchCount ? data?.searchCount : data?.totalScheduleCount
+        }
+        onChangeRowsPerPage={(newPerPage) => setRowPage(newPerPage)}
+        onChangePage={(page) => setPage(page)}
         paginationRowsPerPageOptions={[10, 20, 50, 100]}
       />
-    </>
+    </div>
   );
 };
 

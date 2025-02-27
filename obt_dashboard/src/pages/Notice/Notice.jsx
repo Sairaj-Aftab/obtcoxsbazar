@@ -1,232 +1,348 @@
 import { useEffect, useState } from "react";
-import DataTables from "datatables.net-dt";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { authData } from "../../features/auth/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import useAuth from "@/store/useAuth";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  noticeData,
-  setNoticeMessageEmpty,
-} from "../../features/notice/noticeSlice";
-import toast from "react-hot-toast";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Edit, Loader2, Trash } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import DataTable from "react-data-table-component";
+import Loading from "@/components/Loading/Loading";
 import {
-  createAuthNotice,
-  deleteAuthNotice,
-  deleteParibahanNotice,
-  updateAdminNotice,
-  updateParibahanNotice,
-} from "../../features/notice/noticeApiSlice";
-import swal from "sweetalert";
-import ModalPopup from "../../components/ModalPopup/ModalPopup";
+  useCreateAuthNotice,
+  useGetAllParibahanNotice,
+  useGetAuthNotice,
+  useUpdateAdminNotice,
+  useUpdateParibahanNotice,
+} from "@/services/notice.service";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  status: z.string().min(1, "Status is required").optional(),
+});
 
 const Notice = () => {
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(authData);
-  const { authNotices, paribahanNotices, loader, message, error } =
-    useSelector(noticeData);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
+  const { authUser } = useAuth();
+  const { data: authNotices, isLoading: authNoticesLoading } =
+    useGetAuthNotice();
+  const { data: paribahanNotices, isLoading: paribahanNoticesLoading } =
+    useGetAllParibahanNotice();
+  const createNotice = useCreateAuthNotice();
+  const updateNotice = useUpdateAdminNotice();
+  const updateParibahanNotice = useUpdateParibahanNotice();
 
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!title || !status) {
-      toast.error("Please fill all the fields");
-    } else {
-      dispatch(createAuthNotice({ id: authUser.id, data: { title, status } }));
-    }
-  };
-
-  const [editNotice, setEditNotice] = useState({
-    id: "",
-    title: "",
-    status: "",
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      status: "",
+    },
   });
-  const handleEditShowModal = (id) => {
-    const noticeToEdit = (authNotices || [])
-      .concat(paribahanNotices || [])
-      .find((notice) => notice.id === id);
-    if (noticeToEdit) {
-      setEditNotice({
-        id: noticeToEdit.id,
-        title: noticeToEdit.title,
-        status: noticeToEdit.status,
+
+  async function onSubmit(data) {
+    if (isEditing) {
+      updateNotice.mutate({
+        id: currentData.id,
+        title: data.title,
+      });
+    } else {
+      createNotice.mutate({
+        id: authUser.id,
+        data,
       });
     }
-  };
+  }
 
-  const handleEditNoticecSubmit = (e) => {
-    e.preventDefault();
-    const { id, title, status } = editNotice;
+  // const handleEditShowModal = (id) => {
+  //   const noticeToEdit = (authNotices || [])
+  //     .concat(paribahanNotices || [])
+  //     .find((notice) => notice.id === id);
+  //   if (noticeToEdit) {
+  //     setEditNotice({
+  //       id: noticeToEdit.id,
+  //       title: noticeToEdit.title,
+  //       status: noticeToEdit.status,
+  //     });
+  //   }
+  // };
 
-    if (!title) {
-      toast.warning("Field is required!");
-      return;
-    }
-
-    const validStatuses = [
-      "Passenger",
-      "Display",
-      "Paribahan",
-      "Tourist-Bus-Permission",
-    ];
-
-    if (validStatuses.includes(status)) {
-      dispatch(updateAdminNotice({ id, title }));
-    } else {
-      dispatch(updateParibahanNotice({ id, title }));
-    }
-  };
-
-  const handleDelete = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal("Poof! Successfully deleted", {
-          icon: "success",
-        });
-        // Check in both notices and dispatch the corresponding delete action
-        const noticeToDelete = authNotices.find((notice) => notice.id === id)
-          ? deleteAuthNotice
-          : deleteParibahanNotice;
-
-        dispatch(noticeToDelete(id));
-      }
+  const handleEdit = (data) => {
+    setIsEditing(true);
+    setCurrentData(data);
+    form.reset({
+      title: data.title,
     });
+    form.setValue("title", data.title);
+    setIsDialogOpen(true);
+  };
+
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
   };
 
   useEffect(() => {
-    new DataTables(".datatable");
-    if (message) {
-      toast.success(message);
-      setTitle("");
-      setStatus("");
+    if (createNotice.isSuccess || updateNotice.isSuccess) {
+      toast("Success", {
+        description: `${
+          createNotice?.data?.message || updateNotice?.data?.message
+        }`,
+      });
+      setIsDialogOpen(false);
+      form.reset();
     }
-    if (error) {
-      toast.error(error);
+    if (createNotice.error || updateNotice.error) {
+      toast("Error", {
+        description: `${
+          createNotice?.error?.response?.data?.message ||
+          updateNotice?.error?.response?.data?.message ||
+          createNotice?.error?.message ||
+          updateNotice?.error?.message
+        }`,
+      });
     }
-    return () => {
-      dispatch(setNoticeMessageEmpty());
-    };
-  }, [dispatch, message, error, authNotices]);
-  return (
-    <>
-      <PageHeader title="Notice Board" />
-      <form onSubmit={handleSubmit} className="d-flex mb-2">
-        <input
-          className="form-control mr-2"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Add Notice"
-        />
-        <select
-          className="form-control w-25 mr-2"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">Select Status</option>
-          <option value="Paribahan">Paribahan</option>
-          <option value="Passenger">Passenger</option>
-          <option value="Display">Display</option>
-          <option value="Tourist-Bus-Permission">Tourist Bus Permission</option>
-        </select>
-        <button
-          disabled={authUser?.role?.name === "VIEWER" && true}
-          className="btn btn-primary"
-          type="submit"
-        >
-          Submit
-        </button>
-      </form>
-      <ModalPopup title="Edit Notice" target="noticeEditPopup">
-        <form onSubmit={handleEditNoticecSubmit}>
-          <textarea
-            id="editTitle"
-            rows={5}
-            className="form-control mb-3"
-            value={editNotice?.title}
-            onChange={(e) =>
-              setEditNotice({ ...editNotice, title: e.target.value })
-            }
-          ></textarea>
-          <button
-            disabled={authUser?.role?.name === "VIEWER" && true}
-            type="submit"
-            className="btn btn-primary"
+  }, [
+    createNotice?.data?.message,
+    createNotice.error,
+    createNotice.isSuccess,
+    form,
+    updateNotice?.data?.message,
+    updateNotice.error,
+    updateNotice.isSuccess,
+  ]);
+
+  const columns = [
+    {
+      name: "#",
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "60px",
+    },
+    {
+      name: "Actions",
+      cell: (data) => (
+        <div>
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={authUser?.role?.name === "VIEWER"}
+            onClick={() => handleEdit(data)}
           >
-            {loader ? "Editing..." : "Edit"}
-          </button>
-        </form>
-      </ModalPopup>
-
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                <table className="datatable table table-hover table-center mb-0">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th className="text-right">Actions</th>
-                      <th>User</th>
-                      <th>Title & Explanation</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {(authNotices || [])
-                      .concat(paribahanNotices || [])
-                      .map((data, index) => (
-                        <tr key={data.id || index}>
-                          <td>{index + 1}</td>
-                          <td className="text-right">
-                            <div className="actions">
-                              <button
-                                data-toggle="modal"
-                                data-target="#noticeEditPopup"
-                                className="btn btn-sm bg-primary-light mr-1"
-                                disabled={authUser?.role?.name === "VIEWER"}
-                                onClick={() => handleEditShowModal(data.id)}
-                              >
-                                <i className="fe fe-pencil"></i>
-                              </button>
-                              <button
-                                data-toggle="modal"
-                                className="btn btn-sm bg-danger-light"
-                                disabled={authUser?.role?.name === "VIEWER"}
-                                onClick={() => handleDelete(data.id)}
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                          <td>
-                            {data?.authUser?.userName ||
-                              data?.paribahanUser?.paribahanName}
-                            {data?.authUser && " To "}
-                            <span className="badge badge-success">
-                              {data.status}
-                            </span>
-                          </td>
-                          <td>
-                            {data.title} <br />
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+            <Edit className="h-4 w-4 text-primary" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Trash className="h-4 w-4 text-red-500" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  notice and remove it from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                // onClick={() => deleteSchedule.mutate(data.id)}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
+      ),
+      width: "120px",
+    },
+    {
+      name: "User",
+      cell: (data) => (
+        <div>
+          {data?.authUser?.userName || data?.paribahanUser?.paribahanName}
+          {data?.authUser && " To "}
+          {data?.authUser?.userName && <Badge>{data.status}</Badge>}
+        </div>
+      ),
+      sortable: true,
+      width: "300px",
+    },
+    {
+      name: "Title & Explanation",
+      selector: (data) => data.title,
+      sortable: true,
+    },
+  ];
+
+  return (
+    <div>
+      <div className="flex justify-between items-center">
+        <PageHeader title="Notice Board" />
+        <Button
+          onClick={() => {
+            setIsEditing(false); // Reset editing mode
+            form.reset(); // Reset form
+            setIsDialogOpen(true);
+          }}
+        >
+          Add Notice
+        </Button>
       </div>
-    </>
+      <Input
+        type="text"
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search..."
+        className="my-3"
+      />
+      <DataTable
+        columns={columns}
+        data={authNotices?.notices?.concat(paribahanNotices?.notices) || []}
+        responsive
+        progressPending={authNoticesLoading || paribahanNoticesLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
+          </div>
+        }
+        pagination
+        // paginationServer
+        // paginationTotalRows={
+        //   schedules?.searchCount
+        //     ? schedules?.searchCount
+        //     : schedules?.totalCount
+        // }
+        onChangeRowsPerPage={(value) => setRowPage(value)}
+        onChangePage={(page) => setPage(page)}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+      />
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent
+          className="max-h-[95vh] sm:max-w-[625px] overflow-y-auto"
+          // onClick={(e) => e.stopPropagation()}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>
+              {isEditing ? "Update notice" : "Create notice"}
+            </DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Time */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title & Explanation</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Status */}
+              {!isEditing && (
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Passenger">Passenger</SelectItem>
+                          <SelectItem value="Display">Display</SelectItem>
+                          <SelectItem value="Paribahan">Paribahan</SelectItem>
+                          <SelectItem value="Tourist-Bus-Permission">
+                            Tourist-Bus-Permission
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  disabled={
+                    createNotice.isPending ||
+                    updateNotice.isPending ||
+                    authUser?.role?.name === "VIEWER" ||
+                    authUser?.role?.name === "DEMO"
+                  }
+                >
+                  {createNotice.isPending || updateNotice.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                      wait...
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

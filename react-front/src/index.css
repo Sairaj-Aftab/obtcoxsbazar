@@ -2,6 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 0 0% 98%; /* #f9f9f9 */
+    --foreground: 0 0% 0%; /* #000000 */
+    --muted: 220 10% 90%; /* #e5e7eb */
+    --muted-foreground: 220 9% 50%; /* #6b7280 */
+    --popover: 0 0% 100%; /* #ffffff */
+    --popover-foreground: 0 0% 0%; /* #000000 */
+    --border: 220 10% 80%; /* #d1d5db */
+    --input: 220 10% 80%; /* #d1d5db */
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 0 0% 0%; /* #000000 */
+    --primary: 180 100% 25%; /* #008080 */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+    --secondary: 180 100% 25%; /* #008080 */
+    --secondary-foreground: 0 0% 100%; /* #ffffff */
+    --accent: 180 100% 25%; /* #008080 */
+    --accent-foreground: 0 0% 100%; /* #ffffff */
+    --destructive: 0 100% 50%; /* #ff0000 */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --ring: 220 9% 30%; /* #374151 */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 22% 13%; /* #1f2937 */
+    --foreground: 0 0% 98%; /* #f9f9f9 */
+    --muted: 220 22% 20%; /* #374151 */
+    --muted-foreground: 220 9% 60%; /* #9ca3af */
+    --accent: 220 15% 27%; /* #4b5563 */
+    --accent-foreground: 0 0% 100%; /* #ffffff */
+    --popover: 220 22% 13%; /* #1f2937 */
+    --popover-foreground: 220 10% 90%; /* #e5e7eb */
+    --border: 220 15% 27%; /* #4b5563 */
+    --input: 220 15% 27%; /* #4b5563 */
+    --card: 220 22% 13%; /* #1f2937 */
+    --card-foreground: 0 0% 98%; /* #f9f9f9 */
+    --primary: 180 100% 25%; /* #008080 */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+    --secondary: 180 100% 25%; /* #008080 */
+    --secondary-foreground: 0 0% 100%; /* #ffffff */
+    --destructive: 0 100% 50%; /* #ff0000 */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    --ring: 220 15% 27%; /* #4b5563 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased;
+  }
+}
+
 /* Font for Digital Clock */
 @font-face {
   font-family: "Digital";

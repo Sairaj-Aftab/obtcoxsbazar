@@ -34,17 +34,27 @@ export const createSchedule = async (req, res, next) => {
 export const updateSchedule = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { type, time, leavingPlace, destinationPlace, rent } = req.body;
+    const {
+      busName,
+      type,
+      time,
+      leavingPlace,
+      destinationPlace,
+      paribahanId,
+      rent,
+    } = req.body;
 
     const busSchedule = await prisma.regularBusSchedule.update({
       where: {
         id: String(id),
       },
       data: {
+        busName,
         type,
         time,
         leavingPlace,
         destinationPlace,
+        paribahanUserId: String(paribahanId),
         rent: Number(rent),
       },
     });

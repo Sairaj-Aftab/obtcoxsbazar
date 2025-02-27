@@ -1,8 +1,8 @@
-import { useSelector } from "react-redux";
+import useAuth from "@/store/useAuth";
 import { Navigate, Outlet } from "react-router-dom";
 
 const PublicRouteGrid = () => {
-  const { authUser } = useSelector((state) => state.auth);
+  const { authUser } = useAuth();
   if (localStorage.getItem("authUser")) {
     return authUser ? <Navigate to="/" /> : <Outlet />;
   }

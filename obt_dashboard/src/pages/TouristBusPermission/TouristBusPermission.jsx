@@ -1,149 +1,177 @@
-import { useDispatch, useSelector } from "react-redux";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import DataTable from "react-data-table-component";
-import { authData } from "../../features/auth/authSlice";
 import { useEffect, useState } from "react";
-import {
-  getAllTouristBusPermission,
-  updateTouristBusPermission,
-} from "../../features/touristBusPermission/touristBusPermissionApiSlice";
-import {
-  setMessageEmpty,
-  touristBusPermissionsData,
-} from "../../features/touristBusPermission/touristBusPermissionSlice";
-import toast from "react-hot-toast";
 import { formatDateAndTime, formatDateTime } from "../../utils/timeAgo";
 import Loading from "../../components/Loading/Loading";
-import ModalPopup from "../../components/ModalPopup/ModalPopup";
-import { getAllSettingData } from "../../features/settings/settingSlice";
-import { updateSetting } from "../../features/settings/settingApiSlice";
+import useAuth from "@/store/useAuth";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Building,
+  Bus,
+  Calendar,
+  Clock,
+  Edit,
+  Eye,
+  FileText,
+  Loader2,
+  MapPin,
+  Phone,
+  Truck,
+  User,
+  Users,
+} from "lucide-react";
+import {
+  useAllTouristBusPermission,
+  useUpdateTouristBusPermission,
+} from "@/services/touristBusPer.service";
+import { Switch } from "@/components/ui/switch";
+import { useAllSettings, useUpdateSetting } from "@/services/settings.service";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Card, CardContent } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+
+const rejectionReasons = [
+  "Rejected",
+  "Traffic Jam in Town Area",
+  "Incomplete Bus Reg. Number",
+  "Incomplete Information",
+  "Wrong selection of parking area",
+];
+
+const formSchema = z.object({
+  status: z.enum(["approved", "rejected"]),
+  rejectedReason: z.string().optional(),
+});
+
+const noticeSchema = z.object({
+  description: z.string().min(1, "Notice content is required"),
+});
 
 const TouristBusPermission = () => {
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(authData);
-  const { settings } = useSelector(getAllSettingData);
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isNoticeDialogOpen, setIsNoticeDialogOpen] = useState(false);
+  const [selectedPermission, setSelectedPermission] = useState(null);
+
+  const { data, isLoading } = useAllTouristBusPermission({
+    page,
+    limit: rowPage,
+  });
+  const updatePermissionStatus = useUpdateTouristBusPermission();
+  const updateSetting = useUpdateSetting();
+
+  const { authUser } = useAuth();
+  const { data: settings, isLoading: settingLoading } = useAllSettings();
   const [setting, setSetting] = useState({});
-  const [notice, setNotice] = useState("");
-  const [updateNoticeShow, setUpdateNoticeShow] = useState(false);
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      status: "",
+      rejectedReason: "",
+    },
+  });
+
+  const noticeForm = useForm({
+    resolver: zodResolver(noticeSchema),
+    defaultValues: {
+      description: "",
+    },
+  });
+
+  const handleReview = (data) => {
+    setSelectedPermission(data);
+    form.setValue("status", data.status);
+    setIsDialogOpen(true);
+  };
 
   useEffect(() => {
     if (settings) {
       setSetting(
-        settings?.find((set) => set.name === "TOURIST-BUS-ENTRY-PERMISSION")
+        settings?.settings?.find(
+          (set) => set.name === "TOURIST-BUS-ENTRY-PERMISSION"
+        )
       );
     }
   }, [settings]);
 
-  const {
-    permissions,
-    permissionsCount,
-    message,
-    error,
-    permissionLoader,
-    loader,
-  } = useSelector(touristBusPermissionsData);
-  const [editStatusId, setEditStatusId] = useState(null);
-
-  const [reviewPermission, setReviewPermission] = useState({});
-  const [reviewStatus, setReviewStatus] = useState("");
-  const [rejectContent, setRejectContent] = useState("");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [rowPage, setRowPage] = useState(10);
-
-  const handleShowReviewPermission = (id) => {
-    const selectedReview = permissions?.find((per) => per.id === id);
-    if (selectedReview) {
-      setReviewPermission(selectedReview);
-      setReviewStatus(
-        selectedReview.approved
-          ? "approved"
-          : selectedReview.rejected
-          ? "rejected"
-          : "pending"
-      );
+  function onSubmit(data) {
+    if (selectedPermission) {
+      updatePermissionStatus.mutate({
+        id: selectedPermission.id,
+        status: data.status,
+        rejectedReason: data.rejectedReason,
+      });
     }
+  }
+
+  const handleOnOffPermission = (status) => {
+    updateSetting.mutate({ id: setting.id, data: { status } });
   };
 
-  const handleStatusChange = (id, status) => {
-    const approved = status === "approved";
-    const rejected = status === "rejected";
-
-    dispatch(
-      updateTouristBusPermission({
-        id,
-        approved,
-        rejected,
-        rejectedReason: rejectContent,
-      })
-    ).then(() => {
-      setEditStatusId(null); // Reset the edit mode
-      toast.success(`Status updated to ${status}`);
+  function onNoticeSubmit(data) {
+    updateSetting.mutate({
+      id: setting.id,
+      data: { description: data.description },
     });
-  };
+  }
 
-  const handleOnOffStatusChange = (e) => {
-    const updatedStatus = e.target.checked;
-    // Update the status (e.g., API call, state update)
-    dispatch(
-      updateSetting({ data: { status: updatedStatus }, id: setting.id })
-    );
-  };
+  useEffect(() => {
+    if (updatePermissionStatus.isSuccess || updateSetting.isSuccess) {
+      setIsDialogOpen(false);
+      setIsNoticeDialogOpen(false);
+      form.reset();
+      noticeForm.reset();
+    }
+    if (updatePermissionStatus.error || updateSetting.error) {
+      toast("Error", {
+        description: `${
+          updatePermissionStatus?.error?.response?.data?.message ||
+          updatePermissionStatus?.error?.message ||
+          updateSetting?.error?.message
+        }`,
+      });
+    }
+  }, [
+    form,
+    noticeForm,
+    updatePermissionStatus?.data?.data?.message,
+    updatePermissionStatus.error,
+    updatePermissionStatus.isSuccess,
+    updateSetting.error,
+    updateSetting.isSuccess,
+  ]);
 
-  const handleUpdateSettingNotice = () => {
-    dispatch(updateSetting({ data: { description: notice }, id: setting.id }));
-    setUpdateNoticeShow(false);
-  };
-
-  const handleModalSubmit = (e) => {
-    e.preventDefault();
-    handleStatusChange(reviewPermission.id, reviewStatus);
-  };
-
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getAllTouristBusPermission({ page, limit: rowPage, search }));
-  };
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getAllTouristBusPermission({ page, limit: newPerPage, search }));
-  };
-
-  // const handleSearchChange = (e) => {
-  //   setSearch(e.target.value);
-  //   dispatch(
-  //     getAllTouristBusPermission({
-  //       page,
-  //       limit: rowPage,
-  //       search: e.target.value,
-  //     })
-  //   );
-  // };
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
   };
-
-  useEffect(() => {
-    return () => {
-      setReviewStatus("");
-    };
-  }, [reviewPermission]);
-
-  useEffect(() => {
-    dispatch(getAllTouristBusPermission({ page: 1, limit: 10 }));
-    if (error) {
-      toast.error(error);
-    }
-    if (message) {
-      setReviewPermission({
-        pending: false,
-      });
-    }
-    if (error || message) {
-      dispatch(setMessageEmpty());
-    }
-  }, [dispatch, message, error, reviewPermission?.pending]);
 
   const columns = [
     {
@@ -154,58 +182,27 @@ const TouristBusPermission = () => {
     {
       name: "Review",
       cell: (data) => (
-        <a
-          data-target="#reviewpermission"
-          data-toggle="modal"
-          href="#edit_specialities_details"
-          rel="noreferrer"
-          onClick={() => handleShowReviewPermission(data.id)}
-        >
-          <i
-            className="fa fa-eye"
-            style={{ color: "#00d0f1", fontSize: "17px" }}
-          ></i>
-        </a>
+        <Button variant="ghost" size="icon" onClick={() => handleReview(data)}>
+          <Eye className="h-4 w-4 text-primary" />
+        </Button>
       ),
-      width: "60px",
+      width: "70px",
     },
     {
       name: "Status",
-      cell: (data) =>
-        editStatusId === data.id ? (
-          <select
-            value={
-              data.approved
-                ? "approved"
-                : data.rejected
-                ? "rejected"
-                : "pending"
-            }
-            onChange={(e) => handleStatusChange(data.id, e.target.value)}
-            className="form-control mb-0"
-          >
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-          </select>
-        ) : (
-          <p
-            className={`badge mb-0 ${
-              data.approved
-                ? "badge-success"
-                : data.rejected
-                ? "badge-danger"
-                : "badge-warning"
-            }`}
-            onClick={() => setEditStatusId(data.id)}
-          >
-            {data.approved
-              ? "Approved"
+      cell: (data) => (
+        <Badge
+          variant={
+            data.approved
+              ? "success"
               : data.rejected
-              ? "Rejected"
-              : "Pending"}
-          </p>
-        ),
+              ? "destructive"
+              : "default"
+          }
+        >
+          {data.approved ? "Approved" : data.rejected ? "Rejected" : "Pending"}
+        </Badge>
+      ),
       width: "140px",
     },
     {
@@ -218,11 +215,13 @@ const TouristBusPermission = () => {
       name: "Applicant Name",
       selector: (data) => data.applicantName,
       sortable: true,
+      width: "150px",
     },
     {
       name: "Phone No.",
       selector: (data) => data.phone,
       sortable: true,
+      width: "150px",
     },
     {
       name: "Institution & Arrival Place",
@@ -233,14 +232,17 @@ const TouristBusPermission = () => {
       name: "Arrival Date & Time",
       selector: (data) => formatDateAndTime(data.arrivalDateTime),
       sortable: true,
+      width: "150px",
     },
     {
       name: "No of Tourist",
       selector: (data) => data.numberTourist,
+      width: "100px",
     },
     {
       name: "Number of Bus",
       selector: (data) => data.numberBus,
+      width: "100px",
     },
     {
       name: "Transport Name",
@@ -271,236 +273,313 @@ const TouristBusPermission = () => {
       selector: (data) => formatDateTime(data.createdAt),
       sortable: true,
     },
-    {
-      name: "Actions",
-
-      cell: (data) => (
-        <div className="text-right actions">
-          <button
-            className="btn btn-sm bg-danger-light"
-            // onClick={() => handleDeleteSchedule(data.id)}
-            disabled={authUser?.role?.name === "VIEWER" && true}
-          >
-            <i className="fe fe-trash"></i> Delete
-          </button>
-        </div>
-      ),
-      right: true, // Align the column to the right
-    },
   ];
   return (
-    <>
-      <ModalPopup
-        size="modal-lg"
-        title="Permission Review"
-        target="reviewpermission"
-      >
-        <form className="permission-review-modal" onSubmit={handleModalSubmit}>
-          <ul>
-            <li>
-              <p>Applicant Name</p> <p>{reviewPermission?.applicantName}</p>
-            </li>
-            <li>
-              <p>Mobile No.</p> <p>{reviewPermission?.phone}</p>
-            </li>
-            <li>
-              <p>Institution & Arrival Place</p>{" "}
-              <p>{reviewPermission?.institutionName}</p>
-            </li>
-            <li>
-              <p>No of Tourist</p> <p>{reviewPermission?.numberTourist}</p>
-            </li>
-            <li>
-              <p>No of Transport</p> <p>{reviewPermission?.numberBus}</p>
-            </li>
-            <li>
-              <p>Transport Name</p> <p>{reviewPermission?.transportName}</p>
-            </li>
-            <li>
-              <p>Transport Reg.</p> <p>{reviewPermission?.vehicleRegNo}</p>
-            </li>
-            <li>
-              <p>Destination Place</p>{" "}
-              <p>{reviewPermission?.destinationName}</p>
-            </li>
-            <li>
-              <p>Parking Place</p> <p>{reviewPermission?.parkingPlace}</p>
-            </li>
-            <li>
-              <p>Arrival Date & Time</p>{" "}
-              <p>{formatDateAndTime(reviewPermission?.arrivalDateTime)}</p>
-            </li>
-            <li>
-              <p>Return Date & Time</p>{" "}
-              <p>{formatDateAndTime(reviewPermission?.returnDateTime)}</p>
-            </li>
-            {reviewPermission?.description && (
-              <li>
-                <p>Description</p> <p>{reviewPermission?.description}</p>
-              </li>
-            )}
-            {reviewPermission?.pending && (
-              <li>
-                <p>Permission</p>{" "}
-                <div className="d-flex">
-                  <label
-                    htmlFor="accept"
-                    className="mr-2 mb-0 form-control d-flex align-items-center"
-                  >
-                    <input
-                      type="radio"
-                      id="accept"
-                      name="status"
-                      value="approved"
-                      checked={reviewStatus === "approved"}
-                      onChange={(e) => setReviewStatus(e.target.value)}
-                    />
-                    <span className="ml-1 font-weight-bold">Approve</span>
-                  </label>
-                  <label
-                    htmlFor="reject"
-                    className="mb-0 form-control d-flex align-items-center"
-                  >
-                    <input
-                      type="radio"
-                      id="reject"
-                      name="status"
-                      value="rejected"
-                      checked={reviewStatus === "rejected"}
-                      onChange={(e) => setReviewStatus(e.target.value)}
-                    />
-                    <span className="ml-1 font-weight-bold text-danger">
-                      Reject
-                    </span>
-                  </label>
-                </div>
-              </li>
-            )}
-            {reviewPermission?.pending && reviewStatus === "rejected" && (
-              <li>
-                <p className="text-danger">Reason for rejection</p>{" "}
-                <div className="form-group">
-                  <select
-                    value={rejectContent}
-                    onChange={(e) => setRejectContent(e.target.value)}
-                    className="form-control"
-                  >
-                    <option value="Rejected">Rejected</option>
-                    <option value="Traffic Jam in Town Area">
-                      Traffic Jam in Town Area
-                    </option>
-                    <option value="Incomplete Bus Reg. Number">
-                      Incomplete Bus Reg. Number
-                    </option>
-                    <option value="Incomplete  Information">
-                      Incomplete Information
-                    </option>
-                    <option value="Wrong selection of parking area">
-                      Wrong selection of parking area
-                    </option>
-                  </select>
-                </div>
-              </li>
-            )}
-          </ul>
-          <div className="d-flex justify-content-end mt-3">
-            <button
-              className="btn btn-danger mr-2"
-              type="button"
-              data-dismiss="modal"
-            >
-              Cancel
-            </button>
-            {reviewPermission?.pending && (
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loader}
-              >
-                {loader ? "Updating..." : "Update Status"}
-              </button>
-            )}
-          </div>
-        </form>
-      </ModalPopup>
+    <div>
+      <div className="flex justify-between items-center">
+        <PageHeader title="Tourist Bus Permission" />
+        <div className="flex items-center space-x-2">
+          {settingLoading || updateSetting.isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <Switch
+                checked={setting?.status}
+                onCheckedChange={handleOnOffPermission}
+              />
+              <span>{setting?.status ? "ON" : "OFF"}</span>
+            </>
+          )}
+        </div>
+      </div>
       {!setting?.status && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          {setting?.description && !updateNoticeShow && (
-            <marquee direction="">{setting?.description}</marquee>
-          )}
-          {(updateNoticeShow || !setting?.description) && (
-            <input
-              type="text"
-              placeholder="Notice"
-              value={notice}
-              onChange={(e) => setNotice(e.target.value)}
-              className="form-control"
-            />
-          )}
-          {setting?.description && !updateNoticeShow && (
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                setUpdateNoticeShow(!updateNoticeShow);
-                setNotice(setting?.description);
-              }}
-            >
-              Update
-            </button>
-          )}
-          {(updateNoticeShow || !setting?.description) && (
-            <button
-              className="btn btn-primary"
-              onClick={handleUpdateSettingNotice}
-            >
-              Submit
-            </button>
+        <div className="flex gap-1 items-center mb-2">
+          {setting?.description && (
+            <>
+              <marquee direction="">{setting?.description}</marquee>
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={authUser?.role?.name === "VIEWER"}
+                onClick={() => {
+                  noticeForm.setValue("description", setting?.description);
+                  setIsNoticeDialogOpen(true);
+                }}
+              >
+                <Edit className="h-4 w-4 text-primary" />
+              </Button>
+            </>
           )}
         </div>
       )}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <PageHeader title="Tourist Bus Permission" />
-        <div className="custom-control custom-switch">
-          <input
-            type="checkbox"
-            className="custom-control-input"
-            id="customSwitch1"
-            checked={!!setting?.status}
-            onChange={handleOnOffStatusChange}
-          />
-          <label className="custom-control-label" htmlFor="customSwitch1">
-            {setting?.status ? "ON" : "OFF"}
-          </label>
-        </div>
-      </div>
-
       <DataTable
         columns={columns}
-        data={permissions}
+        data={data?.permissions}
         responsive
-        progressPending={permissionLoader}
-        progressComponent={<Loading />}
+        progressPending={isLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
+          </div>
+        }
         pagination
         paginationServer
-        paginationTotalRows={permissionsCount}
-        onChangeRowsPerPage={handlePerRowsChange}
-        onChangePage={handlePageChange}
+        paginationTotalRows={data?.count}
+        onChangeRowsPerPage={(value) => setRowPage(value)}
+        onChangePage={(page) => setPage(page)}
         paginationRowsPerPageOptions={[10, 20, 50, 100]}
       />
-    </>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-h-[95vh] sm:max-w-5xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Permission Review</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <Card>
+              <CardContent className="py-3 px-3">
+                <h3 className="text-base font-semibold mb-2">
+                  Applicant Details
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Name:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.applicantName}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Phone:</span>
+                    <span className="ml-2">{selectedPermission?.phone}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Building className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Institution:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.institutionName}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="py-3 px-3">
+                <h3 className="text-base font-semibold mb-2">Trip Details</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Arrival:</span>
+                    <span className="ml-2">
+                      {formatDateAndTime(selectedPermission?.arrivalDateTime)}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Tourists:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.numberTourist}
+                    </span>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex items-center">
+                      <Bus className="mr-2 h-4 w-4" />
+                      <span className="font-medium">Buses:</span>
+                      <span className="ml-2">
+                        {selectedPermission?.numberBus}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="font-medium">Reg:</span>
+                      <span className="ml-2">
+                        {selectedPermission?.vehicleRegNo}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="py-3 px-3">
+                <h3 className="text-base font-semibold mb-2">
+                  Transport Details
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <Truck className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Transport:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.transportName}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Destination:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.destinationName}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Parking:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.parkingPlace}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="py-3 px-3">
+                <h3 className="text-base font-semibold mb-2">
+                  Additional Info
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4" />
+                    <span className="font-medium">Return:</span>
+                    <span className="ml-2">
+                      {formatDateAndTime(selectedPermission?.returnDateTime)}
+                    </span>
+                  </div>
+                  <div className="flex items-start">
+                    <FileText className="mr-2 h-4 w-4 mt-1" />
+                    <span className="font-medium">Description:</span>
+                    <span className="ml-2">
+                      {selectedPermission?.description}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          {selectedPermission?.pending && (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-3"
+              >
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem className="flex gap-3 items-center my-3">
+                      <FormLabel>Status :</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex gap-3 items-center !m-0"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="approved" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Approve
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="rejected" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Reject
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {form.watch("status") === "rejected" && (
+                  <FormField
+                    control={form.control}
+                    name="rejectedReason"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Reason for Rejection</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a reason" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {rejectionReasons.map((reason) => (
+                              <SelectItem key={reason} value={reason}>
+                                {reason}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                <Button
+                  type="submit"
+                  disabled={updatePermissionStatus.isPending}
+                >
+                  {updatePermissionStatus.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                      wait...
+                    </>
+                  ) : (
+                    "Update Status"
+                  )}
+                </Button>
+              </form>
+            </Form>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Notice update Dialog */}
+      <Dialog open={isNoticeDialogOpen} onOpenChange={setIsNoticeDialogOpen}>
+        <DialogContent className="max-h-[95vh] sm:max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Notice</DialogTitle>
+          </DialogHeader>
+
+          <Form {...noticeForm}>
+            <form
+              onSubmit={noticeForm.handleSubmit(onNoticeSubmit)}
+              className="space-y-3"
+            >
+              <FormField
+                control={noticeForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notice Content</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Enter notice content" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={updateSetting.isPending}>
+                {updateSetting.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                    wait...
+                  </>
+                ) : (
+                  "Update"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

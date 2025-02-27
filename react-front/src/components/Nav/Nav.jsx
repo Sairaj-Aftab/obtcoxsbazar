@@ -25,7 +25,7 @@ const Nav = () => {
               </div>
             )}
             {/* Desktop Menu */}
-            <div className="w-full md:flex hidden items-center md:justify-center md:gap-10">
+            <div className="w-full md:flex hidden items-center md:justify-between md:gap-10">
               <Link to="/">
                 <img src={logo} alt="OBT" sizes="100vw" className="w-20" />
               </Link>
@@ -66,6 +66,15 @@ const Nav = () => {
                   } hover:border-white py-1 px-2 rounded-sm`}
                 >
                   Tourist Bus Permission
+                </Link>
+                <Link
+                  to="/lost-found"
+                  className={`text-base font-medium text-white border border-transparent ${
+                    ["/lost-found", "/lost-found/form"].includes(pathName) &&
+                    "border-white"
+                  } hover:border-white py-1 px-2 rounded-sm`}
+                >
+                  Lost And Found
                 </Link>
                 <Link
                   to="/about"

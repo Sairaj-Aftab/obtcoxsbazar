@@ -11,9 +11,8 @@ const prisma = new PrismaClient();
 
 export const createDriverInfo = async (req, res, next) => {
   try {
-    const { id } = req.params;
     const {
-      paribahanName,
+      paribahanUserId,
       name,
       fatherName,
       phone,
@@ -23,50 +22,47 @@ export const createDriverInfo = async (req, res, next) => {
       report,
     } = req.body;
 
-    let queryConditions = [];
+    const existingDriver = await prisma.driverInfo.findFirst({
+      where: {
+        OR: [
+          phone && phone.trim() !== "" ? { phone } : {},
+          license && license.trim() !== "" ? { license } : {},
+        ].filter(Boolean),
+      },
+    });
 
-    if (phone && phone.trim() !== "") {
-      queryConditions.push({ phone });
+    if (existingDriver) {
+      return next(
+        createError(
+          400,
+          existingDriver.phone === phone
+            ? "Phone number already exists!"
+            : "License No already exists!"
+        )
+      );
+    }
+    const paribahan = await prisma.paribahanUser.findFirst({
+      where: { id: String(paribahanUserId) },
+    });
+
+    if (!paribahan) {
+      return next(createError(400, "Paribahan Company not found!"));
     }
 
-    if (license && license.trim() !== "") {
-      queryConditions.push({ license });
-    }
-
-    if (queryConditions.length > 0) {
-      const existingDriver = await prisma.driverInfo.findFirst({
-        where: {
-          OR: queryConditions,
-        },
-      });
-
-      if (existingDriver) {
-        if (existingDriver.phone === phone) {
-          return next(createError(400, "Phone number already exists!"));
-        }
-        if (existingDriver.license === license) {
-          return next(createError(400, "License No already exists!"));
-        }
-      }
-    }
     let fileNameWithFolder;
     if (req.file) {
       fileNameWithFolder = `driver/${crypto.randomBytes(32).toString("hex")}-${
         req.file.originalname
       }`;
 
-      try {
-        await uploadFile(req.file, fileNameWithFolder);
-      } catch (error) {
-        return next(error);
-      }
+      await uploadFile(req.file, fileNameWithFolder);
     }
 
     // Create
     let driverInfo = await prisma.driverInfo.create({
       data: {
-        paribahanName,
-        slug: createSlug(paribahanName),
+        paribahanName: paribahan.paribahanName,
+        slug: paribahan.slug,
         name,
         fatherName,
         phone,
@@ -74,8 +70,10 @@ export const createDriverInfo = async (req, res, next) => {
         address,
         comment,
         report,
-        ...(fileNameWithFolder && { image: fileNameWithFolder }),
-        paribahanUserId: String(id),
+        ...(fileNameWithFolder && {
+          image: fileNameWithFolder,
+        }),
+        paribahanUserId: String(paribahanUserId),
       },
       include: {
         paribahanUser: true,
@@ -97,45 +95,93 @@ export const createDriverInfo = async (req, res, next) => {
 export const updateDriverInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, fatherName, phone, license, address, comment, report } =
-      req.body;
+    const {
+      paribahanUserId,
+      name,
+      fatherName,
+      phone,
+      license,
+      address,
+      comment,
+      report,
+    } = req.body;
 
-    let queryConditions = [];
+    const existingDriver = await prisma.driverInfo.findFirst({
+      where: { id: String(id) },
+    });
 
-    if (phone && phone.trim() !== "") {
-      queryConditions.push({
-        phone,
-        id: {
-          not: String(id),
-        },
-      });
+    if (!existingDriver) {
+      return next(createError(404, "Driver not found!"));
     }
 
-    if (license && license.trim() !== "") {
-      queryConditions.push({
-        license,
-        id: {
-          not: String(id),
-        },
-      });
+    const duplicateDriver = await prisma.driverInfo.findFirst({
+      where: {
+        OR: [
+          phone && phone.trim() !== ""
+            ? { phone, id: { not: String(id) } }
+            : {},
+          license && license.trim() !== ""
+            ? { license, id: { not: String(id) } }
+            : {},
+        ].filter(Boolean),
+      },
+    });
+
+    if (duplicateDriver) {
+      return next(
+        createError(
+          400,
+          duplicateDriver.phone === phone
+            ? "Phone number already exists!"
+            : "License No already exists!"
+        )
+      );
     }
 
-    if (queryConditions.length > 0) {
-      const existingDriver = await prisma.driverInfo.findFirst({
-        where: {
-          OR: queryConditions,
-        },
-      });
+    const paribahan = await prisma.paribahanUser.findFirst({
+      where: { id: String(paribahanUserId) },
+    });
 
-      if (existingDriver) {
-        if (existingDriver.phone === phone) {
-          return next(createError(400, "Phone number already exists!"));
-        }
-        if (existingDriver.license === license) {
-          return next(createError(400, "License No already exists!"));
-        }
-      }
+    if (!paribahan) {
+      return next(createError(400, "Paribahan Company not found!"));
     }
+
+    // let queryConditions = [];
+
+    // if (phone && phone.trim() !== "") {
+    //   queryConditions.push({
+    //     phone,
+    //     id: {
+    //       not: String(id),
+    //     },
+    //   });
+    // }
+
+    // if (license && license.trim() !== "") {
+    //   queryConditions.push({
+    //     license,
+    //     id: {
+    //       not: String(id),
+    //     },
+    //   });
+    // }
+
+    // if (queryConditions.length > 0) {
+    //   const existingDriver = await prisma.driverInfo.findFirst({
+    //     where: {
+    //       OR: queryConditions,
+    //     },
+    //   });
+
+    //   if (existingDriver) {
+    //     if (existingDriver.phone === phone) {
+    //       return next(createError(400, "Phone number already exists!"));
+    //     }
+    //     if (existingDriver.license === license) {
+    //       return next(createError(400, "License No already exists!"));
+    //     }
+    //   }
+    // }
 
     let fileNameWithFolder;
     if (req.file) {
@@ -143,12 +189,14 @@ export const updateDriverInfo = async (req, res, next) => {
         req.file.originalname
       }`;
 
-      const existImage = await prisma.driverInfo.findFirst({
-        where: { id: String(id) },
-      });
-
       try {
-        await uploadFile(req.file, fileNameWithFolder, existImage?.image);
+        // Delete the previous image if it exists
+        if (existingDriver?.image) {
+          await deleteExistingFile(existingDriver.image);
+        }
+
+        // Upload new file to S3
+        await uploadFile(req.file, fileNameWithFolder);
       } catch (error) {
         return next(error);
       }
@@ -159,6 +207,9 @@ export const updateDriverInfo = async (req, res, next) => {
         id: String(id),
       },
       data: {
+        paribahanName: paribahan.paribahanName,
+        slug: paribahan.slug,
+        paribahanUserId: String(paribahanUserId),
         name,
         fatherName,
         phone,

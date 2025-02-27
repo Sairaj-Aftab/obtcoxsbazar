@@ -43,8 +43,12 @@ export const login = async (req, res, next) => {
     const token = createToken({ userName: user.userName }, "365d");
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV == "Development" ? false : true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV !== "Development", // Use secure cookies only in production
+      sameSite: process.env.NODE_ENV !== "Development" ? "none" : "lax",
+      domain:
+        process.env.NODE_ENV !== "Development"
+          ? ".obtcoxsbazar.com"
+          : undefined,
       path: "/",
       maxAge: 7 * 24 * 60 * 1000,
     });
@@ -64,6 +68,7 @@ export const logedInUser = async (req, res, next) => {
     if (!req.me) {
       return next(createError(404, "User not found"));
     }
+
     res.status(200).json(req.me);
   } catch (error) {
     return next(error);
@@ -73,7 +78,16 @@ export const logedInUser = async (req, res, next) => {
 export const logout = async (req, res, next) => {
   try {
     res
-      .clearCookie("auth_token")
+      .clearCookie("auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "Development", // Use secure cookies only in production
+        sameSite: process.env.NODE_ENV !== "Development" ? "none" : "lax",
+        domain:
+          process.env.NODE_ENV !== "Development"
+            ? ".obtcoxsbazar.com"
+            : undefined,
+        path: "/",
+      })
       .status(200)
       .json({ message: "Successfully log out" });
   } catch (error) {

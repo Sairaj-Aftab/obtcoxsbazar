@@ -11,7 +11,7 @@ import { upload } from "../utils/multer.js";
 const router = express.Router();
 
 // Paribahan Notice
-router.post("/create/:id", upload.single("photo"), createDriverInfo);
+router.post("/create", upload.single("photo"), createDriverInfo);
 router.put("/update/:id", upload.single("photo"), updateDriverInfo);
 router.get("/getall", getAllDriverInfo);
 router.get("/getbyid/:id", getDriverInfo);

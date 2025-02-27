@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 
 export const createPlace = async (req, res, next) => {
   try {
-    const { placeName, status, mapLink, destinationKM } = req.body;
+    const { placeName, status, mapLink, destinationKM, bdTicketLink } =
+      req.body;
     const existingPlace = await prisma.leaveDestinationPlace.findFirst({
       where: {
         status,
@@ -22,6 +23,7 @@ export const createPlace = async (req, res, next) => {
         status,
         mapLink,
         destinationKM,
+        bdTicketLink,
       },
     });
     return res.status(200).json({ place, message: "Successfully created" });

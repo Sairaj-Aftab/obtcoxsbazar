@@ -20,7 +20,7 @@ export const createPermission = async (req, res, next) => {
     const { name } = req.body;
     const existingPermission = await prisma.permission.findFirst({
       where: {
-        name,
+        name: name.toUpperCase(),
       },
     });
 
@@ -29,11 +29,13 @@ export const createPermission = async (req, res, next) => {
     }
     const permission = await prisma.permission.create({
       data: {
-        name,
+        name: name.toUpperCase(),
         slug: createSlug(name),
       },
     });
-    return res.status(200).json({ permission });
+    return res
+      .status(200)
+      .json({ permission, message: "Successfully created" });
   } catch (error) {
     return next(error);
   }

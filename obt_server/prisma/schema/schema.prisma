@@ -1,0 +1,296 @@
+
+datasource db {
+    provider = "mongodb"
+    url = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+    previewFeatures = ["prismaSchemaFolder"]
+}
+
+model AuthUser {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userName String @unique
+    phone String?
+    role Role? @relation(fields: [roleId], references: [id])
+    roleId String @db.ObjectId
+    password String
+    plainPassword String?
+    lastLoginTime DateTime? @default(now())
+    lastLoginIp String?
+    notice NoticeFromAdmin[]
+    paribahanUser ParibahanUser[]
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model NoticeFromAdmin {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+    authUser AuthUser? @relation(fields: [authUserId], references: [id])
+    authUserId String? @db.ObjectId
+    status String 
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+model Role {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String       @unique
+  slug        String       @unique
+  authUser    AuthUser[]
+  status      Boolean      @default(true)
+  trash       Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[] @relation(fields: [permissionId], references: [id])
+  permissionId String[] @db.ObjectId
+}
+
+model Permission {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String           @unique
+  slug        String           @unique
+  status      Boolean          @default(true)
+  trash       Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  roles       Role[] @relation(fields: [roleId], references: [id])
+  roleId String[] @db.ObjectId
+}
+
+
+
+
+model ParibahanUser {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    paribahanName String @unique
+    slug String @unique
+    contactPerson String?
+    contactNumber String?
+    salesPerson String?
+    salesNumber String?
+    password String
+    plainPassword String
+    type Int?
+    qrCode String?
+    counterLocation String?
+    counterLocationMap String?
+    destination LeaveDestinationPlace[] @relation(fields: [destinationId], references: [id])
+    destinationId String[] @db.ObjectId
+    authUser AuthUser @relation(fields: [authUserId], references: [id])
+    authUserId String @db.ObjectId
+    busSchedule BusSchedule[]
+    regSchedule RegularBusSchedule[]
+    notice NoticeFromBus?
+    busInfo BusInfo[]
+    guideInfo GuideInfo[]
+    driverInfo DriverInfo[]
+    reviews BusReview[]
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusInfo {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    paribahanName String
+    slug String
+    regNo String @unique
+    type String
+    comment String?
+    report String?
+    fcExpire String?
+    qrCode String?
+    paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String @db.ObjectId
+    reviews BusReview[]
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusReview {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    paribahanName String
+    regNo String?
+    type String?
+    rating Int
+    name String
+    comment String?
+    phoneNumber String?
+    destination String?
+    tripTime        String?
+    ipAddress String?
+    phoneName String?
+    phoneModel String?
+    busInfo BusInfo? @relation(fields: [busInfoId], references: [id])
+    busInfoId String? @db.ObjectId
+    paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String? @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model GuideInfo {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    paribahanName String
+    slug String
+    name String
+    phone String
+    address String?
+    comment String?
+    report String?
+    image String?
+    paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+model DriverInfo {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    paribahanName String
+    slug String
+    name String
+    fatherName String?
+    phone String?
+    license String?
+    address String?
+    comment String?
+    report String?
+    image String?
+    paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model NoticeFromBus {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+    paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String? @unique @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusSchedule {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    busName String
+    slug String
+    type String
+    time String
+    busNo String
+    guideName String?
+    guidePhone String?
+    driverName String?
+    driverPhone String?
+    leavingPlace String
+    leavingMapLink String?
+    destinationPlace String
+    destinationMapLink String?
+    rent Int?
+    discountRent Int?
+    seatStatus Boolean
+    paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model RegularBusSchedule {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    busName String
+    slug String
+    type String
+    time String
+    leavingPlace String?
+    destinationPlace String
+    rent Int?
+    paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+model LeaveDestinationPlace {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    placeName String 
+    slug String 
+    status String
+    mapLink String?
+    destinationKM String?
+    bdTicketLink  String?
+    paribahanUser ParibahanUser[] @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String[] @db.ObjectId
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model TouristBusEntryPermission {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  applicationNo     Int
+  applicantName     String
+  phone              String
+  institutionName   String
+  arrivalDateTime   DateTime
+  numberTourist     Int
+  numberBus         Int
+  transportName     String
+  vehicleRegNo      String
+  destinationName   String
+  parkingPlace      String
+  parkingPlaceMapLink      String?
+  returnDateTime    DateTime
+  description       String?
+  approved          Boolean  @default(false)
+  pending           Boolean  @default(true)
+  rejected          Boolean  @default(false)
+  permissionReason  String?
+  approvalDate      DateTime?
+  rejectionDate     DateTime?
+  trash Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VisitorCount {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  date        DateTime @default(now()) @unique
+  dailyCount  Int      @default(0)
+  monthlyCount Int     @default(0)
+  yearlyCount  Int     @default(0)
+  totalCount   Int     @default(0)
+}
+
+model Settings {
+  id  String   @id @default(auto()) @map("_id") @db.ObjectId
+  name String  @unique
+  value String?
+  description String?
+  status Boolean @default(true)
+  trash Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

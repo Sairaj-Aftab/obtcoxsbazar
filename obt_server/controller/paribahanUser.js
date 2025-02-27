@@ -177,10 +177,20 @@ export const updateParibahanUser = async (req, res, next) => {
  */
 export const getAllParibahanUser = async (req, res, next) => {
   try {
+    const searchQuery = req.query.search;
+    const where = searchQuery
+      ? {
+          OR: [
+            { paribahanName: { contains: searchQuery, mode: "insensitive" } },
+            { counterLocation: { contains: searchQuery, mode: "insensitive" } },
+          ],
+        }
+      : {};
     const paribahanUsers = await prisma.paribahanUser.findMany({
       orderBy: {
         paribahanName: "asc",
       },
+      where,
       include: {
         authUser: {
           select: {
@@ -193,7 +203,7 @@ export const getAllParibahanUser = async (req, res, next) => {
       },
     });
 
-    const count = await prisma.paribahanUser.count();
+    const count = await prisma.paribahanUser.count({ where });
 
     if (paribahanUsers.length < 1) {
       return next(createError(400, "Cannot find any Paribahan User!"));
@@ -364,8 +374,12 @@ export const login = async (req, res, next) => {
     const token = createToken({ paribahanName: user.paribahanName }, "365d");
     res.cookie("paribahan_auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV == "Development" ? false : true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV !== "Development", // Use secure cookies only in production
+      sameSite: process.env.NODE_ENV !== "Development" ? "none" : "lax",
+      domain:
+        process.env.NODE_ENV !== "Development"
+          ? ".obtcoxsbazar.com"
+          : undefined,
       path: "/",
       maxAge: 7 * 24 * 60 * 1000,
     });
@@ -395,8 +409,12 @@ export const logout = async (req, res, next) => {
     res
       .clearCookie("paribahan_auth_token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV == "Development" ? false : true,
-        sameSite: "none",
+        secure: process.env.NODE_ENV !== "Development", // Use secure cookies only in production
+        sameSite: process.env.NODE_ENV !== "Development" ? "none" : "lax",
+        domain:
+          process.env.NODE_ENV !== "Development"
+            ? ".obtcoxsbazar.com"
+            : undefined,
         path: "/",
       })
       .status(200)

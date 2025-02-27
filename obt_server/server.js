@@ -6,6 +6,7 @@ import cors from "cors";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 import auth from "./routes/auth.js";
+import info from "./routes/info.js";
 import paribahanUser from "./routes/paribahanUser.js";
 import schedule from "./routes/schedule.js";
 import regularSchedule from "./routes/regularSchedule.js";
@@ -21,6 +22,7 @@ import review from "./routes/review.js";
 import visitor from "./routes/visitorCount.js";
 import setting from "./routes/settings.js";
 import errorHandler from "./middleware/errorHandler.js";
+import lostAndFound from "./routes/lostAndFound.js";
 
 const app = express();
 const server = createServer(app);
@@ -62,6 +64,7 @@ app.use(
 );
 
 app.use("/api/v1/auth", auth);
+app.use("/api/v1/info", info);
 app.use("/api/v1/paribahan", paribahanUser);
 app.use("/api/v1/schedule", schedule);
 app.use("/api/v1/rgschedule", regularSchedule);
@@ -73,6 +76,7 @@ app.use("/api/v1/businfo", busInfo);
 app.use("/api/v1/guideinfo", guideInfo);
 app.use("/api/v1/driverinfo", driverInfo);
 app.use("/api/v1/tourist-permission", touristPermission);
+app.use("/api/v1/lost-found", lostAndFound);
 app.use("/api/v1/review", review);
 app.use("/api/v1/visitorcount", visitor);
 app.use("/api/v1/setting", setting);

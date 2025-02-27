@@ -1,19 +1,9 @@
-import { useSelector } from "react-redux";
-import { authData } from "../../features/auth/authSlice";
-
+// eslint-disable-next-line react/prop-types
 const PageHeader = ({ title }) => {
-  const { authUser } = useSelector(authData);
   return (
-    <div className="page-header">
-      <div className="row">
-        <div className="col-sm-12">
-          <h3 className="page-title">Welcome {authUser?.userName}</h3>
-          <ul className="breadcrumb">
-            <li className="breadcrumb-item active">{title}</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <h1 className="text-xl md:text-2xl py-3 font-bold text-gray-800 dark:text-gray-100">
+      {title}
+    </h1>
   );
 };
 

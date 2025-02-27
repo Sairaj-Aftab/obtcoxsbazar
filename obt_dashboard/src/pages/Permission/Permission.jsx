@@ -1,153 +1,135 @@
-import { useEffect, useState } from "react";
-import DataTables from "datatables.net-dt";
-import ModalPopup from "../../components/ModalPopup/ModalPopup";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllData, setMessageEmpty } from "../../features/user/userSlice";
 import { timeAgo } from "../../utils/timeAgo";
-import toast from "react-hot-toast";
-import swal from "sweetalert";
+import useAuth from "@/store/useAuth";
+import DataTable from "react-data-table-component";
+import Loading from "@/components/Loading/Loading";
 import {
-  createPermission,
-  deletePermission,
-  updatePermissionStatus,
-} from "../../features/user/userApiSllice";
-import { authData } from "../../features/auth/authSlice";
+  useAllPermissions,
+  useCreatePermission,
+} from "@/services/users.service";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useEffect } from "react";
+
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+});
 
 const Permission = () => {
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(authData);
+  const { authUser } = useAuth();
+  const { data, isLoading } = useAllPermissions();
+  const createPermission = useCreatePermission();
 
-  const { permissions } = useSelector(getAllData);
-
-  const [name, setName] = useState("");
-
-  const handleCreate = (e) => {
-    e.preventDefault();
-    if (!name) {
-      toast.error("Please fill the fields");
-    } else {
-      dispatch(createPermission(name));
-      setName("");
-
-      dispatch(setMessageEmpty());
-    }
-  };
-
-  const handleDelete = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
-          icon: "success",
-        });
-        dispatch(deletePermission(id));
-        dispatch(setMessageEmpty());
-      } else {
-        swal("Your imaginary file is safe!");
-      }
-    });
-  };
-
-  const handleChangeStatus = (id, status) => {
-    dispatch(updatePermissionStatus({ id, status }));
-    dispatch(setMessageEmpty());
-  };
-  useEffect(() => {
-    new DataTables(".datatable");
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      permissions: [],
+    },
   });
+
+  function onSubmit(data) {
+    createPermission.mutate(data.name);
+  }
+
+  useEffect(() => {
+    if (createPermission.isSuccess) {
+      toast("Success", {
+        description: `${createPermission?.data?.message}`,
+      });
+      form.reset();
+    }
+    if (createPermission.error) {
+      toast("Error", {
+        description: `${
+          createPermission?.error?.response?.data?.message ||
+          createPermission?.error?.message
+        }`,
+      });
+    }
+  }, [
+    createPermission?.data?.message,
+    createPermission.error,
+    createPermission.isSuccess,
+    form,
+  ]);
+
+  const columns = [
+    {
+      name: "Name",
+      selector: (row) => row.name,
+      sortable: true,
+    },
+    {
+      name: "Created At",
+      selector: (row) => timeAgo(row.createdAt),
+      sortable: true,
+    },
+  ];
   return (
     <>
-      <PageHeader title="User Permission" />
-      <form onSubmit={handleCreate} className="d-flex mb-2">
-        <input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="form-control mr-2"
-          placeholder="Add new permission"
-        />
-        <button
-          disabled={authUser?.role?.name === "VIEWER" && true}
-          type="submit"
-          className="btn btn-primary"
+      <PageHeader title="Permission" />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex gap-3 mb-3"
         >
-          Add
-        </button>
-      </form>
-      <div className="row">
-        <div className="col-md-12">
-          <div className="card card-table">
-            <div className="card-body">
-              <div className="table-responsive">
-                {permissions && (
-                  <table className="dataTable table table-hover table-center mb-0">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Slug</th>
-                        <th>Created At</th>
-                        <th>Status</th>
-                        {/* <th className="text-right">Actions</th> */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {permissions.length > 0 &&
-                        [...permissions].reverse().map((data, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>{index + 1}</td>
-                              <td>{data.name}</td>
-                              <td>{data.slug}</td>
-                              <td>{timeAgo(data.createdAt)}</td>
-                              <td>
-                                <div className="status-toggle">
-                                  <input
-                                    type="checkbox"
-                                    id="status_1"
-                                    className="check"
-                                    checked={data.status ? true : false}
-                                  />
-                                  <label
-                                    htmlFor="status_1"
-                                    onClick={() =>
-                                      handleChangeStatus(data.id, data.status)
-                                    }
-                                    className="checktoggle"
-                                  >
-                                    checkbox
-                                  </label>
-                                </div>
-                              </td>
-                              {/* <td className="text-right">
-                                <button
-                                  onClick={() => handleDelete(data.id)}
-                                  className="border-0 bg-danger text-light"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-trash" />
-                                </button>
-                              </td> */}
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            disabled={
+              createPermission.isPending ||
+              authUser?.role?.name === "VIEWER" ||
+              authUser?.role?.name === "DEMO"
+            }
+          >
+            {createPermission.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+              </>
+            ) : (
+              "Submit"
+            )}
+          </Button>
+        </form>
+      </Form>
+      <DataTable
+        columns={columns}
+        data={data?.permission}
+        responsive
+        progressPending={isLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
           </div>
-        </div>
-      </div>
+        }
+        pagination
+      />
     </>
   );
 };

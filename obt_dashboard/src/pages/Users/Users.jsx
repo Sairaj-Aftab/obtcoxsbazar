@@ -1,408 +1,300 @@
 import { useEffect, useState } from "react";
-import DataTables from "datatables.net-dt";
-import ModalPopup from "../../components/ModalPopup/ModalPopup";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import FormInputValue from "../../hooks/formInputValue";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllData, setMessageEmpty } from "../../features/user/userSlice";
 import {
-  formatDate,
-  formatDateAndTime,
-  formatDateTime,
-} from "../../utils/timeAgo";
-import swal from "sweetalert";
+  useAllAuthUsers,
+  useAllRoles,
+  useCreateAuthUser,
+  useUpdateAuthUser,
+} from "@/services/users.service";
+import { Button } from "@/components/ui/button";
+import useAuth from "@/store/useAuth";
+import DataTable from "react-data-table-component";
+import Loading from "@/components/Loading/Loading";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  createAuthUser,
-  deleteAuthUser,
-  updateAuthUser,
-} from "../../features/user/userApiSllice";
-import { generateRandomPassword } from "../../utils/generateRandomPassword";
-import toast from "react-hot-toast";
-import { authData } from "../../features/auth/authSlice";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  userName: z.string().min(2, "Username must be at least 2 characters"),
+  phone: z.string().optional(),
+  plainPassword: z.string().min(6, "Password must be at least 6 characters"),
+  roleId: z.string().min(1, "Role is required"),
+});
 
 const Users = () => {
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(authData);
-  const { users, roles, success, message, error } = useSelector(getAllData);
-  const { input, handleChangeValue, formReset, setInput } = FormInputValue({
-    userName: "",
-    phone: "",
-    password: "",
-    roleId: "",
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [rowPage, setRowPage] = useState(10);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
+  const { authUser } = useAuth();
+  const { data, isLoading } = useAllAuthUsers();
+  const { data: roles, isLoading: isLoadingRoles } = useAllRoles();
+  const createAuthUser = useCreateAuthUser();
+  const updateAuthUser = useUpdateAuthUser();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userName: "",
+      phone: "",
+      password: "",
+      roleId: "",
+    },
   });
 
-  const handleGenRanPassword = () => {
-    const ranPass = generateRandomPassword();
-    setInput((prev) => ({ ...prev, password: ranPass }));
+  const handleEdit = (data) => {
+    setIsEditing(true);
+    setCurrentData(data);
+    form.setValue("userName", data.userName);
+    form.setValue("phone", data.phone);
+    form.setValue("plainPassword", data.plainPassword);
+    form.setValue("roleId", data.roleId);
+    setIsDialogOpen(true);
   };
 
-  const handleCreateUserSubmit = (e) => {
-    e.preventDefault();
-    if (!input.userName || !input.password || !input.roleId) {
-      toast.error("All fields are required");
+  const onSubmit = (data) => {
+    if (isEditing) {
+      updateAuthUser.mutate({ id: currentData.id, data });
     } else {
-      dispatch(createAuthUser(input));
-      dispatch(setMessageEmpty());
+      createAuthUser.mutate(data);
     }
   };
-
-  const [findUser, setFindUser] = useState({});
-
-  const handleChangeEditValue = (e) => {
-    setFindUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleEditShowModal = (id) => {
-    const user = users.find((user) => user.id === id);
-    setFindUser(user);
-  };
-
-  const handleEditUserSubmit = (e) => {
-    e.preventDefault();
-    if (!findUser.userName || !findUser.plainPassword || !findUser.roleId) {
-      toast.error("All fields are required");
-    } else {
-      dispatch(
-        updateAuthUser({
-          id: findUser.id,
-          data: {
-            userName: findUser.userName,
-            phone: findUser.phone,
-            plainPassword: findUser.plainPassword,
-            roleId: findUser.roleId,
-          },
-        })
-      );
-      dispatch(setMessageEmpty());
-    }
-  };
-
-  // const handleDeleteUser = (id) => {
-  //   swal({
-  //     title: "Are you sure?",
-  //     text: "Once deleted, you will not be able to recover this imaginary file!",
-  //     icon: "warning",
-  //     buttons: true,
-  //     dangerMode: true,
-  //   }).then((willDelete) => {
-  //     if (willDelete) {
-  //       swal(`Poof! Successfully deleted`, {
-  //         icon: "success",
-  //       });
-  //       dispatch(deleteAuthUser(id));
-  //       dispatch(setMessageEmpty());
-  //     } else {
-  //       swal("Your imaginary file is safe!");
-  //     }
-  //   });
-  // };
 
   useEffect(() => {
-    new DataTables(".datatable");
-    if (success) {
-      formReset();
+    if (createAuthUser.isSuccess || updateAuthUser.isSuccess) {
+      toast("Success", {
+        description: `${
+          createAuthUser?.data?.message || updateAuthUser?.data?.message
+        }`,
+      });
+      setIsDialogOpen(false);
+      setIsEditing(false);
+      setCurrentData(null);
+      form.reset();
     }
-    if (error) {
-      toast.error(error);
+    if (createAuthUser.error || updateAuthUser.error) {
+      toast("Error", {
+        description: `${
+          createAuthUser?.error?.response?.data?.message ||
+          updateAuthUser?.error?.response?.data?.message ||
+          createAuthUser?.error?.message ||
+          updateAuthUser?.error?.message
+        }`,
+      });
     }
+  }, [
+    createAuthUser?.data?.message,
+    createAuthUser.error,
+    createAuthUser.isSuccess,
+    form,
+    updateAuthUser?.data?.message,
+    updateAuthUser.error,
+    updateAuthUser.isSuccess,
+  ]);
 
-    if (message) {
-      toast.success(message);
-    }
+  const calculateItemIndex = (page, rowPage, index) => {
+    return (page - 1) * rowPage + index + 1;
+  };
 
-    return () => {
-      dispatch(setMessageEmpty());
-    };
-  }, [success, message, error, formReset, dispatch]);
+  const columns = [
+    {
+      name: "#",
+      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "60px",
+    },
+    {
+      name: "User Name",
+      selector: (row) => row.userName,
+      sortable: true,
+    },
+    {
+      name: "Role",
+      selector: (row) => row.role.name,
+      sortable: true,
+    },
+    {
+      name: "Last Login",
+      selector: (row) => new Date(row.lastLoginTime).toLocaleString(),
+      sortable: true,
+      width: "180px",
+    },
+    {
+      name: "Last Login IP",
+      selector: (row) => row.lastLoginIp,
+    },
+    {
+      name: "Phone",
+      selector: (row) => row.phone,
+    },
+    {
+      name: "Password",
+      selector: (row) => row.plainPassword,
+    },
+    {
+      name: "Created At",
+      selector: (row) => new Date(row.createdAt).toLocaleDateString(),
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      cell: (row) => (
+        <Button variant="ghost" size="icon" onClick={() => handleEdit(row)}>
+          <Eye className="h-4 w-4 text-primary" />
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <>
-      <ModalPopup title="Create User" target="userModalPopup">
-        <form onSubmit={handleCreateUserSubmit}>
-          <div className="form-group mb-2">
-            <input
-              type="text"
-              name="userName"
-              value={input.userName}
-              onChange={handleChangeValue}
-              className="form-control"
-              placeholder="User Name"
-            />
-          </div>
-          <div className="form-group mb-2">
-            <input
-              type="text"
-              name="phone"
-              value={input.phone}
-              onChange={handleChangeValue}
-              className="form-control"
-              placeholder="Phone Number (Optional)"
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              name="password"
-              value={input.password}
-              onChange={handleChangeValue}
-              className="form-control"
-              placeholder="Password"
-            />
-            <a
-              onClick={handleGenRanPassword}
-              className="badge badge-info text-light"
-            >
-              Generate random password
-            </a>
-          </div>
-          <div className="form-group">
-            <select
-              name="roleId"
-              onChange={handleChangeValue}
-              className="form-control inputstl"
-            >
-              <option value="">--Select--</option>
-              {roles?.map((item, index) => {
-                return (
-                  <option key={index} value={item.id}>
-                    {item.name}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          <button
-            disabled={authUser?.role?.name === "VIEWER" && true}
-            type="submit"
-            className="btn btn-primary"
-          >
-            Create
-          </button>
-        </form>
-      </ModalPopup>
-      <ModalPopup title="Edit User" target="userEditModalPopup">
-        <form onSubmit={handleEditUserSubmit}>
-          <div className="form-row">
-            <div className="form-group col-md-6">
-              <label htmlFor="userName" className="mb-1">
-                User Name
-              </label>
-              <input
-                type="text"
-                id="userName"
-                name="userName"
-                value={findUser.userName}
-                onChange={handleChangeEditValue}
-                className="form-control"
-              />
-            </div>
-            <div className="form-group col-md-6">
-              <label htmlFor="phone" className="mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                value={findUser.phone}
-                onChange={handleChangeEditValue}
-                className="form-control"
-              />
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group col-md-6">
-              <label htmlFor="plainPassword" className="mb-1">
-                Password
-              </label>
-              <input
-                type="text"
-                id="plainPassword"
-                name="plainPassword"
-                value={findUser.plainPassword}
-                onChange={handleChangeEditValue}
-                className="form-control"
-              />
-            </div>
-            <div className="form-group col-md-6">
-              <label htmlFor="roleId" className="mb-1">
-                Role
-              </label>
-              <select
-                name="roleId"
-                id="roleId"
-                onChange={handleChangeEditValue}
-                className="form-control inputstl"
-              >
-                {roles?.map((item, index) => {
-                  return (
-                    <option
-                      selected={findUser.roleId === item.id}
-                      key={index}
-                      value={item.id}
-                    >
-                      {item.name}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          </div>
-          <button
-            disabled={
-              authUser?.role?.name === "VIEWER" ||
-              (authUser?.role?.name !== "ADMIN" && true)
-            }
-            type="submit"
-            className="btn btn-primary"
-          >
-            Edit
-          </button>
-        </form>
-      </ModalPopup>
-
-      <PageHeader title="Users" />
-      <button
-        data-target="#userModalPopup"
-        data-toggle="modal"
-        className="btn btn-primary btn-sm mb-2"
-      >
-        Add new user
-      </button>
-      <div className="row">
-        <div className="col-sm-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                {users && (
-                  <table className="datatable table table-hover table-center mb-0">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>User Name</th>
-                        <th>Role</th>
-                        <th>Last Login</th>
-                        <th>Last Login IP</th>
-                        <th>Phone</th>
-                        {authUser?.role?.name === "SUPER-ADMIN" && (
-                          <th>Password</th>
-                        )}
-                        <th>Created At</th>
-                        <th className="text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users
-                        ?.filter((data) => data.role?.name !== "SUPER-ADMIN")
-                        ?.map((data, index) => (
-                          <tr key={data.id}>
-                            <td>{index + 1}</td>
-                            <td>{data.userName}</td>
-                            <td>{data.role?.name}</td>
-                            <td>{formatDateTime(data?.lastLoginTime)}</td>
-                            <td>{data?.lastLoginIp}</td>
-                            <td>{data?.phone}</td>
-                            {authUser?.role?.name === "SUPER-ADMIN" && (
-                              <td>{data?.plainPassword}</td>
-                            )}
-                            <td>{formatDate(data.createdAt)}</td>
-                            <td className="text-right">
-                              <div className="actions">
-                                <a
-                                  className="btn btn-sm bg-success-light mr-1"
-                                  data-toggle="modal"
-                                  href="#userEditModalPopup"
-                                  onClick={() => handleEditShowModal(data.id)}
-                                >
-                                  <i className="fe fe-pencil"></i>
-                                </a>
-                                {/* <button
-                                onClick={() => handleDeleteUser(data.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button> */}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-sm-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                {users && (
-                  <table className="datatable table table-hover table-center mb-0">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>User Name</th>
-                        <th>Role</th>
-                        <th>Last Login</th>
-                        <th>Last Login IP</th>
-                        <th>Phone</th>
-                        {authUser?.role?.name === "SUPER-ADMIN" && (
-                          <th>Password</th>
-                        )}
-                        <th>Created At</th>
-                        <th className="text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users
-                        ?.filter((data) => data.role?.name === "SUPER-ADMIN")
-                        ?.map((data, index) => (
-                          <tr key={data.id}>
-                            <td>{index + 1}</td>
-                            <td>{data.userName}</td>
-                            <td>{data.role?.name}</td>
-                            <td>{formatDateTime(data?.lastLoginTime)}</td>
-                            <td>{data?.lastLoginIp}</td>
-                            <td>{data?.phone}</td>
-                            {authUser?.role?.name === "SUPER-ADMIN" && (
-                              <td>{data?.plainPassword}</td>
-                            )}
-                            <td>{formatDate(data.createdAt)}</td>
-                            <td className="text-right">
-                              <div className="actions">
-                                <a
-                                  className="btn btn-sm bg-success-light mr-1"
-                                  data-toggle="modal"
-                                  href="#userEditModalPopup"
-                                  onClick={() => handleEditShowModal(data.id)}
-                                >
-                                  <i className="fe fe-pencil"></i>
-                                </a>
-                                {/* <button
-                                onClick={() => handleDeleteUser(data.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button> */}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+    <div>
+      <div className="flex justify-between items-center">
+        <PageHeader title="Auth Users" />
+        <Button
+          onClick={() => {
+            setIsEditing(false); // Reset editing mode
+            form.reset(); // Reset form
+            setIsDialogOpen(true);
+          }}
+        >
+          Create Auth
+        </Button>
       </div>
-    </>
+      <DataTable
+        columns={columns}
+        data={data?.users || []}
+        responsive
+        progressPending={isLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
+          </div>
+        }
+        pagination
+        onChangeRowsPerPage={(value) => setRowPage(value)}
+        onChangePage={(page) => setPage(page)}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
+      />
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create User</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone (Optional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="plainPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="roleId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingRoles && <Loader2 className="mr-2 h-4 w-4" />}
+                        {roles?.roles?.map((role) => (
+                          <SelectItem key={role.id} value={role.id}>
+                            {role.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={
+                  createAuthUser.isPending ||
+                  updateAuthUser.isPending ||
+                  authUser?.role?.name === "VIEWER" ||
+                  authUser?.role?.name === "DEMO"
+                }
+              >
+                {createAuthUser.isPending || updateAuthUser.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                    wait...
+                  </>
+                ) : (
+                  "Submit"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

@@ -1,437 +1,418 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import toast from "react-hot-toast";
-import swal from "sweetalert";
+import useAuth from "@/store/useAuth";
 import {
-  placeData,
-  setPlaceMessageEmpty,
-} from "../../features/place/placeSlice";
-import { useDispatch, useSelector } from "react-redux";
+  useCreatePlace,
+  useDeletePlace,
+  useGetAllPlaces,
+  useUpdatePlace,
+} from "@/services/place.service";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Loader2, MapPin, Pencil, Trash2 } from "lucide-react";
 import {
-  createPlace,
-  deletePlace,
-  updatePlace,
-} from "../../features/place/placeApiSlice";
-import { authData } from "../../features/auth/authSlice";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Loading from "@/components/Loading/Loading";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  placeName: z.string().min(2, {
+    message: "Place name must be at least 2 characters.",
+  }),
+  status: z.enum(["leave", "destination", "parkingPlace"], {
+    required_error: "Please select a place status.",
+  }),
+  mapLink: z
+    .string()
+    .url({ message: "Please enter a valid URL." })
+    .nullable()
+    .optional(),
+  destinationKM: z.number().positive().nullable().optional(),
+  bdTicketLink: z
+    .string()
+    .url({ message: "Please enter a valid URL." })
+    .nullable()
+    .optional(),
+});
 
 const Destination = () => {
-  const dispatch = useDispatch();
-  const { authUser } = useSelector(authData);
-  const {
-    places,
-    leavingPlaces,
-    destinationPlaces,
-    parkingPlaces,
-    message,
-    success,
-    error,
-  } = useSelector(placeData);
-  const [placeName, setPlaceName] = useState("");
-  const [placeStatus, setPlaceStatus] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
+  const { authUser } = useAuth();
+  const { data: placeData, isLoading: isPlaceLoading } = useGetAllPlaces();
+  const createPlace = useCreatePlace();
+  const updatePlace = useUpdatePlace();
+  const deletePlace = useDeletePlace();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      placeName: "",
+      status: undefined,
+      mapLink: undefined,
+      destinationKM: undefined,
+      bdTicketLink: undefined,
+    },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!placeName || !placeStatus) {
-      toast.error("Please fill all the fields");
+  function onSubmit(data) {
+    if (isEditing) {
+      updatePlace.mutate({ id: currentData.id, data });
     } else {
-      dispatch(createPlace({ placeName, status: placeStatus }));
-      dispatch(setPlaceMessageEmpty());
+      createPlace.mutate(data);
     }
-  };
+  }
 
-  const [id, setId] = useState("");
-  const [plName, setPlName] = useState("");
-  const [plStatus, setPlStatus] = useState("");
-  const [map, setMap] = useState("");
-  const [destinationKM, setDestinationKM] = useState("");
-  const [bdTicketLink, setBdTicketLink] = useState("");
-  const handleShowPlaceName = (id) => {
-    setId(id);
-    const place = places.find((pl) => pl.id === id);
-    setPlName(place.placeName);
-    setPlStatus(place.status);
-    setMap(place?.mapLink);
-    setDestinationKM(place?.destinationKM);
-    setBdTicketLink(place?.bdTicketLink);
-  };
-
-  const handleUpdate = (id) => {
-    if (!plName) {
-      toast.error("Place is required!");
-    } else {
-      dispatch(
-        updatePlace({
-          id,
-          data: {
-            placeName: plName,
-            status: plStatus,
-            mapLink: map,
-            destinationKM,
-            bdTicketLink,
-          },
-        })
-      );
-      setId("");
-    }
-  };
-  const handleDeletePlace = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
-          icon: "success",
-        });
-        dispatch(deletePlace(id));
-        dispatch(setPlaceMessageEmpty());
-      } else {
-        swal("Your imaginary file is safe!");
-      }
-    });
+  const handleEdit = (data) => {
+    setIsEditing(true);
+    setCurrentData(data);
+    form.setValue("placeName", data.placeName);
+    form.setValue("status", data.status);
+    form.setValue("mapLink", data.mapLink);
+    form.setValue("destinationKM", data.destinationKM);
+    form.setValue("bdTicketLink", data.bdTicketLink);
+    setIsDialogOpen(true);
   };
 
   useEffect(() => {
-    if (message) {
-      toast.success(message);
+    if (createPlace.isSuccess || updatePlace.isSuccess) {
+      toast("Success", {
+        description: `${
+          createPlace?.data?.message || updatePlace?.data?.message
+        }`,
+      });
+      setIsDialogOpen(false);
+      setIsEditing(false);
+      form.reset();
     }
-    if (success) {
-      setPlaceName("");
-      setPlaceStatus("");
+    if (createPlace.error || updatePlace.error) {
+      toast("Error", {
+        description: `${
+          createPlace?.error?.response?.data?.message ||
+          updatePlace?.error?.response?.data?.message ||
+          createPlace?.error?.message ||
+          updatePlace?.error?.message
+        }`,
+      });
     }
-    if (error) {
-      toast.error(error);
-    }
-    if (message || success || error) {
-      dispatch(setPlaceMessageEmpty());
-    }
-  }, [dispatch, message, error, success]);
-  return (
+  }, [
+    createPlace?.data?.message,
+    createPlace.error,
+    createPlace.isSuccess,
+    form,
+    updatePlace?.data?.message,
+    updatePlace.error,
+    updatePlace.isSuccess,
+  ]);
+
+  const renderPlaceTable = (filteredPlaces) => (
     <>
-      <PageHeader title="Arrival & Destination Places" />
-      <form
-        onSubmit={handleSubmit}
-        className="d-flex justify-content-between mb-3"
-      >
-        <input
-          className="form-control mr-2"
-          type="text"
-          value={placeName}
-          onChange={(e) => setPlaceName(e.target.value)}
-          placeholder="Add Place"
-        />
-        <select
-          name=""
-          className="form-control w-25 mr-2"
-          id=""
-          value={placeStatus}
-          onChange={(e) => setPlaceStatus(e.target.value)}
-        >
-          <option value="">Select Status</option>
-          <option value="leave">Departure</option>
-          <option value="destination">Destination</option>
-          <option value="parkingPlace">TB Parking Place</option>
-        </select>
-        <button
-          disabled={authUser?.role?.name === "VIEWER" && true}
-          type="submit"
-          className="btn btn-primary"
-        >
-          Submit
-        </button>
-      </form>
-      <div className="row">
-        {/* Tourist Bus Parking Place */}
-        <div className="col-sm-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex justify-content-between mb-2">
-                <h5>TB Parking Places</h5>
-              </div>
-              <div className="table-responsive">
-                {parkingPlaces && (
-                  <table className="datatable table table-hover table-center mb-0">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Place & Map</th>
-                        <th className="text-right">Actions</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {parkingPlaces?.map((place, index) => (
-                        <tr key={place.id}>
-                          <td>{index + 1}</td>
-                          {id === place?.id ? (
-                            <td className="d-flex flex-column">
-                              <input
-                                type="text"
-                                value={plName}
-                                onChange={(e) => setPlName(e.target.value)}
-                                className="form-control"
-                              />
-                              <input
-                                type="text"
-                                value={map}
-                                onChange={(e) => setMap(e.target.value)}
-                                className="form-control"
-                                placeholder="Google Map Link"
-                              />
-                            </td>
-                          ) : (
-                            <td className="d-flex flex-column">
-                              <span>{place.placeName}</span>
-                              <a target="_blank" href={place?.mapLink}>
-                                {place?.mapLink}
-                              </a>
-                            </td>
-                          )}
-                          <td className="text-right">
-                            <div className="actions">
-                              {id === place?.id ? (
-                                <button
-                                  onClick={() => handleUpdate(place?.id)}
-                                  className="btn btn-sm bg-primary-light mr-1"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-check-square-o"></i>
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleShowPlaceName(place?.id)}
-                                  className="btn btn-sm bg-primary-light mr-1"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-pencil-square-o"></i>
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleDeletePlace(place.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          </div>
+      {isPlaceLoading ? (
+        <div className="h-96 flex justify-center items-center">
+          <Loading />
         </div>
-      </div>
-      <div className="row">
-        {/* This is Dashboard Management Users table */}
-        <div className="col-sm-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex justify-content-between mb-2">
-                <h5>Destination Places</h5>
-              </div>
-              <div className="table-responsive">
-                {destinationPlaces && (
-                  <table className="datatable table table-hover table-center mb-0">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Place Name</th>
-                        <th className="text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {destinationPlaces?.map((place, index) => (
-                        <tr key={place.id}>
-                          <td>{index + 1}</td>
-                          {id === place?.id ? (
-                            <td>
-                              <input
-                                type="text"
-                                value={plName}
-                                onChange={(e) => setPlName(e.target.value)}
-                                className="form-control"
-                              />
-                              <input
-                                type="number"
-                                value={destinationKM}
-                                onChange={(e) =>
-                                  setDestinationKM(e.target.value)
-                                }
-                                className="form-control"
-                                placeholder="Destination KM"
-                              />
-                              <input
-                                type="text"
-                                value={bdTicketLink}
-                                onChange={(e) =>
-                                  setBdTicketLink(e.target.value)
-                                }
-                                className="form-control"
-                                placeholder="BD Ticket Link"
-                              />
-                            </td>
-                          ) : (
-                            <td className="d-flex flex-column">
-                              <span>{place.placeName}</span>
-                              {place?.destinationKM && (
-                                <span>{place?.destinationKM} KM</span>
-                              )}
-                              {place?.bdTicketLink && (
-                                <span>
-                                  {place?.bdTicketLink.split("/").pop()}
-                                </span>
-                              )}
-                            </td>
-                          )}
-
-                          <td className="text-right">
-                            <div className="actions">
-                              {id === place?.id ? (
-                                <button
-                                  onClick={() => handleUpdate(place?.id)}
-                                  className="btn btn-sm bg-primary-light mr-1"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-check-square-o"></i>
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleShowPlaceName(place?.id)}
-                                  className="btn btn-sm bg-primary-light mr-1"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-pencil-square-o"></i>
-                                </button>
-                              )}
-
-                              <button
-                                onClick={() => handleDeletePlace(place.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* This is Paribahan User Table */}
-        <div className="col-sm-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex justify-content-between mb-2">
-                <h5>Departure Places</h5>
-              </div>
-              <div className="table-responsive">
-                {leavingPlaces && (
-                  <table className="datatable table table-hover table-center mb-0">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Place & Map</th>
-                        <th className="text-right">Actions</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {leavingPlaces?.map((place, index) => (
-                        <tr key={place.id}>
-                          <td>{index + 1}</td>
-                          {id === place?.id ? (
-                            <td className="d-flex flex-column">
-                              <input
-                                type="text"
-                                value={plName}
-                                onChange={(e) => setPlName(e.target.value)}
-                                className="form-control"
-                              />
-                              <input
-                                type="text"
-                                value={map}
-                                onChange={(e) => setMap(e.target.value)}
-                                className="form-control"
-                                placeholder="Google Map Link"
-                              />
-                            </td>
-                          ) : (
-                            <td className="d-flex flex-column">
-                              <span>{place.placeName}</span>
-                              <a target="_blank" href={place?.mapLink}>
-                                {place?.mapLink}
-                              </a>
-                            </td>
-                          )}
-                          <td className="text-right">
-                            <div className="actions">
-                              {id === place?.id ? (
-                                <button
-                                  onClick={() => handleUpdate(place?.id)}
-                                  className="btn btn-sm bg-primary-light mr-1"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-check-square-o"></i>
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleShowPlaceName(place?.id)}
-                                  className="btn btn-sm bg-primary-light mr-1"
-                                  disabled={
-                                    authUser?.role?.name === "VIEWER" && true
-                                  }
-                                >
-                                  <i className="fa fa-pencil-square-o"></i>
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleDeletePlace(place.id)}
-                                className="btn btn-sm bg-danger-light"
-                                disabled={
-                                  authUser?.role?.name === "VIEWER" && true
-                                }
-                              >
-                                <i className="fe fe-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">#</TableHead>
+              <TableHead>Place & Details</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredPlaces?.map((place, index) => (
+              <TableRow key={place.id}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <div className="font-medium">{place.placeName}</div>
+                    {place.mapLink && (
+                      <a
+                        href={place.mapLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground flex items-center"
+                      >
+                        <MapPin className="w-4 h-4 mr-1" />
+                        View on Map
+                      </a>
+                    )}
+                    {place.destinationKM && (
+                      <div className="text-sm text-muted-foreground">
+                        {place.destinationKM} KM
+                      </div>
+                    )}
+                    {place.bdTicketLink && (
+                      <a
+                        href={place.bdTicketLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground flex items-center"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        BD Ticket
+                      </a>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleEdit(place)}
+                  >
+                    <Pencil className="w-4 h-4 text-primary" />
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="ghost">
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete the place and remove it from our servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deletePlace.mutate(place.id)}
+                        >
+                          Continue
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </>
+  );
+  return (
+    <div>
+      <div className="flex justify-between items-center">
+        <PageHeader title="Places" />
+        <Button
+          onClick={() => {
+            setIsEditing(false); // Reset editing mode
+            form.reset();
+            setIsDialogOpen(true);
+          }}
+        >
+          Add Place
+        </Button>
+      </div>
+      <Tabs defaultValue="parkingPlace">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="parkingPlace">TB Parking Places</TabsTrigger>
+          <TabsTrigger value="destination">Destination Places</TabsTrigger>
+          <TabsTrigger value="leave">Departure Places</TabsTrigger>
+        </TabsList>
+        <TabsContent value="parkingPlace">
+          {renderPlaceTable(
+            placeData?.places?.filter(
+              (place) => place.status === "parkingPlace"
+            )
+          )}
+        </TabsContent>
+        <TabsContent value="destination">
+          {renderPlaceTable(
+            placeData?.places?.filter((place) => place.status === "destination")
+          )}
+        </TabsContent>
+        <TabsContent value="leave">
+          {renderPlaceTable(
+            placeData?.places?.filter((place) => place.status === "leave")
+          )}
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent
+          className="max-h-[95vh] sm:max-w-[625px] overflow-y-auto"
+          // onClick={(e) => e.stopPropagation()}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
+        >
+          <AlertDialogHeader>
+            <DialogTitle>
+              {isEditing ? "Update notice" : "Create notice"}
+            </DialogTitle>
+          </AlertDialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="placeName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Place Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter place name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="leave">Departure</SelectItem>
+                        <SelectItem value="destination">Destination</SelectItem>
+                        <SelectItem value="parkingPlace">
+                          TB Parking Place
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="mapLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Google Map Link</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter Google Map link" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {form.watch("status") === "destination" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="destinationKM"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Destination KM</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Enter distance in KM"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value ? Number(e.target.value) : ""
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="bdTicketLink"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>BD Ticket Link</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter BD Ticket link"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  disabled={
+                    createPlace.isPending ||
+                    updatePlace.isPending ||
+                    authUser?.role?.name === "VIEWER" ||
+                    authUser?.role?.name === "DEMO"
+                  }
+                >
+                  {createPlace.isPending || updatePlace.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                      wait...
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

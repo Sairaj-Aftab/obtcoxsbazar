@@ -1,89 +1,69 @@
 import DataTable from "react-data-table-component";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  reviewsData,
-  setReviewMessageEmpty,
-} from "../../features/review/reviewSlice";
-import { authData } from "../../features/auth/authSlice";
-import swal from "sweetalert";
-import {
-  deleteReview,
-  getAllReview,
-} from "../../features/review/reviewApiSlice";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { formatDateTime } from "../../utils/timeAgo";
 import Loading from "../../components/Loading/Loading";
-import ModalPopup from "../../components/ModalPopup/ModalPopup";
+import useAuth from "@/store/useAuth";
+import { useDeleteReview, useGetAllReview } from "@/services/review.service";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Bus,
+  Calendar,
+  Clock,
+  Eye,
+  MapPin,
+  MessageSquare,
+  Star,
+  Trash2,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const Review = () => {
-  const dispatch = useDispatch();
-  const { reviews, totalCount, searchCount, loader, message, error } =
-    useSelector(reviewsData);
-  const { authUser } = useSelector(authData);
-
-  const [review, setReview] = useState({});
-
-  const handleShowReview = (id) => {
-    const selectedReview = reviews.find((review) => review.id === id);
-    if (selectedReview) {
-      setReview(selectedReview);
-    }
-  };
-
-  const handleDeleteSchedule = (id) => {
-    swal({
-      title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this imaginary file!",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal(`Poof! Successfully deleted`, {
-          icon: "success",
-        });
-        dispatch(deleteReview(id));
-        dispatch(setReviewMessageEmpty());
-      } else {
-        swal("Your imaginary file is safe!");
-      }
-    });
-  };
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
-  const handlePageChange = (page) => {
-    setPage(page);
-    dispatch(getAllReview({ page, limit: rowPage, search }));
-  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { data, isLoading } = useGetAllReview({ page, limit: rowPage, search });
+  const deleteReview = useDeleteReview();
 
-  const handlePerRowsChange = (newPerPage, page) => {
-    setRowPage(newPerPage);
-    dispatch(getAllReview({ page, limit: newPerPage, search }));
-  };
+  const { authUser } = useAuth();
+  const [review, setReview] = useState(null);
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-    dispatch(getAllReview({ page, limit: rowPage, search: e.target.value }));
-  };
+  useEffect(() => {
+    if (deleteReview.error) {
+      toast("Error", {
+        description: `${
+          deleteReview?.error?.response?.data?.message ||
+          deleteReview?.error?.message
+        }`,
+      });
+    }
+  }, [deleteReview.error]);
+
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
   };
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-    if (message) {
-      toast.success(message);
-    }
-    return () => {
-      dispatch(setReviewMessageEmpty());
-    };
-  }, [dispatch, message, error]);
 
   const columns = [
     {
@@ -94,18 +74,16 @@ const Review = () => {
     {
       name: "View",
       cell: (data) => (
-        <a
-          data-target="#showreview"
-          data-toggle="modal"
-          href="#edit_specialities_details"
-          rel="noreferrer"
-          onClick={() => handleShowReview(data.id)}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            setReview(data);
+            setIsDialogOpen(true);
+          }}
         >
-          <i
-            className="fa fa-eye"
-            style={{ color: "#00d0f1", fontSize: "17px" }}
-          ></i>
-        </a>
+          <Eye className="h-4 w-4 text-primary" />
+        </Button>
       ),
       width: "60px",
     },
@@ -119,23 +97,25 @@ const Review = () => {
       selector: (data) => data.regNo,
       sortable: true,
     },
-    {
-      name: "Type",
-      selector: (data) => data.type,
-    },
+    // {
+    //   name: "Type",
+    //   selector: (data) => data.type,
+    // },
     {
       name: "Rating",
       selector: (data) => data.rating,
       sortable: true,
       cell: (row) => (
-        <div>
-          {Array.from({ length: 5 }, (_, index) => (
-            <i
-              key={index}
-              className={`fa ${index < row.rating ? "fa-star" : "fa-star-o"}`}
-              aria-hidden="true"
-              style={{ color: "gold", fontSize: "17px" }}
-            ></i>
+        <div className="flex">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={`h-5 w-5 ${
+                i < row.rating
+                  ? "text-yellow-400 fill-yellow-400"
+                  : "text-gray-300"
+              }`}
+            />
           ))}
         </div>
       ),
@@ -161,19 +141,6 @@ const Review = () => {
       name: "Trip time",
       selector: (data) => formatDateTime(data.tripTime),
     },
-    // {
-    //   name: "Device with model",
-    //   selector: (data) => data,
-    //   cell: (data) => {
-    //     return (
-    //       <p>
-    //         {data.phoneName}
-    //         {"."}
-    //         {data.phoneModel}
-    //       </p>
-    //     );
-    //   },
-    // },
     {
       name: "IP Address",
       selector: (data) => data.ipAddress,
@@ -186,80 +153,142 @@ const Review = () => {
     {
       name: "Actions",
       cell: (data) => (
-        <div className="text-right actions">
-          <button
-            className="btn btn-sm bg-danger-light"
-            onClick={() => handleDeleteSchedule(data.id)}
-            disabled={authUser?.role?.name === "VIEWER" && true}
-          >
-            <i className="fe fe-trash"></i> Delete
-          </button>
-        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={authUser?.role?.name === "VIEWER"}
+            >
+              <Trash2 className="h-4 w-4 text-red-500" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                review and remove it from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => deleteReview.mutate(data.id)}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       ),
       right: true, // Align the column to the right
     },
   ];
   return (
-    <>
-      <ModalPopup title={review.paribahanName} target="showreview">
-        <div>
-          {review?.regNo && (
-            <p>
-              <b>Registration No : </b> {review?.regNo}
-            </p>
-          )}
-          <p>
-            <b>Name : </b> {review?.name}
-          </p>
-          {review?.phoneNumber && (
-            <p>
-              <b>Phone number : </b> {review?.phoneNumber}
-            </p>
-          )}
-          <p>
-            <b>Rating : </b> {review.rating}
-          </p>
-          {review?.comment && (
-            <p>
-              <b>Comment : </b> {review?.comment}
-            </p>
-          )}
-          {review?.tripTime && (
-            <p>
-              <b>Trip Time : </b> {formatDateTime(review?.tripTime)}
-            </p>
-          )}
-          {review?.destination && (
-            <p>
-              <b>Destination : </b> {review?.destination}
-            </p>
-          )}
-          <p>
-            <b>Entry Date : </b> {formatDateTime(review.createdAt)}
-          </p>
-        </div>
-      </ModalPopup>
+    <div>
       <PageHeader title="Reviews" />
-      <input
+      <Input
         type="text"
-        placeholder="Search"
-        className="form-control table-search-box"
-        onChange={handleSearchChange}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search..."
+        className="my-3"
       />
       <DataTable
         columns={columns}
-        data={reviews}
+        data={data?.reviews}
         responsive
-        progressPending={loader}
-        progressComponent={<Loading />}
+        progressPending={isLoading}
+        progressComponent={
+          <div className="h-96 flex justify-center items-center">
+            <Loading />
+          </div>
+        }
         pagination
         paginationServer
-        paginationTotalRows={searchCount ? searchCount : totalCount}
-        onChangeRowsPerPage={handlePerRowsChange}
-        onChangePage={handlePageChange}
+        paginationTotalRows={
+          data?.searchCount ? data?.searchCount : data?.totalCount
+        }
+        onChangeRowsPerPage={(value) => setRowPage(value)}
+        onChangePage={(page) => setPage(page)}
         paginationRowsPerPageOptions={[10, 20, 50, 100]}
       />
-    </>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-h-[95vh] sm:max-w-[425px] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Bus className="h-5 w-5 text-primary" />
+              {review?.paribahanName}
+            </DialogTitle>
+            <DialogDescription>
+              Detailed feedback from our valued passenger
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-3">
+            <div>
+              <h4 className="text-sm font-semibold">{review?.name}</h4>
+              <p className="text-sm font-semibold text-primary">
+                <a href={`tel:${review?.phoneNumber}`}>{review?.phoneNumber}</a>
+              </p>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Rating</h4>
+              <div className="flex items-center gap-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-5 w-5 ${
+                      i < review?.rating
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+                <span className="text-sm font-medium ml-2">
+                  {review?.rating}/5
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Trip Details</h4>
+              <div className="grid gap-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Badge variant="outline" className="text-xs">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {formatDateTime(review?.tripTime)}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    {review?.destination}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Bus className="h-4 w-4" /> Reg No: {review?.regNo}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Passenger Feedback</h4>
+              <p className="text-sm text-muted-foreground">
+                <MessageSquare className="h-4 w-4 inline mr-2" />
+                {review?.comment}
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Review ID: #R{Math.floor(Math.random() * 10000)}</span>
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                {formatDateTime(review?.createdAt)}
+              </span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 
