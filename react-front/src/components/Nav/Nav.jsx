@@ -194,6 +194,16 @@ const Nav = () => {
               </Link>
               <Link
                 onClick={() => setOpen(!open)}
+                to="/lost-found"
+                className={`text-base font-medium text-white border border-transparent ${
+                  ["/lost-found", "/lost-found/form"].includes(pathName) &&
+                  "border-white"
+                } hover:border-white py-1 px-2 rounded-sm`}
+              >
+                Lost And Found
+              </Link>
+              <Link
+                onClick={() => setOpen(!open)}
                 to="/about"
                 className={`text-base font-medium text-white border border-transparent ${
                   pathName === "/about" && "border-white"
