@@ -3,11 +3,23 @@ import avatar from "@/assets/img/no-image.jpg";
 import PageHeader from "@/components/PageHeader/PageHeader";
 import { useAllLostFound } from "@/services/lostFound.service";
 import { formatDateTime } from "@/utils/timeAgo";
-import { Eye } from "lucide-react";
+import { Calendar, Eye, MapPin, Phone, Tag, User } from "lucide-react";
 import { useState } from "react";
 import DataTable from "react-data-table-component";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const LostFound = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
+  const [activeImage, setActiveImage] = useState(0);
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
   const [filters, setFilters] = useState({});
@@ -16,7 +28,6 @@ const LostFound = () => {
     limit: rowPage,
     filters,
   });
-  console.log(data);
 
   const calculateItemIndex = (page, limit, index) => {
     return (page - 1) * limit + index + 1;
@@ -31,9 +42,16 @@ const LostFound = () => {
     {
       name: "View",
       cell: (data) => (
-        <div>
-          <Eye className="w-5 text-primary cursor-pointer" />
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            setSelectedData(data);
+            setIsDialogOpen(true);
+          }}
+        >
+          <Eye className="h-4 w-4 text-primary" />
+        </Button>
       ),
       width: "60px",
     },
@@ -62,6 +80,21 @@ const LostFound = () => {
           style={{ width: "100px", height: "100px", objectFit: "cover" }}
         />
       ),
+    },
+    {
+      name: "Category",
+      selector: (data) => data.statusType,
+      sortable: true,
+    },
+    {
+      name: "Name",
+      selector: (data) => data.name,
+      sortable: true,
+    },
+    {
+      name: "Phone",
+      selector: (data) => data.phone,
+      sortable: true,
     },
     {
       name: "Item",
@@ -128,6 +161,186 @@ const LostFound = () => {
         onChangePage={(page) => setPage(page)}
         paginationRowsPerPageOptions={[10, 20, 50, 100]}
       />
+      {selectedData && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-h-[95vh] sm:max-w-5xl overflow-y-auto">
+            <DialogHeader className="p-0">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl font-bold">
+                  Item Details
+                </DialogTitle>
+                <Badge
+                  variant={
+                    selectedData.reportType === "LOST"
+                      ? "destructive"
+                      : "default"
+                  }
+                  className="text-sm"
+                >
+                  {selectedData.reportType}
+                </Badge>
+              </div>
+            </DialogHeader>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              {/* Left column - Images */}
+              <div className="space-y-4">
+                <div className="relative rounded-lg overflow-hidden bg-muted h-[300px] w-full">
+                  <img
+                    src={
+                      selectedData.imageUrls &&
+                      selectedData.imageUrls.length > 0
+                        ? selectedData.imageUrls[activeImage]
+                        : avatar
+                    }
+                    alt={selectedData.goods || "Item image"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {selectedData.imageUrls &&
+                  selectedData.imageUrls.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {selectedData.imageUrls.map((url, index) => (
+                        <div
+                          key={index}
+                          className={`relative h-16 w-16 rounded-md overflow-hidden cursor-pointer border-2 ${
+                            activeImage === index
+                              ? "border-primary"
+                              : "border-transparent"
+                          }`}
+                          onClick={() => setActiveImage(index)}
+                        >
+                          <img
+                            src={url || "/placeholder.svg"}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                <Card>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-lg mb-2">
+                      Item Information
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Category:</span>
+                        <span>{selectedData.statusType}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            selectedData.status === "RESOLVED"
+                              ? "outline"
+                              : "secondary"
+                          }
+                          className="capitalize"
+                        >
+                          {selectedData.status?.toLowerCase()}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Date:</span>
+                        <span>{formatDateTime(selectedData.dateTime)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">Location:</span>
+                        <span>{selectedData.place}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right column - Details */}
+              <div className="space-y-3">
+                {/* Item Details */}
+                <div className="space-y-2">
+                  <div>
+                    <h3 className="text-xl font-bold">{selectedData.goods}</h3>
+                    <div className="flex items-center gap-2 mt-1 text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <span>{formatDateTime(selectedData.dateTime)}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Description</h4>
+                    <p className="text-muted-foreground">
+                      {selectedData.description || "No description provided."}
+                    </p>
+                  </div>
+
+                  {selectedData.policeReport && (
+                    <div className="bg-muted p-4 rounded-lg">
+                      <h4 className="font-medium mb-2">Police Report</h4>
+                      <p className="text-muted-foreground">
+                        {selectedData.policeReport}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Application Number</h4>
+                    <p className="text-muted-foreground">
+                      #{selectedData.applicationNo}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <Card>
+                  <CardContent className="p-4 space-y-4">
+                    <h3 className="font-semibold text-lg mb-2">
+                      Contact Information
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-3 rounded-full">
+                        <User className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Name</p>
+                        <p className="font-medium">{selectedData.name}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-3 rounded-full">
+                        <Phone className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone</p>
+                        <p className="font-medium">{selectedData.phone}</p>
+                      </div>
+                    </div>
+
+                    {selectedData.address && (
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-3 rounded-full">
+                          <MapPin className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Address
+                          </p>
+                          <p className="font-medium">{selectedData.address}</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

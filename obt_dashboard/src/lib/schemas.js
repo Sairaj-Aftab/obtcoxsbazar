@@ -30,7 +30,7 @@ export const paribahanUserFormSchema = z.object({
   salesNumber: z.string().optional(),
   counterLocation: z.string().optional(),
   counterLocationMap: z.string().optional(),
-  password: z.string().regex(/^\d{5}$/, {
+  plainPassword: z.string().regex(/^\d{5}$/, {
     message: "Password must be a 5-digit number.",
   }),
   type: z.array(z.string()).refine((value) => value.length > 0, {

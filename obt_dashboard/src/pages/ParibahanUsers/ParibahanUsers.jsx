@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { generateRandomNumberPassword } from "../../utils/generateRandomPassword";
-import { formatDate, formatDateTime } from "../../utils/timeAgo";
+import { formatDateTime } from "../../utils/timeAgo";
 import useAuth from "@/store/useAuth";
 import {
   useCreateParibahanUser,
+  useDeleteParibahanUser,
   useParibahanUsers,
   useUpdateParibahanUser,
 } from "@/services/paribahan.service";
-import { Edit, Loader2, Map, MapPin, Trash } from "lucide-react";
+import { Edit, Loader2, MapPin, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -46,20 +46,25 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { busTypes } from "@/config/busType";
 import { useGetDestinationPlaces } from "@/services/place.service";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 const ParibahanUsers = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowPage, setRowPage] = useState(10);
+
   const { authUser } = useAuth();
   const { data: users, isLoading } = useParibahanUsers({ search });
   const createParibahan = useCreateParibahanUser();
   const updateParibahan = useUpdateParibahanUser();
+  const deleteParibahan = useDeleteParibahanUser();
   const { data: destinationPlace, isLoading: isDestinationPlaceLoading } =
     useGetDestinationPlaces();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
 
   const form = useForm({
     resolver: zodResolver(paribahanUserFormSchema),
@@ -71,7 +76,7 @@ const ParibahanUsers = () => {
       salesNumber: "",
       counterLocation: "",
       counterLocationMap: "",
-      password: "",
+      plainPassword: "",
       type: [],
       destinationId: [],
     },
@@ -79,70 +84,26 @@ const ParibahanUsers = () => {
 
   const generateRandomPassword = () => {
     const randomPassword = Math.floor(10000 + Math.random() * 90000).toString();
-    form.setValue("password", randomPassword);
+    form.setValue("plainPassword", randomPassword);
   };
-
-  // const handleCreateParibahanUserSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (
-  //     !paribahanInput.paribahanName ||
-  //     !paribahanInput.password ||
-  //     !paribahanInput.type
-  //   ) {
-  //     toast.error("All fields are required");
-  //   } else {
-  //     dispatch();
-  //     createParibahanUser({ authUserId: authUser.id, data: paribahanInput })
-  //     dispatch(setMessageEmpty());
-  //   }
-  // };
 
   // Function to open the dialog for editing a role
   const handleEdit = (data) => {
     setIsEditing(true);
     setCurrentData(data);
 
-    setExistImgUrl(data?.pictureUrl);
-    setFile(null);
-    form.setValue("name", data.name);
-    form.setValue("nameBn", data.nameBn);
-    form.setValue("fatherName", data?.fatherName || "");
-    form.setValue("motherName", data?.motherName || "");
-    form.setValue("mobileNo", data?.mobileNo || "");
-    form.setValue("nidNo", data?.nidNo || "");
-    form.setValue("nidDob", data.nidDob ? data.nidDob.split("T")[0] : "");
-    form.setValue("bloodGroup", data?.bloodGroup || "");
-    form.setValue("drivingLicenseNo", data?.drivingLicenseNo || "");
-    form.setValue(
-      "educationalQualification",
-      data?.educationalQualification || ""
-    );
+    const typeArray = data.type ? data.type.toString().split("") : [];
 
-    // Set form values for related fields
-    form.setValue("vehicleId", data?.vehicle?.id || "");
-    setVehicle({
-      id: data?.vehicle?.id || "",
-      regNo: data?.vehicle?.registrationNo || "",
-      ownerName: data?.vehicle?.ownerName || "",
-    });
-
-    // Permanent Address
-    form.setValue("perVillage", data?.permanentAddress?.village || "");
-    form.setValue("perPo", data?.permanentAddress?.po || "");
-    form.setValue("perThana", data?.permanentAddress?.thana || "");
-    form.setValue("perDistrict", data?.permanentAddress?.district || "");
-
-    // Current Address
-    form.setValue("currVillage", data?.currentAddress?.village || "");
-    form.setValue("currHoldingNo", data?.currentAddress?.holdingNo || "");
-    form.setValue("currWardNo", data?.currentAddress?.wardNo || "");
-    form.setValue("currThana", data?.currentAddress?.thana || "");
-    form.setValue("currDistrict", data?.currentAddress?.district || "");
-
-    form.setValue("driverActivitiesId", data?.driverActivitiesId || "");
-    form.setValue("driverStatusId", data?.driverStatusId || "");
-    form.setValue("vehicleTypeId", data?.vehicleTypeId || "");
-    form.setValue("note", data?.note || "");
+    form.setValue("paribahanName", data.paribahanName);
+    form.setValue("contactPerson", data.contactPerson);
+    form.setValue("contactNumber", data.contactNumber);
+    form.setValue("salesPerson", data.salesPerson);
+    form.setValue("salesNumber", data.salesNumber);
+    form.setValue("plainPassword", data.plainPassword);
+    form.setValue("counterLocation", data.counterLocation);
+    form.setValue("counterLocationMap", data.counterLocationMap);
+    form.setValue("type", typeArray);
+    form.setValue("destinationId", data.destinationId);
 
     setIsDialogOpen(true);
   };
@@ -157,26 +118,60 @@ const ParibahanUsers = () => {
       ...data,
       type: parseInt(typeValue),
     };
-    console.log(submissionData);
+
+    if (isEditing) {
+      updateParibahan.mutate({ id: currentData.id, data: submissionData });
+    } else {
+      createParibahan.mutate({ authUserId: authUser.id, data: submissionData });
+    }
   }
 
-  const handleEditUserSubmit = (e) => {
-    // updateParibahanUser({
-    //   id: findUser.id,
-    //   data: {
-    //     paribahanName: findUser.paribahanName,
-    //     contactPerson: findUser.contactPerson,
-    //     contactNumber: findUser.contactNumber,
-    //     salesPerson: findUser.salesPerson,
-    //     salesNumber: findUser.salesNumber,
-    //     plainPassword: findUser.plainPassword,
-    //     counterLocation: findUser.counterLocation,
-    //     counterLocationMap: findUser.counterLocationMap,
-    //     type: type,
-    //     destinationId: selected,
-    //   },
-    // })
-  };
+  useEffect(() => {
+    if (
+      createParibahan.isSuccess ||
+      updateParibahan.isSuccess ||
+      deleteParibahan.isSuccess
+    ) {
+      toast("Success", {
+        description: `${
+          createParibahan?.data?.message ||
+          updateParibahan?.data?.message ||
+          deleteParibahan?.data?.message
+        }`,
+      });
+      setIsDialogOpen(false);
+      setIsEditing(false);
+      setCurrentData(null);
+      form.reset();
+    }
+    if (
+      createParibahan.error ||
+      updateParibahan.error ||
+      deleteParibahan.error
+    ) {
+      toast("Error", {
+        description: `${
+          createParibahan?.error?.response?.data?.message ||
+          updateParibahan?.error?.response?.data?.message ||
+          deleteParibahan?.error?.response?.data?.message ||
+          createParibahan?.error?.message ||
+          updateParibahan?.error?.message ||
+          deleteParibahan?.error?.message
+        }`,
+      });
+    }
+  }, [
+    createParibahan?.data?.message,
+    createParibahan.error,
+    createParibahan.isSuccess,
+    deleteParibahan?.data?.message,
+    deleteParibahan.error,
+    deleteParibahan.isSuccess,
+    form,
+    updateParibahan?.data?.message,
+    updateParibahan.error,
+    updateParibahan.isSuccess,
+  ]);
 
   const calculateItemIndex = (page, rowPage, index) => {
     return (page - 1) * rowPage + index + 1;
@@ -185,6 +180,20 @@ const ParibahanUsers = () => {
     {
       name: "#",
       selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      width: "60px",
+    },
+    {
+      name: "View",
+      cell: (data) => (
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={authUser?.role?.name === "VIEWER"}
+          onClick={() => handleEdit(data)}
+        >
+          <Edit className="h-4 w-4 text-primary" />
+        </Button>
+      ),
       width: "60px",
     },
     {
@@ -282,40 +291,30 @@ const ParibahanUsers = () => {
     {
       name: "Actions",
       cell: (data) => (
-        <div>
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={authUser?.role?.name === "VIEWER"}
-            onClick={() => handleEdit(data)}
-          >
-            <Edit className="h-4 w-4 text-primary" />
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Trash className="h-4 w-4 text-red-500" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  schedule and remove it from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                // onClick={() => deleteSchedule.mutate(data.id)}
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Trash className="h-4 w-4 text-red-500" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                schedule and remove it from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => deleteParibahan.mutate(data.id)}
+              >
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       ),
       right: true, // Align the column to the right
     },
@@ -481,7 +480,7 @@ const ParibahanUsers = () => {
               />
               <FormField
                 control={form.control}
-                name="password"
+                name="plainPassword"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
@@ -492,14 +491,12 @@ const ParibahanUsers = () => {
                       />
                     </FormControl>
                     <FormDescription>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
+                      <Badge
+                        className="cursor-pointer"
                         onClick={generateRandomPassword}
                       >
                         Generate random password
-                      </Button>
+                      </Badge>
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
