@@ -83,6 +83,20 @@ const LostAndFoundList = () => {
       width: "100px",
     },
     {
+      name: "Image",
+      cell: (data) => (
+        <img
+          src={
+            data.imageUrls && data.imageUrls.length > 0
+              ? data.imageUrls[0]
+              : avatar
+          }
+          alt={data.goods}
+        />
+      ),
+      width: "100px",
+    },
+    {
       name: "Item",
       cell: (data) => (
         <div>

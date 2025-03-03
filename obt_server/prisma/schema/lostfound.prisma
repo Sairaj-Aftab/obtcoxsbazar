@@ -8,6 +8,11 @@ enum Status {
     RESOLVED
 }
 
+enum From {
+    OBTCOX
+    COXSCAB
+}
+
 model LostAndFound {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     applicationNo Int @unique
@@ -22,6 +27,7 @@ model LostAndFound {
     policeReport String?
     description String?
     images String[]
+    from   From? @default(OBTCOX)
     status Status @default(PENDING)
     createdAt      DateTime   @default(now())
     updatedAt      DateTime   @updatedAt
