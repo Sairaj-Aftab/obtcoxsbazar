@@ -370,7 +370,7 @@ const ParibahanUsers = () => {
         >
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Update driver" : "Create driver"}
+              {isEditing ? "Update Paribahan" : "Create Paribahan"}
             </DialogTitle>
           </DialogHeader>
           <Form {...form}>

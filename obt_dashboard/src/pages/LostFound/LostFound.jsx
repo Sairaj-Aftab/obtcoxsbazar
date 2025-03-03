@@ -4,7 +4,7 @@ import PageHeader from "@/components/PageHeader/PageHeader";
 import { useAllLostFound } from "@/services/lostFound.service";
 import { formatDateTime } from "@/utils/timeAgo";
 import { Calendar, Eye, MapPin, Phone, Tag, User } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
   Dialog,
@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { toPng } from "html-to-image";
 
 const LostFound = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -28,6 +29,27 @@ const LostFound = () => {
     limit: rowPage,
     filters,
   });
+  const ref = useRef(null);
+
+  const handleDownload = useCallback(() => {
+    if (!ref.current) {
+      console.log("ref is null");
+      return;
+    }
+
+    toPng(ref.current, { cacheBust: true, backgroundColor: "#ffffff" })
+      .then((dataUrl) => {
+        const link = document.createElement("a");
+        link.download = `lost-found-item-${
+          selectedData?.applicationNo || "details"
+        }.png`;
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [selectedData?.applicationNo]);
 
   const calculateItemIndex = (page, limit, index) => {
     return (page - 1) * limit + index + 1;
@@ -163,7 +185,10 @@ const LostFound = () => {
       />
       {selectedData && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-h-[95vh] sm:max-w-5xl overflow-y-auto">
+          <DialogContent
+            ref={ref}
+            className="max-h-[95vh] sm:max-w-5xl overflow-y-auto"
+          >
             <DialogHeader className="p-0">
               <div className="flex items-center justify-between">
                 <DialogTitle className="text-xl font-bold">
@@ -193,6 +218,10 @@ const LostFound = () => {
                         ? selectedData.imageUrls[activeImage]
                         : avatar
                     }
+                    onError={(e) => {
+                      e.target.src = "/fallback-image.jpg"; // Set a default image
+                      e.target.onerror = null; // Prevent infinite loops
+                    }}
                     alt={selectedData.goods || "Item image"}
                     className="w-full h-full object-cover"
                   />
@@ -338,6 +367,7 @@ const LostFound = () => {
                 </Card>
               </div>
             </div>
+            {/* <Button onClick={handleDownload}>Download Image</Button> */}
           </DialogContent>
         </Dialog>
       )}
