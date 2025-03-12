@@ -10,6 +10,8 @@ const BusScheduleTable = () => {
   const navigate = useNavigate();
   const { destinationPlaces } = usePlaces();
   const { todaySchedules, todayScheduleLoader } = useSchedules();
+  console.log(todaySchedules);
+
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
   const fiveDaysLater = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
@@ -51,7 +53,7 @@ const BusScheduleTable = () => {
               },
             }}
           />
-          {todaySchedules?.length > 10 && (
+          {todaySchedules?.schedules?.length > 10 && (
             <Link
               to="/all-bus-schedules"
               className="block text-end text-sm font-medium text-primary-color"

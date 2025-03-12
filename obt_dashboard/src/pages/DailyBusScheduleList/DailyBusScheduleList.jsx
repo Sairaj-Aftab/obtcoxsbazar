@@ -84,11 +84,6 @@ const DailyBusScheduleList = () => {
       sortable: true,
     },
     {
-      name: "Seat Status",
-      selector: (data) => (data.seatStatus ? "Available" : "Booked"),
-      sortable: true,
-    },
-    {
       name: "Entry Date",
       selector: (data) => formatDateTime(data.createdAt),
       sortable: true,

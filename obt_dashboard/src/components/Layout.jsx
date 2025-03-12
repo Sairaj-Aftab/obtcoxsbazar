@@ -52,16 +52,22 @@ export default function Layout() {
       permission: "DASHBOARD",
     },
     {
-      to: "/regular-bus-schedule",
-      name: "Regular Bus Schedule",
+      to: "/todays-schedule",
+      name: "Today's Schedule",
       icon: <ListTodo className="w-4 h-4" />,
-      permission: "REGULAR-BUS-SCHEDULE",
+      permission: "TODAYS-SCHEDULE",
     },
     {
       to: "/total-bus-schedule-list",
       name: "Schedule Log Book",
       icon: <ListTodo className="w-4 h-4" />,
       permission: "TOTAL-BUS-SCHEDULE",
+    },
+    {
+      to: "/regular-bus-schedule",
+      name: "Regular Bus Schedule",
+      icon: <ListTodo className="w-4 h-4" />,
+      permission: "REGULAR-BUS-SCHEDULE",
     },
     {
       to: "/notice",

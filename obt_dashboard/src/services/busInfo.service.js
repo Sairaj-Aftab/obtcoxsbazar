@@ -2,14 +2,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./url.service";
 
 // Get a single bus info
-export const useGetBusInfo = ({ id, limit }) => {
+export const useGetBusInfo = ({ id, page, limit, search }) => {
   return useQuery({
-    queryKey: ["busInfo", id, limit],
+    queryKey: ["busInfo", id, page, limit, search],
     queryFn: async () => {
-      const response = await axiosInstance.get(`/businfo/${id}?limit=${limit}`);
+      const response = await axiosInstance.get(`/businfo/${id}`, {
+        params: { page, limit, search },
+      });
       return response.data;
     },
-    enabled: !!id, // Ensures it only runs if id is provided
   });
 };
 

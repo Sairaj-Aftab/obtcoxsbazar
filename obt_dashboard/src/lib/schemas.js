@@ -1,5 +1,35 @@
 import * as z from "zod";
 
+export const scheduleFormSchema = z.object({
+  type: z.enum([
+    "AC",
+    "Non-AC",
+    "Sleeper Coach",
+    "Double Decker",
+    "Suite Class",
+    "Hyundai Biz Class",
+    "Mercedes-Benz",
+    "Local Service",
+  ]),
+  time: z.string().min(1, "Time is required"),
+  busNo: z.string().min(1, "Bus number is required"),
+  guideName: z.string().min(1, "Guide name is required"),
+  guidePhone: z.string().regex(/^\+?[0-9]+$/, "Invalid phone number"),
+  driverName: z.string().optional(),
+  driverPhone: z.string().optional(),
+  leavingPlace: z.string().min(1, "Leaving place is required"),
+  leavingMapLink: z.string().optional(),
+  destinationPlace: z.string().min(1, "Destination place is required"),
+  rent: z.coerce.number().min(0, "Rent must be a positive number"),
+  discountRent: z
+    .union([
+      z.coerce.number().min(0, "Discount rent must be a positive number"),
+      z.literal("").transform(() => undefined),
+    ])
+    .optional(),
+  seatStatus: z.boolean(),
+});
+
 export const rgScheduleFormSchema = z.object({
   busName: z.string().min(1, "Bus name is required"),
   time: z

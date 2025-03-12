@@ -1,0 +1,67 @@
+
+
+model RoadAccident {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  incidentTitle  String
+  date           DateTime
+  location       String
+  cause          String?
+  legalAction   String?
+  images         String[]
+  vehicles       AccidentVehicle[]
+  drivers        AccidentDriver[]
+  victims        Victim[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AccidentVehicle {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  paribahan      String
+  registrationNo String?
+  type           String?
+  ownerName      String?
+  note           String?
+  roadAccident RoadAccident @relation(fields: [roadAccidentId], references: [id])
+  roadAccidentId String @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([roadAccidentId])
+  @@index([registrationNo])
+  @@index([paribahan])
+}
+
+model Victim {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  fatherName    String?
+  age           Int?
+  gender        String?
+  status        VictimStatus?
+  address       String?
+  roadAccident RoadAccident @relation(fields: [roadAccidentId], references: [id])
+  roadAccidentId String @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+}
+
+model AccidentDriver {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  fatherName    String?
+  dateOfBirth   DateTime?
+  nidOrDlNo     String?
+  address       String?
+  roadAccident RoadAccident @relation(fields: [roadAccidentId], references: [id])
+  roadAccidentId String @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+}
+
+enum VictimStatus {
+  DEATH
+  INJURED
+}

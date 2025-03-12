@@ -2,16 +2,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./url.service";
 
 // Fetch guide info by Paribahan ID
-export const useGuideInfo = ({ id, limit }) => {
+export const useGuideInfo = ({ id, page, limit, search }) => {
   return useQuery({
-    queryKey: ["guideInfo", id, limit],
+    queryKey: ["guideInfo", id, page, limit, search],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${import.meta.env.VITE_API_URL}/guideinfo/getbyid/${id}?limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/guideinfo/getbyid/${id}`,
+        {
+          params: { page, limit, search },
+        }
       );
       return response.data;
     },
-    enabled: !!id, // Prevent query execution if ID is not provided
   });
 };
 
@@ -41,6 +43,7 @@ export const useCreateGuideInfo = () => {
       return response.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(["guideInfo"]);
       queryClient.invalidateQueries(["allGuideInfo"]); // Refetch guide info list
     },
   });

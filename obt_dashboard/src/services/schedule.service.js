@@ -27,6 +27,22 @@ export const useGetTodaysSchedule = ({ page = 1, limit = 10, search }) => {
   });
 };
 
+export const useUpdateSchedule = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }) => {
+      const response = await axiosInstance.put(`/schedule/update/${id}`, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["schedules"]);
+      // eslint-disable-next-line no-undef
+      queryClient.invalidateQueries(["todaysSchedule"]);
+    },
+  });
+};
+
 // Delete Schedule
 export const useDeleteSchedule = () => {
   const queryClient = useQueryClient();

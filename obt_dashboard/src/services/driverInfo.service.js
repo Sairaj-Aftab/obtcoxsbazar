@@ -2,18 +2,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "./url.service";
 
 // Fetch driver info by ID
-export const useDriverInfo = ({ id, limit }) => {
+export const useDriverInfo = ({ id, page, limit, search }) => {
   return useQuery({
-    queryKey: ["driverInfo", id, limit],
+    queryKey: ["driverInfo", id, page, limit, search],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/driverinfo/getbyid/${id}?limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/driverinfo/getbyid/${id}`,
+        {
+          params: { page, limit, search },
+        }
       );
       return response.data;
     },
-    enabled: !!id,
   });
 };
 

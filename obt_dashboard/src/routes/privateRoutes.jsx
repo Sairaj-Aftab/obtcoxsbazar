@@ -15,6 +15,7 @@ import Review from "../pages/Review/Review";
 import TouristBusPermission from "../pages/TouristBusPermission/TouristBusPermission";
 import Layout from "@/components/Layout";
 import LostFound from "@/pages/LostFound/LostFound";
+import TodaysSchedule from "@/pages/TodaysSchedule/TodaysSchedule";
 
 const privateRoutes = [
   {
@@ -26,6 +27,10 @@ const privateRoutes = [
           {
             path: "/",
             element: <Dashboard />,
+          },
+          {
+            path: "/todays-schedule",
+            element: <TodaysSchedule />,
           },
           {
             path: "/total-bus-schedule-list",
