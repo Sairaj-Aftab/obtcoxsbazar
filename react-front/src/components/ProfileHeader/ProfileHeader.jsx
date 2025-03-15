@@ -10,6 +10,10 @@ import {
   deleteNotice,
 } from "../../services/notice.service";
 import useParibahanAuth from "../../store/useParibahanAuth";
+import { Card } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Loader2, LogOut } from "lucide-react";
 
 const ProfileHeader = () => {
   const queryClient = useQueryClient();
@@ -89,24 +93,33 @@ const ProfileHeader = () => {
 
   return (
     <>
-      <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
+      <Card className="container mx-auto bg-white p-5 my-5 shadow-md">
         {/* Profile Header Section */}
-        <div className="flex justify-between items-start ">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-medium text-gray-700">
-              <span className="text-primary-color">{user?.paribahanName}</span>
+            <h1 className="text-2xl font-bold text-primary">
+              {user?.paribahanName}
             </h1>
-            <p className="text-lg font-medium text-gray-700">
-              Sales Number:{" "}
-              <span className="text-primary-color">{user?.salesNumber}</span>
-            </p>
+            <div className="flex items-center mt-1">
+              <span className="text-muted-foreground">Sales Number:</span>
+              <Badge variant="outline" className="ml-2">
+                {user?.salesNumber}
+              </Badge>
+            </div>
           </div>
-          <button
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={handleLogout}
-            className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
+            disabled={loader}
           >
-            {loader ? "Loading..." : "Logout"}
-          </button>
+            {loader ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="mr-2 h-4 w-4" />
+            )}
+            Logout
+          </Button>
         </div>
 
         <div className="text-base font-semibold pb-5 sm:flex gap-1">
@@ -140,13 +153,13 @@ const ProfileHeader = () => {
                 onChange={(e) => setNotice(e.target.value)}
                 placeholder="Notice to Passenger"
               />
-              <button
+              <Button
                 type="submit"
-                className="bg-primary-color py-1 px-2 rounded text-white text-base font-medium"
+                className="bg-primary-color text-white"
                 disabled={createLoading}
               >
                 {createLoading ? "Submiting..." : "Submit"}
-              </button>
+              </Button>
             </form>
           )}
         </div>
@@ -162,6 +175,18 @@ const ProfileHeader = () => {
               } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
             >
               Schedule
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/profile/schedule-logs"
+              className={`${
+                pathName === "/profile/schedule-logs"
+                  ? "bg-primary-color text-white"
+                  : "bg-gray-200 text-primary-color"
+              } border border-primary-color text-sm sm:text-base font-medium py-1 px-1 sm:px-2 rounded-md`}
+            >
+              Schedule Logs
             </Link>
           </li>
           <li>
@@ -225,7 +250,7 @@ const ProfileHeader = () => {
             </Link>
           </li>
         </ul>
-      </div>
+      </Card>
       <Outlet />
     </>
   );

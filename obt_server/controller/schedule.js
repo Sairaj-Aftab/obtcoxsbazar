@@ -283,6 +283,84 @@ export const getSchedulesByLimit = async (req, res, next) => {
   }
 };
 
+export const getTodaysSchedulesByParibahanUserId = async (req, res, next) => {
+  try {
+    const { paribahanUserId } = req.params;
+    const searchQuery = req.query.search;
+
+    // Calculate the start and end of today
+    const today = new Date();
+    const startOfToday = new Date(
+      Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0)
+    );
+    const endOfToday = new Date(
+      Date.UTC(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        23,
+        59,
+        59,
+        999
+      )
+    );
+
+    // Base filter with time range
+    const baseFilter = {
+      time: {
+        gte: startOfToday.toISOString().slice(0, 16),
+        lte: endOfToday.toISOString().slice(0, 16),
+      },
+    };
+
+    // Extend filter if searchQuery is provided
+    const searchFilter = searchQuery
+      ? {
+          OR: [
+            { time: { contains: searchQuery, mode: "insensitive" } },
+            { busName: { contains: searchQuery, mode: "insensitive" } },
+            { busNo: { contains: searchQuery, mode: "insensitive" } },
+            {
+              destinationPlace: { contains: searchQuery, mode: "insensitive" },
+            },
+            { leavingPlace: { contains: searchQuery, mode: "insensitive" } },
+            { guideName: { contains: searchQuery, mode: "insensitive" } },
+            { guidePhone: { contains: searchQuery, mode: "insensitive" } },
+            { type: { contains: searchQuery, mode: "insensitive" } },
+          ],
+        }
+      : {};
+
+    const [schedules, count, searchCount] = await Promise.all([
+      prisma.busSchedule.findMany({
+        where: {
+          paribahanUserId: String(paribahanUserId),
+          AND: [baseFilter, searchFilter],
+        },
+        include: {
+          paribahanUser: true,
+        },
+        orderBy: {
+          time: "asc",
+        },
+      }),
+      prisma.busSchedule.count({
+        where: { paribahanUserId: String(paribahanUserId), AND: [baseFilter] },
+      }),
+      prisma.busSchedule.count({
+        where: {
+          paribahanUserId: String(paribahanUserId),
+          AND: [baseFilter, searchFilter],
+        },
+      }),
+    ]);
+
+    return res.status(200).json({ schedules, count, searchCount });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const getSchedulesByParibahanUserId = async (req, res, next) => {
   try {
     const { paribahanUserId } = req.params;

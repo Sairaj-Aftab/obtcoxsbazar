@@ -15,10 +15,10 @@ export const getGuideInfo = async ({ id, page, limit, search }) => {
   }
 };
 
-export const createGuideInfo = async ({ id, data }) => {
+export const createGuideInfo = async (data) => {
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/guideinfo/create/${id}`,
+      `${import.meta.env.VITE_API_URL}/guideinfo/create`,
       data,
       { withCredentials: true }
     );

@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 // Paribahan Notice
-router.post("/createbusinfo/:id", createBusInfo);
+router.post("/createbusinfo", createBusInfo);
 router.put("/update/:id", updateBusInfo);
 router.get("/getall", getAllBusInfo);
 router.get("/:id", getBusInfo);

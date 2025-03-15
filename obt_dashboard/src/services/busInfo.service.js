@@ -33,11 +33,8 @@ export const useCreateBusInfo = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }) => {
-      const response = await axiosInstance.post(
-        `/businfo/createbusinfo/${id}`,
-        data
-      );
+    mutationFn: async ({ data }) => {
+      const response = await axiosInstance.post(`/businfo/createbusinfo`, data);
       return response.data;
     },
     onSuccess: () => {

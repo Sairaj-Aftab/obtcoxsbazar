@@ -70,9 +70,9 @@ export const paribahanUserFormSchema = z.object({
     message: "You must select at least one destination.",
   }),
 });
-// Paribahan User Form
+// Bus Info Form
 export const busInfoFormSchema = z.object({
-  paribahanName: z.string().min(1, { message: "Paribahan Name is required" }),
+  paribahanUserId: z.string().min(1, { message: "Paribahan Name is required" }),
   regNo: z.string().min(1, { message: "Registration Number is required" }),
   type: z.enum(
     [
@@ -102,6 +102,15 @@ export const driverFormSchema = z.object({
   fatherName: z.string().optional(),
   phone: z.string().optional(),
   license: z.string().optional(),
+  address: z.string().optional(),
+  comment: z.string().optional(),
+  report: z.string().optional(),
+});
+// Guide Form
+export const guideFormSchema = z.object({
+  paribahanUserId: z.string().min(1, { message: "Paribahan Name is required" }),
+  name: z.string().min(1, { message: "Name is required" }),
+  phone: z.string().optional(),
   address: z.string().optional(),
   comment: z.string().optional(),
   report: z.string().optional(),

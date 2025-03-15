@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Modal from "../../components/Modal/Modal";
 import DataTable from "react-data-table-component";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -10,6 +9,36 @@ import {
 } from "../../services/busRegNo.service";
 import ComponentLoader from "../../components/Loader/ComponentLoader";
 import useParibahanAuth from "../../store/useParibahanAuth";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { busInfoSchema } from "@/lib/schemas";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { busTypes } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const ProfileBusInfo = () => {
   const queryClient = useQueryClient();
@@ -17,8 +46,9 @@ const ProfileBusInfo = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
   const { data: busRegNo, isLoading: busRegNoLoading } = useQuery({
     queryKey: ["busRegNo", { id: user.id, page, limit, search }],
     queryFn: () => getBusRegNo({ id: user.id, page, limit, search }),
@@ -31,8 +61,12 @@ const ProfileBusInfo = () => {
     isPending: createLoading,
   } = useMutation({
     mutationFn: createBusRegNo,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["busRegNo"] });
+      form.reset();
+      setIsEditing(false);
+      setIsOpen(false);
+      toast.success(data.message);
     },
   });
   // Update bus info
@@ -44,50 +78,27 @@ const ProfileBusInfo = () => {
     isPending: updateLoading,
   } = useMutation({
     mutationFn: updateBusRegNo,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["busRegNo"] });
-      setShowUpdateModal(false);
+      form.reset();
+      setIsEditing(false);
+      setIsOpen(false);
+      toast.success(data.message);
     },
   });
-  const [input, setInput] = useState({
-    paribahanName: user?.paribahanName,
-    regNo: "",
-    type: "",
-    comment: "",
+  const form = useForm({
+    resolver: zodResolver(busInfoSchema),
+    defaultValues: {
+      paribahanUserId: user.id,
+      regNo: "",
+      type: undefined,
+    },
   });
-  const changeInputValue = (e) => {
-    const { name, value } = e.target;
-    setInput({ ...input, [name]: value });
-  };
-  const handleSubmitInfo = async (e) => {
-    e.preventDefault();
-    if (!input.regNo || !input.type) {
-      toast.error("Fields are required!");
+  const onSubmit = async (data) => {
+    if (isEditing) {
+      await updateBusReg({ id: currentData.id, data });
     } else {
-      await createRegNo({ id: user.id, data: input });
-    }
-  };
-
-  const [id, setId] = useState();
-  const [infoData, setInfoData] = useState();
-  const changeInfoData = (e) => {
-    const { name, value } = e.target;
-    setInfoData({ ...infoData, [name]: value });
-  };
-  const handleOpenUpdateForm = (id) => {
-    const data = busRegNo?.busInfo.find((info) => info.id === id);
-    setId(data.id);
-    setInfoData({
-      ...data,
-    });
-    setShowUpdateModal(true);
-  };
-  const handleUpdateInfo = async (e) => {
-    e.preventDefault();
-    if (!infoData.regNo || !infoData.type) {
-      toast.error("All fields are required");
-    } else {
-      await updateBusReg({ id, data: infoData });
+      await createRegNo(data);
     }
   };
 
@@ -162,120 +173,12 @@ const ProfileBusInfo = () => {
   ];
 
   useEffect(() => {
-    if (
-      createSuccess ||
-      createData?.message ||
-      updateData?.message ||
-      updateSuccess
-    ) {
-      toast.success(createData?.message || updateData?.message);
-      setInput({
-        regNo: "",
-        type: "",
-        comment: "",
-      });
-      setShowModal(false);
-      setShowUpdateModal(false);
-    }
     if (createError || updateError) {
       toast.error(createError.message || updateError.message);
     }
-  }, [
-    createData?.message,
-    createError,
-    createSuccess,
-    updateData?.message,
-    updateError,
-    updateSuccess,
-  ]);
+  }, [createError, updateError]);
   return (
     <>
-      {showModal && (
-        <Modal title="Add Bus Info" close={() => setShowModal(false)}>
-          <form
-            onSubmit={handleSubmitInfo}
-            className="flex flex-col gap-2 w-full p-2"
-          >
-            <input
-              type="text"
-              name="regNo"
-              value={input.regNo}
-              onChange={changeInputValue}
-              placeholder="Reg No"
-            />
-            <select
-              name="type"
-              id="type"
-              value={input.type}
-              onChange={changeInputValue}
-            >
-              <option value="">Bus Type</option>
-              <option value="AC">AC</option>
-              <option value="Non-AC">Non-AC</option>
-              <option value="Sleeper Coach">Sleeper Coach</option>
-              <option value="Double-decker">Double-decker</option>
-              <option value="Suite Class">Suite Class</option>
-              <option value="Hyundai Biz Class">Hyundai Biz Class</option>
-            </select>
-            {/* <input
-              type="text"
-              name="comment"
-              value={input.comment}
-              onChange={changeInputValue}
-              placeholder="Remark"
-            /> */}
-            <button
-              type="submit"
-              className="bg-primary-color py-1 text-base font-medium text-white rounded disabled:cursor-not-allowed disabled:opacity-80"
-              disabled={createLoading}
-            >
-              {createLoading ? "Adding..." : "Add"}
-            </button>
-          </form>
-        </Modal>
-      )}
-      {showUpdateModal && (
-        <Modal title="Edit Bus Info" close={() => setShowUpdateModal(false)}>
-          <form
-            onSubmit={handleUpdateInfo}
-            className="flex flex-col gap-2 w-full p-2"
-          >
-            <input
-              type="text"
-              name="regNo"
-              value={infoData.regNo}
-              onChange={changeInfoData}
-              placeholder="Reg No"
-            />
-            <select
-              name="type"
-              id="type"
-              value={infoData.type}
-              onChange={changeInfoData}
-            >
-              <option value="">Bus Type</option>
-              <option value="AC">AC</option>
-              <option value="Non-AC">Non-AC</option>
-              <option value="Sleeper Coach">Sleeper Coach</option>
-              <option value="Double-decker">Double-decker</option>
-            </select>
-            <input
-              type="text"
-              name="comment"
-              value={infoData.comment}
-              onChange={changeInfoData}
-              placeholder="Remark"
-            />
-            <button
-              type="submit"
-              className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={updateLoading}
-            >
-              {updateLoading ? "Updating..." : "Update"}
-            </button>
-          </form>
-        </Modal>
-      )}
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
         <div className="flex justify-between items-start mb-2">
           <h1 className="text-lg font-semibold text-gray-700">Bus Info</h1>
@@ -287,7 +190,12 @@ const ProfileBusInfo = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => {
+                setIsEditing(false);
+                setCurrentData(null);
+                form.reset();
+                setIsOpen(true);
+              }}
               className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
             >
               Add bus info
@@ -330,6 +238,74 @@ const ProfileBusInfo = () => {
           }}
         />
       </div>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent
+          className="max-h-[95vh] sm:max-w-[625px] overflow-y-auto"
+          // onClick={(e) => e.stopPropagation()}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>{isEditing ? "Update Bus" : "Create Bus"}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+              <FormField
+                control={form.control}
+                name="regNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Registration Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bus Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bus type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {busTypes?.map((data) => (
+                          <SelectItem key={data.id} value={data.label}>
+                            {data.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit" disabled={createLoading || updateLoading}>
+                  {createLoading || updateLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                      wait...
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

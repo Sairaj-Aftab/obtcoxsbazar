@@ -328,7 +328,7 @@ const TodaysSchedule = () => {
   ];
   return (
     <div>
-      <PageHeader title="Schedule Log Book" />
+      <PageHeader title="Today's Schedule" />
       <Input
         type="text"
         onChange={(e) => setSearch(e.target.value)}

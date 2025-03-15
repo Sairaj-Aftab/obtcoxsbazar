@@ -15,10 +15,10 @@ export const getDriverInfo = async ({ id, page, limit, search }) => {
   }
 };
 
-export const createDriverInfo = async ({ id, data }) => {
+export const createDriverInfo = async (data) => {
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/driverinfo/create/${id}`,
+      `${import.meta.env.VITE_API_URL}/driverinfo/create`,
       data,
       { withCredentials: true }
     );

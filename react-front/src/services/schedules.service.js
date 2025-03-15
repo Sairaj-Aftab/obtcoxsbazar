@@ -40,6 +40,20 @@ export const getTodaysSchedules = async () => {
   }
 };
 
+export const getTodaysSchedulesDataByAuthId = async ({ id, search }) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/schedule/gettodaysbyparibahan/${id}`,
+      {
+        params: { search },
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+};
 export const getSchedulesDataByAuthId = async ({ id, page, limit, search }) => {
   try {
     const response = await axios.get(

@@ -1,16 +1,14 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import DataTable from "react-data-table-component";
-import { FaPencilAlt, FaRegTrashAlt } from "react-icons/fa";
 import locationIcon from "../../assets/icon/location.png";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import Modal from "../../components/Modal/Modal";
 import { formatDateTime } from "../../utils/formatDateTime";
 import {
   createSchedule,
   deleteSchedule,
-  getSchedulesDataByAuthId,
+  getTodaysSchedulesDataByAuthId,
   updateSchedule,
 } from "../../services/schedules.service";
 import { getBusRegNo } from "../../services/busRegNo.service";
@@ -19,33 +17,96 @@ import ComponentLoader from "../../components/Loader/ComponentLoader";
 import { getDriverInfo } from "../../services/driverInof.service";
 import usePlaces from "../../store/usePlaces";
 import useParibahanAuth from "../../store/useParibahanAuth";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { scheduleSchema } from "@/lib/schemas";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { busTypes } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Edit, Loader2, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const BusProfile = () => {
   const queryClient = useQueryClient();
   const { paribahanAuth: user } = useParibahanAuth();
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentData, setCurrentData] = useState(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(100);
+  const [limit, setLimit] = useState(10);
   const { leavingPlaces, destinationPlaces } = usePlaces();
-  const { data: schedules, isLoading: schedulesLoading } = useQuery({
-    queryKey: ["authSchedules", { id: user.id, page, limit, search }],
-    queryFn: () =>
-      getSchedulesDataByAuthId({ id: user.id, page, limit, search }),
+  const form = useForm({
+    resolver: zodResolver(scheduleSchema),
+    defaultValues: {
+      busName: user?.paribahanName || "",
+      time: "",
+      busNo: "",
+      type: "",
+      leavingPlace: "",
+      leavingMapLink: "",
+      destinationPlace: "",
+      destinationMapLink: "",
+      guideName: "",
+      guidePhone: "",
+      driverName: "",
+      driverPhone: "",
+      rent: 0,
+      discountRent: 0,
+      seatStatus: false,
+    },
+  });
+
+  const { data: todaysSchedule, isLoading: schedulesLoading } = useQuery({
+    queryKey: ["todaysSchedules", { id: user.id, search }],
+    queryFn: () => getTodaysSchedulesDataByAuthId({ id: user.id, search }),
   });
 
   const { data: busRegNo } = useQuery({
-    queryKey: ["busRegNo", { id: user.id, page, limit }],
-    queryFn: () => getBusRegNo({ id: user.id, page: 1, limit: 200 }),
+    queryKey: ["busRegNo", { id: user.id, page, limit: 1000 }],
+    queryFn: () => getBusRegNo({ id: user.id, page: 1, limit: 1000 }),
   });
   const { data: guide } = useQuery({
-    queryKey: ["guide", { id: user.id, page, limit }],
-    queryFn: () => getGuideInfo({ id: user.id, page: 1, limit: 200 }),
+    queryKey: ["guide", { id: user.id, page, limit: 1000 }],
+    queryFn: () => getGuideInfo({ id: user.id, page: 1, limit: 1000 }),
   });
   const { data: driver } = useQuery({
-    queryKey: ["driverInfo", { id: user.id, page: 1, limit: 200 }],
-    queryFn: () => getDriverInfo({ id: user.id, page: 1, limit: 200 }),
+    queryKey: ["driverInfo", { id: user.id, page: 1, limit: 1000 }],
+    queryFn: () => getDriverInfo({ id: user.id, page: 1, limit: 1000 }),
   });
 
   const {
@@ -57,6 +118,7 @@ const BusProfile = () => {
   } = useMutation({
     mutationFn: createSchedule,
     onSuccess: (data) => {
+      queryClient.invalidateQueries(["todaysSchedules"]);
       queryClient.setQueryData(
         ["authSchedules", { id: user.id, page, limit, search }],
         (oldData = { schedules: [] }) => ({
@@ -71,6 +133,11 @@ const BusProfile = () => {
           schedules: [data?.busSchedule, ...oldData.schedules],
         })
       );
+      setIsOpen(false);
+      form.reset();
+      setCurrentData(null);
+      setIsEditing(false);
+      toast.success(data.message);
     },
   });
   const {
@@ -82,6 +149,7 @@ const BusProfile = () => {
   } = useMutation({
     mutationFn: updateSchedule,
     onSuccess: (data) => {
+      queryClient.invalidateQueries(["todaysSchedules"]);
       queryClient.setQueryData(
         ["authSchedules", { id: user.id, page, limit, search }],
         (oldData = { schedules: [] }) => ({
@@ -100,7 +168,11 @@ const BusProfile = () => {
           ),
         })
       );
-      setShowUpdateModal(false);
+      setIsOpen(false);
+      form.reset();
+      setCurrentData(null);
+      setIsEditing(false);
+      toast.success(data.message);
     },
   });
 
@@ -127,141 +199,41 @@ const BusProfile = () => {
       );
     },
   });
+  // Create form
 
-  const [input, setInput] = useState({
-    busName: user?.paribahanName,
-    time: "",
-    busNo: "",
-    type: "",
-    leavingPlace: "",
-    leavingMapLink: "",
-    destinationPlace: "",
-    destinationMapLink: "",
-    guideName: "",
-    guidePhone: "",
-    driverName: "",
-    driverPhone: "",
-    rent: "",
-    discountRent: "",
-    seatStatus: null,
-  });
+  const handleEdit = (data) => {
+    setIsEditing(true);
+    setCurrentData(data);
+    form.setValue("time", data.time);
+    form.setValue("busNo", data.busNo);
+    form.setValue("guideName", data.guideName);
+    form.setValue("guidePhone", data.guidePhone);
+    form.setValue("driverName", data.driverName || "");
+    form.setValue("driverPhone", data.driverPhone || "");
+    form.setValue("busName", data.busName);
+    form.setValue("type", data.type);
+    form.setValue("leavingPlace", data.leavingPlace);
+    form.setValue("leavingMapLink", data.leavingMapLink);
+    form.setValue("destinationPlace", data.destinationPlace);
+    form.setValue("rent", data.rent);
+    form.setValue("discountRent", data.discountRent);
+    form.setValue("seatStatus", data.seatStatus);
+    form.setValue("destinationMapLink", data.destinationMapLink);
+    setIsOpen(true);
+  };
 
-  const changeInputValue = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "guideName") {
-      const selectedGuide = guide?.guideInfo.find(
-        (guide) => guide.name === value
-      );
-      if (selectedGuide) {
-        setInput({
-          ...input,
-          guideName: selectedGuide.name,
-          guidePhone: selectedGuide.phone,
-        });
-      } else {
-        setInput({ ...input, guideName: value, guidePhone: "" });
-      }
-    } else if (name === "driverName") {
-      const selectedDriver = driver?.driverInfo.find(
-        (driver) => driver.name === value
-      );
-      if (selectedDriver) {
-        setInput({
-          ...input,
-          driverName: selectedDriver.name,
-          driverPhone: selectedDriver.phone,
-        });
-      } else {
-        setInput({ ...input, driverName: value, driverPhone: "" });
-      }
-    } else if (name === "leavingPlace") {
-      const selectedPlace = leavingPlaces?.places?.find(
-        (place) => place.placeName === value
-      );
-      setInput({
-        ...input,
-        leavingPlace: value,
-        leavingMapLink: selectedPlace ? selectedPlace.mapLink : "",
-      });
+  async function onSubmit(data) {
+    if (isEditing) {
+      await updateData({ id: currentData.id, data });
     } else {
-      setInput({ ...input, [name]: value });
+      await create({ id: user.id, data });
     }
-  };
-
-  const handleSubmitSchedule = async (e) => {
-    e.preventDefault();
-    if (
-      !input.busName ||
-      !input.time ||
-      !input.busNo ||
-      !input.type ||
-      !input.leavingPlace ||
-      !input.destinationPlace ||
-      !input.guideName ||
-      !input.guidePhone ||
-      !input.rent ||
-      !input.seatStatus
-    ) {
-      toast.error("All fields are required");
-    } else {
-      await create({ id: user.id, data: input });
-    }
-  };
-
-  const [id, setId] = useState();
-  const [updateInput, setUpdateInput] = useState();
-  const changeUpdateInputValue = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "leavingPlace") {
-      const selectedPlace = leavingPlaces?.places?.find(
-        (place) => place.placeName === value
-      );
-      setUpdateInput({
-        ...updateInput,
-        leavingPlace: value,
-        leavingMapLink: selectedPlace ? selectedPlace.mapLink : "",
-      });
-    } else {
-      setUpdateInput({ ...updateInput, [name]: value });
-    }
-  };
-
-  const handleOpenUpdateForm = (id) => {
-    const data = schedules?.schedules?.find((schedule) => schedule.id === id);
-    setId(data.id);
-    setUpdateInput({
-      ...data,
-    });
-    setShowUpdateModal(true);
-  };
-
-  const handleUpdateSchedule = async (e) => {
-    e.preventDefault();
-    if (
-      !updateInput.time ||
-      !updateInput.busNo ||
-      !updateInput.type ||
-      !updateInput.leavingPlace ||
-      !updateInput.destinationPlace ||
-      !updateInput.guideName ||
-      !updateInput.guidePhone ||
-      !updateInput.rent
-    ) {
-      toast.error("All fields are required");
-    } else {
-      await updateData({ id, data: updateInput });
-    }
-  };
-
-  const handleDeleteSchedule = async (id) => {
-    await deleteData(id);
-  };
+  }
 
   const calculateItemIndex = (page, limit, index) => {
     return (page - 1) * limit + index + 1;
   };
+  const today = new Date().toISOString().split("T")[0];
   const column = [
     {
       name: "#",
@@ -354,18 +326,33 @@ const BusProfile = () => {
       name: "Actions",
       cell: (data) => (
         <div className="flex justify-end gap-1">
-          <button
-            onClick={() => handleOpenUpdateForm(data.id)}
-            className="bg-primary-color py-1 px-2 text-sm font-medium text-white rounded w-full"
-          >
-            <FaPencilAlt />
-          </button>
-          <button
-            onClick={() => handleDeleteSchedule(data.id)}
-            className="bg-red py-1 px-2 text-sm font-medium text-white rounded w-full"
-          >
-            <FaRegTrashAlt />
-          </button>
+          <Button variant="ghost" size="icon" onClick={() => handleEdit(data)}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Trash2 className="h-4 w-4 text-red" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  data and remove it from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={async () => await deleteData(data.id)}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       ),
       right: true, // Align the column to the right
@@ -373,462 +360,13 @@ const BusProfile = () => {
   ];
 
   useEffect(() => {
-    if (createSuccess && createData?.message) {
-      toast.success(createData?.message);
-      setInput({
-        busName: user?.paribahanName,
-        time: "",
-        busNo: "",
-        type: "",
-        leavingPlace: "",
-        leavingMapLink: "",
-        destinationPlace: "",
-        destinationMapLink: "",
-        guideName: "",
-        guidePhone: "",
-        driverName: "",
-        driverPhone: "",
-        rent: "",
-        discountRent: "",
-        seatStatus: "",
-      });
-      setShowUpdateModal(false);
-    }
-    if (updateSuccess && updatedData?.message) {
-      toast.success(updatedData?.message);
-    }
     if (createError || updateError) {
       toast.error(createError?.message || updateError?.message);
     }
-  }, [
-    user,
-    createData?.message,
-    createError,
-    createSuccess,
-    updatedData?.message,
-    updateSuccess,
-    updateError,
-  ]);
+  }, [createError, updateError]);
 
   return (
     <>
-      {showModal && (
-        <Modal title="Add Schedule" close={() => setShowModal(false)}>
-          <form
-            onSubmit={handleSubmitSchedule}
-            className="flex flex-col gap-2 w-full p-2"
-          >
-            <input
-              type="text"
-              name="busName"
-              value={user?.paribahanName}
-              // onChange={changeInputValue}
-              placeholder="Paribahan Name"
-            />
-            <select
-              name="busNo"
-              id="busNo"
-              value={input.busNo}
-              onChange={changeInputValue}
-            >
-              <option value="">Reg No.</option>
-              {busRegNo?.busInfo?.map((data, index) => (
-                <option key={index} value={data.regNo}>
-                  {data.regNo}
-                </option>
-              ))}
-            </select>
-            <select
-              name="guideName"
-              id="guideName"
-              value={input.guideName}
-              onChange={changeInputValue}
-            >
-              <option value="">Guide Name</option>
-              {guide?.guideInfo?.map((data, index) => (
-                <option key={index} value={data.name}>
-                  {data.name}
-                </option>
-              ))}
-            </select>
-            <select
-              name="guidePhone"
-              id="guidePhone"
-              value={input.guidePhone}
-              disabled
-            >
-              <option value="">Guide Phone</option>
-              {guide?.guideInfo?.map((data, index) => (
-                <option key={index} value={data.phone}>
-                  {data.phone}
-                </option>
-              ))}
-            </select>
-            <select
-              name="driverName"
-              id="driverName"
-              value={input.driverName}
-              onChange={changeInputValue}
-            >
-              <option value="">Driver Name</option>
-              {driver?.driverInfo?.map((data, index) => (
-                <option key={index} value={data.name}>
-                  {data.name}
-                </option>
-              ))}
-            </select>
-            <select
-              name="driverPhone"
-              id="driverPhone"
-              value={input.driverPhone}
-              disabled
-            >
-              <option value="">Driver Phone</option>
-              {driver?.driverInfo?.map((data, index) => (
-                <option key={index} value={data.phone}>
-                  {data.phone}
-                </option>
-              ))}
-            </select>
-
-            <div>
-              <label htmlFor="time">Starting Time</label>
-              <input
-                id="time"
-                type="datetime-local"
-                name="time"
-                value={input.time}
-                min={new Date().toISOString().slice(0, 16)}
-                onChange={changeInputValue}
-                placeholder="Starting Time"
-              />
-            </div>
-            <select
-              name="type"
-              id="type"
-              value={input.type}
-              onChange={changeInputValue}
-            >
-              <option value="">Bus Type</option>
-              <option value="AC">AC</option>
-              <option value="Non-AC">Non-AC</option>
-              <option value="Sleeper Coach">Sleeper Coach</option>
-              <option value="Double Decker">Double Decker</option>
-              <option value="Suite Class">Suite Class</option>
-              <option value="Hyundai Biz Class">Hyundai Biz Class</option>
-              <option value="Mercedes-Benz">Mercedes-Benz</option>
-            </select>
-            <select
-              name="leavingPlace"
-              id="leavingPlace"
-              value={input.leavingPlace}
-              onChange={changeInputValue}
-            >
-              <option value="">Departure Place</option>
-              {leavingPlaces?.places?.map((place, index) => (
-                <option key={index} value={place?.placeName}>
-                  {place?.placeName}
-                </option>
-              ))}
-            </select>
-            <select
-              name="leavingMapLink"
-              id="leavingPlace"
-              value={input.leavingMapLink}
-              onChange={changeInputValue}
-              className="hidden"
-            >
-              <option value="">Leaving Map Link</option>
-              {leavingPlaces?.places?.map((place, index) => (
-                <option key={index} value={place?.mapLink}>
-                  {place?.mapLink}
-                </option>
-              ))}
-            </select>
-            <select
-              name="destinationPlace"
-              id="destinationPlace"
-              value={input.destinationPlace}
-              onChange={changeInputValue}
-            >
-              <option value="">Destination</option>
-              {destinationPlaces?.places?.map((place, index) => (
-                <option key={index} value={place?.placeName}>
-                  {place?.placeName}
-                </option>
-              ))}
-            </select>
-            {/* For desktop view */}
-            <div className="hidden sm:flex gap-2">
-              <input
-                type="number"
-                name="rent"
-                value={input.rent}
-                onChange={changeInputValue}
-                placeholder="৳ Regular Price"
-                onInput={(e) => {
-                  if (e.target.value.length > 4)
-                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
-                }}
-              />
-              <input
-                type="number"
-                name="discountRent"
-                value={input.discountRent}
-                onChange={changeInputValue}
-                placeholder="৳ Discount Price (Optional)"
-                onInput={(e) => {
-                  if (e.target.value.length > 4)
-                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
-                }}
-              />
-            </div>
-            {/* For Mobile view */}
-            <div className="flex sm:hidden gap-2">
-              <input
-                type="number"
-                name="rent"
-                value={input.rent}
-                onChange={changeInputValue}
-                placeholder="৳ Reg. Price"
-                onInput={(e) => {
-                  if (e.target.value.length > 4)
-                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
-                }}
-              />
-              <input
-                type="number"
-                name="discountRent"
-                value={input.discountRent}
-                onChange={changeInputValue}
-                placeholder="৳ Dis. Price (Optional)"
-                onInput={(e) => {
-                  if (e.target.value.length > 4)
-                    e.target.value = e.target.value.slice(0, 4); // Restrict input to 4 digits
-                }}
-              />
-            </div>
-            <select
-              name="seatStatus"
-              id="seatStatus"
-              value={input.seatStatus}
-              onChange={changeInputValue}
-            >
-              <option value="">Seat Status</option>
-              <option value={true}>Available</option>
-              <option value={false}>Booked</option>
-            </select>
-            <button
-              type="submit"
-              className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={createLoading}
-            >
-              {createLoading ? "Loading..." : "Submit"}
-            </button>
-          </form>
-        </Modal>
-      )}
-      {showUpdateModal && (
-        <Modal title="Edit Schedule" close={() => setShowUpdateModal(false)}>
-          <form
-            onSubmit={handleUpdateSchedule}
-            className="flex flex-col gap-2 w-full p-2"
-          >
-            <div>
-              <label htmlFor="time">Starting Time</label>
-              <input
-                id="time"
-                type="datetime-local"
-                name="time"
-                value={updateInput.time}
-                min={new Date().toISOString().slice(0, 16)}
-                onChange={changeUpdateInputValue}
-                placeholder="Starting Time"
-              />
-            </div>
-            <div className="flex gap-3 justify-between items-center">
-              <div className="w-1/2">
-                <label htmlFor="busNo">Reg No.</label>
-                <input
-                  type="text"
-                  id="busNo"
-                  name="busNo"
-                  value={updateInput.busNo}
-                  onChange={changeUpdateInputValue}
-                  placeholder="Bus No."
-                />
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="type">Bus Type</label>
-                <select
-                  name="type"
-                  id="type"
-                  value={updateInput.type}
-                  onChange={changeUpdateInputValue}
-                >
-                  <option value="">Bus Type</option>
-                  <option value="AC">AC</option>
-                  <option value="Non-AC">Non-AC</option>
-                  <option value="Sleeper Coach">Sleeper Coach</option>
-                  <option value="Double Decker">Double Decker</option>
-                  <option value="Suite Class">Suite Class</option>
-                  <option value="Hyundai Biz Class">Hyundai Biz Class</option>
-                  <option value="Mercedes-Benz">Mercedes-Benz</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-between items-center">
-              <div className="w-1/2">
-                <label htmlFor="guideName">Guide Name</label>
-                <input
-                  type="text"
-                  name="guideName"
-                  value={updateInput.guideName}
-                  onChange={changeUpdateInputValue}
-                  placeholder="Guide Name"
-                />
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="guidePhone">Guide Phone</label>
-                <input
-                  type="text"
-                  name="guidePhone"
-                  value={updateInput.guidePhone}
-                  onChange={changeUpdateInputValue}
-                  placeholder="Guide Phone"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-between items-center">
-              <div className="w-1/2">
-                <label htmlFor="driverName">Driver Name</label>
-                <input
-                  type="text"
-                  name="driverName"
-                  value={updateInput.driverName}
-                  onChange={changeUpdateInputValue}
-                  placeholder="Driver Name"
-                />
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="driverPhone">Driver Phone</label>
-                <input
-                  type="text"
-                  name="driverPhone"
-                  value={updateInput.driverPhone}
-                  onChange={changeUpdateInputValue}
-                  placeholder="Driver Phone"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-between items-center">
-              <div className="w-1/2">
-                <label htmlFor="leavingPlace">Departure Place</label>
-                <select
-                  name="leavingPlace"
-                  id="leavingPlace"
-                  value={updateInput.leavingPlace}
-                  onChange={changeUpdateInputValue}
-                >
-                  <option value="">Leaving Place</option>
-                  {leavingPlaces?.places?.map((place, index) => (
-                    <option key={index} value={place?.placeName}>
-                      {place?.placeName}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  name="leavingMapLink"
-                  id="leavingMapLink"
-                  value={updateInput.leavingMapLink}
-                  onChange={changeUpdateInputValue}
-                  className="hidden"
-                >
-                  <option value="">Leaving Map Link</option>
-                  {leavingPlaces?.places?.map((place, index) => (
-                    <option key={index} value={place?.mapLink}>
-                      {place?.mapLink}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="destinationPlace">Destination Place</label>
-                <select
-                  name="destinationPlace"
-                  id="destinationPlace"
-                  value={updateInput.destinationPlace}
-                  onChange={changeUpdateInputValue}
-                >
-                  <option value="">Destination</option>
-                  {destinationPlaces?.places?.map((place, index) => (
-                    <option key={index} value={place?.placeName}>
-                      {place?.placeName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-between items-center">
-              <div className="w-1/2">
-                <label htmlFor="rent" className="hidden sm:block">
-                  ৳ Regular Price
-                </label>
-                <label htmlFor="rent" className="sm:hidden">
-                  ৳ Reg. Price
-                </label>
-                <input
-                  type="number"
-                  name="rent"
-                  value={updateInput.rent}
-                  onChange={changeUpdateInputValue}
-                  placeholder="৳ Regular Price"
-                />
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="rent" className="hidden sm:block">
-                  ৳ Discount Price
-                </label>
-                <label htmlFor="rent" className="sm:hidden">
-                  ৳ Dis. Price
-                </label>
-                <input
-                  type="number"
-                  name="discountRent"
-                  value={updateInput.discountRent}
-                  onChange={changeUpdateInputValue}
-                  placeholder="৳ Discount Price (Optional)"
-                />
-              </div>
-              <div className="w-1/2">
-                <label htmlFor="seatStatus">Seat Status</label>
-                <select
-                  name="seatStatus"
-                  id="seatStatus"
-                  value={updateInput.seatStatus}
-                  onChange={changeUpdateInputValue}
-                >
-                  <option value="">Seat Status</option>
-                  <option value={true}>Available</option>
-                  <option value={false}>Booked</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="bg-primary-color py-1 text-base font-medium text-white rounded"
-              disabled={updateLoading}
-            >
-              {updateLoading ? "Updating..." : "Update"}
-            </button>
-          </form>
-        </Modal>
-      )}
       <div className="container mx-auto bg-white p-5 my-5 rounded-lg">
         {/* Table Body */}
         <div>
@@ -844,7 +382,12 @@ const BusProfile = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
               <button
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  form.reset();
+                  setCurrentData(null);
+                  setIsEditing(false);
+                  setIsOpen(true);
+                }}
                 className="bg-primary-color py-1 px-2 text-base font-medium text-white rounded"
               >
                 Add schedule
@@ -853,7 +396,7 @@ const BusProfile = () => {
           </div>
           <DataTable
             columns={column}
-            data={schedules?.schedules}
+            data={todaysSchedule?.schedules}
             responsive
             progressPending={schedulesLoading}
             progressComponent={
@@ -864,11 +407,13 @@ const BusProfile = () => {
             pagination
             paginationServer
             paginationTotalRows={
-              schedules?.count ? schedules?.count : schedules?.searchCount
+              todaysSchedule?.count
+                ? todaysSchedule?.count
+                : todaysSchedule?.searchCount
             }
             onChangeRowsPerPage={(rowsPerPage) => setLimit(rowsPerPage)}
             onChangePage={(page) => setPage(page)}
-            paginationRowsPerPageOptions={[100, 150, 200]}
+            paginationRowsPerPageOptions={[10, 20, 30, 50, 100, 150, 200]}
             customStyles={{
               headCells: {
                 style: {
@@ -886,6 +431,386 @@ const BusProfile = () => {
           />
         </div>
       </div>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-h-[95vh] sm:max-w-[625px] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Schedule</DialogTitle>
+            <DialogDescription>
+              Add a new bus schedule to your system
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Paribahan Name */}
+              <FormField
+                control={form.control}
+                name="busName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Paribahan Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} readOnly />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Bus Registration Number */}
+              <FormField
+                control={form.control}
+                name="busNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Registration Number</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select registration number" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {busRegNo?.busInfo?.map((data, index) => (
+                          <SelectItem key={index} value={data.regNo}>
+                            {data.regNo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Guide Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="guideName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Guide Name</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          const selectedGuide = guide?.guideInfo.find(
+                            (g) => g.name === value
+                          );
+                          if (selectedGuide) {
+                            form.setValue("guidePhone", selectedGuide.phone);
+                          }
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select guide" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {guide?.guideInfo?.map((data, index) => (
+                            <SelectItem key={index} value={data.name}>
+                              {data.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="guidePhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Guide Phone</FormLabel>
+                      <FormControl>
+                        <Input {...field} readOnly />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Driver Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="driverName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Driver Name</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          const selectedDriver = driver?.driverInfo.find(
+                            (d) => d.name === value
+                          );
+                          if (selectedDriver) {
+                            form.setValue("driverPhone", selectedDriver.phone);
+                          }
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select driver" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {driver?.driverInfo?.map((data, index) => (
+                            <SelectItem key={index} value={data.name}>
+                              {data.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="driverPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Driver Phone</FormLabel>
+                      <FormControl>
+                        <Input {...field} readOnly />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Starting Time */}
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Starting Time</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        {...field}
+                        min={`${today}T00:00`}
+                        max={`${today}T23:59`}
+                        onChange={(e) => {
+                          // Only validate the date part, not the time
+                          const selectedDate = new Date(e.target.value)
+                            .toISOString()
+                            .split("T")[0];
+
+                          if (selectedDate !== today) {
+                            // If not today's date, reset to today with the same time
+                            const selectedTime = e.target.value.split("T")[1];
+                            field.onChange(`${today}T${selectedTime}`);
+
+                            toast.warning("Only today's date can be selected");
+                          } else {
+                            field.onChange(e.target.value);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Bus Type */}
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bus Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bus type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {busTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.label}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Departure and Destination */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="leavingPlace"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Departure Place</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          const selectedPlace = leavingPlaces?.places?.find(
+                            (place) => place.placeName === value
+                          );
+                          if (selectedPlace && selectedPlace.mapLink) {
+                            form.setValue(
+                              "leavingMapLink",
+                              selectedPlace.mapLink
+                            );
+                          }
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select departure place" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {leavingPlaces?.places?.map((place, index) => (
+                            <SelectItem key={index} value={place.placeName}>
+                              {place.placeName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="destinationPlace"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Destination</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select destination" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {destinationPlaces?.places?.map((place, index) => (
+                            <SelectItem key={index} value={place.placeName}>
+                              {place.placeName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Pricing */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rent"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Regular Price (৳)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= 4) {
+                              field.onChange(Number(value));
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="discountRent"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Discount Price (৳) (Optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length <= 4) {
+                              field.onChange(Number(value));
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Seat Status */}
+              <FormField
+                control={form.control}
+                name="seatStatus"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value === true}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked ? true : false);
+                        }}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Seats Available</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Check if seats are available, uncheck if booked
+                      </p>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="submit" disabled={createLoading || updateLoading}>
+                  {createLoading || updateLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
+                      wait...
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

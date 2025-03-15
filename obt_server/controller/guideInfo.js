@@ -5,8 +5,15 @@ const prisma = new PrismaClient();
 
 export const createGuideInfo = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { paribahanName, name, phone, address, comment, report } = req.body;
+    const { paribahanUserId, name, phone, address, comment, report } = req.body;
+
+    const paribahan = await prisma.paribahanUser.findFirst({
+      where: { id: String(paribahanUserId) },
+    });
+
+    if (!paribahan) {
+      return next(createError(400, "Paribahan Company not found!"));
+    }
 
     const existingInfo = await prisma.guideInfo.findFirst({
       where: {
@@ -20,14 +27,14 @@ export const createGuideInfo = async (req, res, next) => {
     // Create
     const guideInfo = await prisma.guideInfo.create({
       data: {
-        paribahanName,
-        slug: createSlug(paribahanName),
+        paribahanName: paribahan.paribahanName,
+        slug: paribahan.slug,
+        paribahanUserId: String(paribahanUserId),
         name,
         phone,
         address,
         comment,
         report,
-        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -43,7 +50,14 @@ export const createGuideInfo = async (req, res, next) => {
 export const updateGuideInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, phone, address, comment, report } = req.body;
+    const { paribahanUserId, name, phone, address, comment, report } = req.body;
+    const paribahan = await prisma.paribahanUser.findFirst({
+      where: { id: String(paribahanUserId) },
+    });
+
+    if (!paribahan) {
+      return next(createError(400, "Paribahan Company not found!"));
+    }
     const existingInfo = await prisma.guideInfo.findFirst({
       where: {
         phone,
@@ -60,6 +74,9 @@ export const updateGuideInfo = async (req, res, next) => {
         id: String(id),
       },
       data: {
+        paribahanName: paribahan.paribahanName,
+        slug: paribahan.slug,
+        paribahanUserId: String(paribahanUserId),
         name,
         phone,
         address,
@@ -134,7 +151,11 @@ export const getAllGuideInfo = async (req, res, next) => {
     const where = searchQuery
       ? {
           OR: [
-            { paribahanName: { contains: searchQuery, mode: "insensitive" } },
+            {
+              paribahanUser: {
+                paribahanName: { contains: searchQuery, mode: "insensitive" },
+              },
+            },
             { name: { contains: searchQuery, mode: "insensitive" } },
             { phone: { contains: searchQuery, mode: "insensitive" } },
             { address: { contains: searchQuery, mode: "insensitive" } },

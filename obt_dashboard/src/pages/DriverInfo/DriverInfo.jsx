@@ -115,7 +115,7 @@ const DriverInfo = () => {
   const handleEdit = (data) => {
     setIsEditing(true);
     setCurrentData(data);
-    form.setValue("paribahanUserId", data?.paribahanUser?.id);
+    form.setValue("paribahanUserId", data?.paribahanUserId);
     form.setValue("name", data.name);
     form.setValue("fatherName", data?.fatherName || "");
     form.setValue("phone", data?.phone || "");
@@ -125,6 +125,7 @@ const DriverInfo = () => {
     form.setValue("report", data?.report || "");
     setIsDialogOpen(true);
   };
+
   const handleView = (data) => {
     setCurrentData(data);
     setIsViewMode(true);
@@ -254,7 +255,7 @@ const DriverInfo = () => {
     },
     {
       name: "Paribahan",
-      selector: (data) => data.paribahanName,
+      selector: (data) => data?.paribahanUser?.paribahanName,
       sortable: true,
     },
     {
@@ -498,6 +499,7 @@ const DriverInfo = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-2"
               >
+                {/* ParibahanUserId */}
                 <FormField
                   control={form.control}
                   name="paribahanUserId"

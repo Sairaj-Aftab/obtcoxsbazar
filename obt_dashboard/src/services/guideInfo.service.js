@@ -35,9 +35,9 @@ export const useAllGuideInfo = ({ page, limit, search }) => {
 export const useCreateGuideInfo = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }) => {
+    mutationFn: async ({ data }) => {
       const response = await axiosInstance.post(
-        `${import.meta.env.VITE_API_URL}/guideinfo/create/${id}`,
+        `${import.meta.env.VITE_API_URL}/guideinfo/create`,
         data
       );
       return response.data;

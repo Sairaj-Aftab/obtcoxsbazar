@@ -76,7 +76,7 @@ const BusInfo = () => {
   const form = useForm({
     resolver: zodResolver(busInfoFormSchema),
     defaultValues: {
-      paribahanName: "",
+      paribahanUserId: "",
       regNo: "",
       type: undefined,
       comment: "",
@@ -88,7 +88,7 @@ const BusInfo = () => {
   const handleEdit = (data) => {
     setIsEditing(true);
     setCurrentData(data);
-    form.setValue("paribahanName", data?.paribahanUser?.paribahanName);
+    form.setValue("paribahanUserId", data?.paribahanUserId);
     form.setValue("regNo", data.regNo);
     form.setValue("type", data.type);
     form.setValue("comment", data.comment);
@@ -103,19 +103,10 @@ const BusInfo = () => {
   };
 
   async function handleSubmit(data) {
-    const paribahanUser = users?.paribahanUsers?.find(
-      (user) => user.paribahanName === data.paribahanName
-    );
-    if (!paribahanUser) {
-      toast("Error", {
-        description: "Invalid Paribahan Name selected.",
-      });
-      return;
-    }
     if (isEditing) {
       updateInfo.mutate({ id: currentData.id, data });
     } else {
-      createInfo.mutate({ id: paribahanUser.id, data });
+      createInfo.mutate({ data });
     }
   }
 
@@ -412,7 +403,7 @@ const BusInfo = () => {
               >
                 <FormField
                   control={form.control}
-                  name="paribahanName"
+                  name="paribahanUserId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Paribahan Name</FormLabel>
@@ -430,10 +421,7 @@ const BusInfo = () => {
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           )}
                           {users?.paribahanUsers?.map((data) => (
-                            <SelectItem
-                              key={data.id}
-                              value={data.paribahanName}
-                            >
+                            <SelectItem key={data.id} value={data.id}>
                               {data.paribahanName}
                             </SelectItem>
                           ))}

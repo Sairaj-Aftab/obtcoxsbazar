@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 // Paribahan Notice
-router.post("/create/:id", createGuideInfo);
+router.post("/create", createGuideInfo);
 router.put("/update/:id", updateGuideInfo);
 router.get("/getall", getAllGuideInfo);
 router.get("/getbyid/:id", getGuideInfo);

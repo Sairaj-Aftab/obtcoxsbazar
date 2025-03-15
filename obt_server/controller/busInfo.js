@@ -6,8 +6,16 @@ const prisma = new PrismaClient();
 
 export const createBusInfo = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { paribahanName, regNo, type, comment, report, fcExpire } = req.body;
+    const { paribahanUserId, regNo, type, comment, report, fcExpire } =
+      req.body;
+
+    const paribahan = await prisma.paribahanUser.findFirst({
+      where: { id: String(paribahanUserId) },
+    });
+
+    if (!paribahan) {
+      return next(createError(400, "Paribahan Company not found!"));
+    }
 
     const existingInfo = await prisma.busInfo.findUnique({
       where: {
@@ -21,14 +29,14 @@ export const createBusInfo = async (req, res, next) => {
     // Create
     const busInfo = await prisma.busInfo.create({
       data: {
-        paribahanName,
-        slug: createSlug(paribahanName),
+        paribahanName: paribahan.paribahanName,
+        slug: paribahan.slug,
+        paribahanUserId: String(paribahanUserId),
         regNo,
         type,
         comment,
         report,
         fcExpire,
-        paribahanUserId: String(id),
       },
       include: {
         paribahanUser: true,
@@ -60,7 +68,15 @@ export const createBusInfo = async (req, res, next) => {
 export const updateBusInfo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { regNo, type, comment, report, fcExpire } = req.body;
+    const { paribahanUserId, regNo, type, comment, report, fcExpire } =
+      req.body;
+    const paribahan = await prisma.paribahanUser.findFirst({
+      where: { id: String(paribahanUserId) },
+    });
+
+    if (!paribahan) {
+      return next(createError(400, "Paribahan Company not found!"));
+    }
     const existingInfo = await prisma.busInfo.findFirst({
       where: {
         regNo,
@@ -77,6 +93,9 @@ export const updateBusInfo = async (req, res, next) => {
         id: String(id),
       },
       data: {
+        paribahanName: paribahan.paribahanName,
+        slug: paribahan.slug,
+        paribahanUserId: String(paribahanUserId),
         regNo,
         type,
         comment,
@@ -104,7 +123,11 @@ export const getAllBusInfo = async (req, res, next) => {
     const where = searchQuery
       ? {
           OR: [
-            { paribahanName: { contains: searchQuery, mode: "insensitive" } },
+            {
+              paribahanUser: {
+                paribahanName: { contains: searchQuery, mode: "insensitive" },
+              },
+            },
             { regNo: { contains: searchQuery, mode: "insensitive" } },
             { type: { contains: searchQuery, mode: "insensitive" } },
             { comment: { contains: searchQuery, mode: "insensitive" } },

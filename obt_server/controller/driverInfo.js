@@ -309,7 +309,11 @@ export const getAllDriverInfo = async (req, res, next) => {
     const where = searchQuery
       ? {
           OR: [
-            { paribahanName: { contains: searchQuery, mode: "insensitive" } },
+            {
+              paribahanUser: {
+                paribahanName: { contains: searchQuery, mode: "insensitive" },
+              },
+            },
             { name: { contains: searchQuery, mode: "insensitive" } },
             { phone: { contains: searchQuery, mode: "insensitive" } },
             { license: { contains: searchQuery, mode: "insensitive" } },

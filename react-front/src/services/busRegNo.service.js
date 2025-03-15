@@ -15,10 +15,10 @@ export const getBusRegNo = async ({ id, page, limit, search }) => {
   }
 };
 
-export const createBusRegNo = async ({ id, data }) => {
+export const createBusRegNo = async (data) => {
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/businfo/createbusinfo/${id}`,
+      `${import.meta.env.VITE_API_URL}/businfo/createbusinfo`,
       data,
       { withCredentials: true }
     );

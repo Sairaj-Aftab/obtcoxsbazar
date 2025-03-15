@@ -1,3 +1,4 @@
+import ScheduleLogBook from "@/pages/ScheduleLogBook/ScheduleLogBook";
 import Nav from "../components/Nav/Nav";
 import ProfileHeader from "../components/ProfileHeader/ProfileHeader";
 import BusProfile from "../pages/BusProfile/BusProfile";
@@ -21,6 +22,10 @@ const privateRoutes = [
               {
                 path: "/profile",
                 element: <BusProfile />,
+              },
+              {
+                path: "/profile/schedule-logs",
+                element: <ScheduleLogBook />,
               },
               {
                 path: "/profile/regular-schedules",

@@ -7,6 +7,7 @@ import {
   getSchedulesByParibahanUserId,
   getSchedulesByPlace,
   getTodaysSchedules,
+  getTodaysSchedulesByParibahanUserId,
   updateSchedule,
 } from "../controller/schedule.js";
 
@@ -15,6 +16,10 @@ const router = express.Router();
 router.get("/", getAllSchedules);
 router.get("/todays", getTodaysSchedules);
 router.get("/getbylimit", getSchedulesByLimit);
+router.get(
+  "/gettodaysbyparibahan/:paribahanUserId",
+  getTodaysSchedulesByParibahanUserId
+);
 router.get("/getbyparibahan/:paribahanUserId", getSchedulesByParibahanUserId);
 router.get("/getbydestination/:destination", getSchedulesByPlace);
 router.post("/:paribahanUserId", createSchedule);
