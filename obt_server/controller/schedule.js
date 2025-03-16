@@ -53,7 +53,7 @@ export const createSchedule = async (req, res, next) => {
         destinationMapLink,
         rent: Number(rent),
         discountRent: Number(discountRent),
-        seatStatus: seatStatus === "true" ? true : false,
+        seatStatus: seatStatus,
         paribahanUserId: String(paribahanUserId),
       },
       include: {
@@ -112,7 +112,7 @@ export const updateSchedule = async (req, res, next) => {
         destinationMapLink,
         rent: Number(rent),
         discountRent: Number(discountRent),
-        seatStatus: seatStatus === true ? true : false,
+        seatStatus: seatStatus,
       },
       include: {
         paribahanUser: true,

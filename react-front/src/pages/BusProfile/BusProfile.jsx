@@ -118,7 +118,13 @@ const BusProfile = () => {
   } = useMutation({
     mutationFn: createSchedule,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["todaysSchedules"]);
+      queryClient.setQueryData(
+        ["todaysSchedules", { id: user.id, search }],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: [data?.busSchedule, ...oldData.schedules],
+        })
+      );
       queryClient.setQueryData(
         ["authSchedules", { id: user.id, page, limit, search }],
         (oldData = { schedules: [] }) => ({
@@ -149,7 +155,15 @@ const BusProfile = () => {
   } = useMutation({
     mutationFn: updateSchedule,
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["todaysSchedules"]);
+      queryClient.setQueryData(
+        ["todaysSchedules", { id: user.id, search }],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.map((item) =>
+            item.id === data?.busSchedule.id ? data?.busSchedule : item
+          ),
+        })
+      );
       queryClient.setQueryData(
         ["authSchedules", { id: user.id, page, limit, search }],
         (oldData = { schedules: [] }) => ({
@@ -180,7 +194,16 @@ const BusProfile = () => {
     mutationFn: deleteSchedule,
     onSuccess: (data) => {
       queryClient.setQueryData(
-        ["authSchedules", { id: user.id, page, limit, search }],
+        ["todaysSchedules", { id: user.id, search }],
+        (oldData = { schedules: [] }) => ({
+          ...oldData,
+          schedules: oldData.schedules.filter(
+            (item) => item.id !== data?.schedule.id
+          ),
+        })
+      );
+      queryClient.setQueryData(
+        ["schedules"],
         (oldData = { schedules: [] }) => ({
           ...oldData,
           schedules: oldData.schedules.filter(
@@ -233,7 +256,8 @@ const BusProfile = () => {
   const calculateItemIndex = (page, limit, index) => {
     return (page - 1) * limit + index + 1;
   };
-  const today = new Date().toISOString().split("T")[0];
+  // Get today's date for the datetime-local input
+  const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD format for input[type="date"]
   const column = [
     {
       name: "#",
@@ -604,16 +628,19 @@ const BusProfile = () => {
                         max={`${today}T23:59`}
                         onChange={(e) => {
                           // Only validate the date part, not the time
-                          const selectedDate = new Date(e.target.value)
-                            .toISOString()
-                            .split("T")[0];
+                          const selectedDate = new Date(
+                            e.target.value
+                          ).toLocaleDateString("en-CA");
 
                           if (selectedDate !== today) {
                             // If not today's date, reset to today with the same time
                             const selectedTime = e.target.value.split("T")[1];
                             field.onChange(`${today}T${selectedTime}`);
 
-                            toast.warning("Only today's date can be selected");
+                            toast({
+                              title: "Warning",
+                              description: "Only today's date can be selected",
+                            });
                           } else {
                             field.onChange(e.target.value);
                           }
