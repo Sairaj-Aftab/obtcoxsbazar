@@ -81,3 +81,17 @@ export const guideFormSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
 });
+// Form schema with Zod validation
+export const reviewFormSchema = z.object({
+  rating: z.string().min(1, { message: "Please select a rating" }),
+  name: z.string().min(1, { message: "Name is required" }),
+  phoneNumber: z.string().optional(),
+  regNo: z.string().optional(),
+  destination: z.string().optional(),
+  tripTime: z.string().optional(),
+  comment: z.string().optional(),
+  images: z
+    .array(z.instanceof(File))
+    .max(3, "Maximum 3 images can be uploaded")
+    .optional(),
+});

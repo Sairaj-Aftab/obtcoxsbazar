@@ -6,12 +6,13 @@ import {
   getReviewsByParibahanUserId,
   updateReview,
 } from "../controller/review.js";
+import { upload } from "../utils/multer.js";
 
 const router = express.Router();
 
 router.get("/", getAllReview);
 router.get("/getbyparibahan/:id", getReviewsByParibahanUserId);
-router.post("/create/:id", createReview);
+router.post("/create/:id", upload.array("images"), createReview);
 router.put("/update/:id", updateReview);
 
 router.delete("/delete/:id", deleteReview);

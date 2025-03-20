@@ -38,6 +38,7 @@ export const createTouristBusEntryPermission = async (req, res, next) => {
       orderBy: {
         applicationNo: "desc", // Sorting by the serial number to get the last one
       },
+      select: { applicationNo: true },
     });
 
     // Set the new serial number (if there's no previous entry, start from 1)

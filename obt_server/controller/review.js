@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import createError from "../utils/createError.js";
+import { processFiles } from "../utils/processFile.js";
+import { uploadFile } from "../utils/s3.js";
 const prisma = new PrismaClient();
 
 // Create Review
@@ -21,6 +23,13 @@ export const createReview = async (req, res, next) => {
       phoneModel,
     } = req.body;
 
+    let fileNamesWithFolders = [];
+
+    if (req.files) {
+      fileNamesWithFolders = await processFiles(req.files, "review"); // Convert to WebP & optimize
+      await uploadFile(req.files, fileNamesWithFolders); // Upload compressed files
+    }
+
     // Hash the password
     const busReview = await prisma.busReview.create({
       data: {
@@ -36,6 +45,9 @@ export const createReview = async (req, res, next) => {
         ipAddress,
         phoneName,
         phoneModel,
+        ...(fileNamesWithFolders.length > 0 && {
+          images: fileNamesWithFolders,
+        }),
         busInfoId: String(id),
         paribahanUserId: String(id),
       },
@@ -105,11 +117,30 @@ export const getAllReview = async (req, res, next) => {
       },
     });
 
+    const reviewInfoWithUrls = await Promise.all(
+      reviews.map(async (review) => {
+        if (review.images && Array.isArray(review.images)) {
+          try {
+            review.imageUrls = await Promise.all(
+              review.images.map((image) => getObjectSignedUrl(image))
+            );
+          } catch (err) {
+            review.imageUrls = []; // Set to an empty array if URL generation fails
+          }
+        } else {
+          review.imageUrls = [];
+        }
+        return review;
+      })
+    );
+
     const count = await prisma.busReview.count();
     const searchCount = await prisma.busReview.count({
       where,
     });
-    return res.status(200).json({ reviews, count, searchCount });
+    return res
+      .status(200)
+      .json({ reviews: reviewInfoWithUrls, count, searchCount });
   } catch (error) {
     return next(error);
   }
@@ -151,10 +182,27 @@ export const getReviewsByParibahanUserId = async (req, res, next) => {
       },
     });
 
+    const reviewInfoWithUrls = await Promise.all(
+      reviews.map(async (review) => {
+        if (review.images && Array.isArray(review.images)) {
+          try {
+            review.imageUrls = await Promise.all(
+              review.images.map((image) => getObjectSignedUrl(image))
+            );
+          } catch (err) {
+            review.imageUrls = []; // Set to an empty array if URL generation fails
+          }
+        } else {
+          review.imageUrls = [];
+        }
+        return review;
+      })
+    );
+
     const count = await prisma.busReview.count({
       where: whereClause,
     });
-    return res.status(200).json({ reviews, count });
+    return res.status(200).json({ reviews: reviewInfoWithUrls, count });
   } catch (error) {
     return next(error);
   }

@@ -131,6 +131,7 @@ model BusReview {
     ipAddress String?
     phoneName String?
     phoneModel String?
+    images String[]
     busInfo BusInfo? @relation(fields: [busInfoId], references: [id])
     busInfoId String? @db.ObjectId
     paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
@@ -250,7 +251,7 @@ model LeaveDestinationPlace {
 
 model TouristBusEntryPermission {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  applicationNo     Int
+  applicationNo     Int     @unique
   applicantName     String
   phone              String
   institutionName   String

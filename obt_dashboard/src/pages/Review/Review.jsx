@@ -1,4 +1,5 @@
 import DataTable from "react-data-table-component";
+import avatar from "@/assets/img/no-image.jpg";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import { useEffect, useState } from "react";
 import { formatDateTime } from "../../utils/timeAgo";
@@ -86,6 +87,16 @@ const Review = () => {
         </Button>
       ),
       width: "60px",
+    },
+    {
+      name: "Photo",
+      cell: (data) => (
+        <img
+          src={data.imageUrls ? data.imageUrls[0] : avatar}
+          alt=""
+          style={{ width: "100px", height: "100px", objectFit: "cover" }}
+        />
+      ),
     },
     {
       name: "Paribahan",
