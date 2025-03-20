@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import createError from "../utils/createError.js";
 import { processFiles } from "../utils/processFile.js";
-import { uploadFile } from "../utils/s3.js";
+import { getObjectSignedUrl, uploadFile } from "../utils/s3.js";
 const prisma = new PrismaClient();
 
 // Create Review
