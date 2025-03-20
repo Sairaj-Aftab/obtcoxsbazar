@@ -12,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { Star, UploadIcon, X } from "lucide-react";
+import { Loader2, Star, UploadIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -191,11 +191,18 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="tripTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Trip Time</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Trip Time
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="datetime-local"
                       placeholder="Select trip date and time"
+                      disabled={isSubmitting}
                       {...field}
                     />
                   </FormControl>
@@ -209,9 +216,19 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your Name</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Your Name
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your name" {...field} />
+                    <Input
+                      placeholder="Enter your name"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -223,9 +240,19 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mobile Number</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Mobile Number
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your phone number" {...field} />
+                    <Input
+                      placeholder="Enter your phone number"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -237,10 +264,17 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="regNo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bus/Coach No.</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Bus/Coach No.
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter bus registration number"
+                      disabled={isSubmitting}
                       {...field}
                     />
                   </FormControl>
@@ -254,9 +288,19 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="destination"
               render={({ field }) => (
                 <FormItem className="md:col-span-2">
-                  <FormLabel>Route/Location</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Route/Location
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter route or location" {...field} />
+                    <Input
+                      placeholder="Enter route or location"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -268,11 +312,18 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="comment"
               render={({ field }) => (
                 <FormItem className="md:col-span-2">
-                  <FormLabel>Comment</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Comment
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Share your experience..."
                       className="min-h-[120px] resize-none"
+                      disabled={isSubmitting}
                       {...field}
                     />
                   </FormControl>
@@ -286,7 +337,13 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
               name="images"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Images</FormLabel>
+                  <FormLabel
+                    className={`${
+                      isSubmitting && "cursor-not-allowed text-gray-400"
+                    }`}
+                  >
+                    Images
+                  </FormLabel>
                   <FormControl>
                     <div className="space-y-4">
                       <div className="flex items-center space-x-2">
@@ -297,6 +354,7 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
                           accept="image/*"
                           className="hidden"
                           onChange={handleFileChange}
+                          disabled={isSubmitting}
                         />
                         <Button
                           type="button"
@@ -304,6 +362,7 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
                           onClick={() =>
                             document.getElementById("images")?.click()
                           }
+                          disabled={isSubmitting}
                         >
                           <UploadIcon className="mr-2 h-4 w-4" />
                           Upload Images
@@ -331,6 +390,7 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
                                 size="icon"
                                 className="absolute -top-2 -right-2 h-6 w-6"
                                 onClick={() => removeFile(index)}
+                                disabled={isSubmitting}
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -351,11 +411,16 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
             className="w-full"
             disabled={isSubmitting || submitted}
           >
-            {isSubmitting
-              ? "Submitting..."
-              : submitted
-              ? "Review Submitted"
-              : "Submit Review"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : submitted ? (
+              "Review Submitted"
+            ) : (
+              "Submit Review"
+            )}
           </Button>
         </form>
       </Form>
