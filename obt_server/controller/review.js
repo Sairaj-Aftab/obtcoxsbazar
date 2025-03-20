@@ -1,7 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import createError from "../utils/createError.js";
 import { processFiles } from "../utils/processFile.js";
-import { getObjectSignedUrl, uploadFile } from "../utils/s3.js";
+import {
+  deleteExistingFile,
+  getObjectSignedUrl,
+  uploadFile,
+} from "../utils/s3.js";
 const prisma = new PrismaClient();
 
 // Create Review
@@ -30,9 +34,21 @@ export const createReview = async (req, res, next) => {
       await uploadFile(req.files, fileNamesWithFolders); // Upload compressed files
     }
 
+    // Get the last entry and increment the serial number
+    const lastEntry = await prisma.busReview.findFirst({
+      orderBy: {
+        reviewId: "desc", // Sorting by the serial number to get the last one
+      },
+      select: { reviewId: true },
+    });
+
+    // Set the new serial number (if there's no previous entry, start from 1)
+    const newReviewId = lastEntry ? lastEntry.reviewId + 1 : 1;
+
     // Hash the password
     const busReview = await prisma.busReview.create({
       data: {
+        reviewId: parseInt(newReviewId),
         paribahanName,
         regNo,
         type,
@@ -216,9 +232,37 @@ export const deleteReview = async (req, res, next) => {
         id: String(id),
       },
     });
+    if (review?.images && Array.isArray(review.images)) {
+      for (const image of review.images) {
+        await deleteExistingFile(image);
+      }
+    }
 
     return res.status(200).json({ review, message: "Deleted successfully" });
   } catch (error) {
     return next(error);
   }
 };
+
+// export const setReviewId = async (req, res, next) => {
+//   try {
+//     const reviews = await prisma.busReview.findMany({
+//       orderBy: {
+//         createdAt: "asc",
+//       },
+//       select: { id: true },
+//     });
+
+//     // Update each review one by one asynchronously
+//     for (let i = 0; i < reviews.length; i++) {
+//       await prisma.busReview.update({
+//         where: { id: reviews[i].id },
+//         data: { reviewId: i + 1 },
+//       });
+//     }
+
+//     return res.status(200).json({ message: "Successfully updated" });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };

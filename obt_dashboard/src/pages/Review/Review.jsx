@@ -1,5 +1,5 @@
 import DataTable from "react-data-table-component";
-import avatar from "@/assets/img/no-image.jpg";
+import avatar from "../../assets/img/no-image.jpg";
 import PageHeader from "../../components/PageHeader/PageHeader";
 import { useEffect, useState } from "react";
 import { formatDateTime } from "../../utils/timeAgo";
@@ -17,12 +17,15 @@ import {
 import {
   Bus,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Eye,
   MapPin,
   MessageSquare,
   Star,
   Trash2,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -47,6 +50,8 @@ const Review = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data, isLoading } = useGetAllReview({ page, limit: rowPage, search });
   const deleteReview = useDeleteReview();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
 
   const { authUser } = useAuth();
   const [review, setReview] = useState(null);
@@ -62,14 +67,10 @@ const Review = () => {
     }
   }, [deleteReview.error]);
 
-  const calculateItemIndex = (page, rowPage, index) => {
-    return (page - 1) * rowPage + index + 1;
-  };
-
   const columns = [
     {
-      name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
+      name: "ID",
+      selector: (data) => data.reviewId,
       width: "60px",
     },
     {
@@ -91,11 +92,27 @@ const Review = () => {
     {
       name: "Photo",
       cell: (data) => (
-        <img
-          src={data.imageUrls ? data.imageUrls[0] : avatar}
-          alt=""
-          style={{ width: "100px", height: "100px", objectFit: "cover" }}
-        />
+        <div
+          className="relative w-[100px] h-[100px] cursor-pointer"
+          onClick={() => {
+            if (data.imageUrls.length > 0) {
+              setReview(data);
+              setSelectedImageIndex(0);
+              setIsFullscreenOpen(true);
+            }
+          }}
+        >
+          <img
+            src={data.imageUrls.length > 0 ? data.imageUrls[0] : avatar}
+            alt=""
+            style={{ width: "100px", height: "100px", objectFit: "cover" }}
+          />
+          {data.imageUrls.length > 1 && (
+            <Badge className="absolute bottom-1 right-1 bg-black/70">
+              +{data.imageUrls.length - 1}
+            </Badge>
+          )}
+        </div>
       ),
     },
     {
@@ -287,10 +304,34 @@ const Review = () => {
               </p>
             </div>
 
+            {review?.imageUrls?.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Images</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {review.imageUrls.map((url, index) => (
+                    <div
+                      key={index}
+                      className="relative h-20 w-full cursor-pointer rounded overflow-hidden"
+                      onClick={() => {
+                        setSelectedImageIndex(index);
+                        setIsFullscreenOpen(true);
+                      }}
+                    >
+                      <img
+                        src={url || "/placeholder.svg"}
+                        alt={`Review image ${index + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Separator />
 
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Review ID: #R{Math.floor(Math.random() * 10000)}</span>
+              <span>Review ID: #{review?.reviewId}</span>
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 {formatDateTime(review?.createdAt)}
@@ -299,6 +340,75 @@ const Review = () => {
           </div>
         </DialogContent>
       </Dialog>
+      {/* Fullscreen Image Viewer */}
+      {isFullscreenOpen && review?.imageUrls?.length > 0 && (
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/95">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-4 top-4 z-50 rounded-full bg-black/50 hover:bg-black/70 text-white"
+            onClick={() => setIsFullscreenOpen(false)}
+          >
+            <X className="h-6 w-6" />
+            <span className="sr-only">Close fullscreen view</span>
+          </Button>
+
+          <div className="relative h-[80vh] w-[90vw] md:w-[80vw]">
+            <img
+              src={review.imageUrls[selectedImageIndex] || "/placeholder.svg"}
+              alt={`Review image ${selectedImageIndex + 1}`}
+              className="h-full w-full object-contain"
+            />
+          </div>
+
+          {review.imageUrls.length > 1 && (
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute left-4 top-1/2 z-50 -translate-y-1/2 rounded-full bg-black/50 hover:bg-black/70 text-white border-gray-600"
+                onClick={() =>
+                  setSelectedImageIndex((prev) =>
+                    prev === 0 ? review.imageUrls.length - 1 : prev - 1
+                  )
+                }
+              >
+                <ChevronLeft className="h-5 w-5" />
+                <span className="sr-only">Previous image</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute right-4 top-1/2 z-50 -translate-y-1/2 rounded-full bg-black/50 hover:bg-black/70 text-white border-gray-600"
+                onClick={() =>
+                  setSelectedImageIndex((prev) =>
+                    prev === review.imageUrls.length - 1 ? 0 : prev + 1
+                  )
+                }
+              >
+                <ChevronRight className="h-5 w-5" />
+                <span className="sr-only">Next image</span>
+              </Button>
+
+              <div className="absolute bottom-8 left-1/2 z-50 flex -translate-x-1/2 space-x-2">
+                {review.imageUrls.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`h-2 rounded-full transition-all ${
+                      index === selectedImageIndex
+                        ? "bg-white w-4"
+                        : "bg-white/50 w-2"
+                    }`}
+                    onClick={() => setSelectedImageIndex(index)}
+                  >
+                    <span className="sr-only">Go to image {index + 1}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

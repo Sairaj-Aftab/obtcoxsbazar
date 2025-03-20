@@ -119,6 +119,7 @@ model BusInfo {
 
 model BusReview {
     id String @id @default(auto()) @map("_id") @db.ObjectId
+    reviewId Int?
     paribahanName String
     regNo String?
     type String?

@@ -17,4 +17,6 @@ router.put("/update/:id", updateReview);
 
 router.delete("/delete/:id", deleteReview);
 
+// router.patch("/setid", setReviewId);
+
 export default router;
