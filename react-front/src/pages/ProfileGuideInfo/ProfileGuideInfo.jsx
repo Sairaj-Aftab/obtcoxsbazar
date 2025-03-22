@@ -125,9 +125,7 @@ const ProfileGuideInfo = () => {
     if (isEditing) {
       await updateGuide({ id: currentData.id, data });
     } else {
-      console.log(data);
-
-      // await createGuide(data);
+      await createGuide(data);
     }
   };
 
