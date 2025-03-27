@@ -39,7 +39,15 @@ const getRatingComment = (rating) => {
 };
 
 // eslint-disable-next-line react/prop-types
-export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
+export function ReviewForm({
+  busId,
+  emergency,
+  lon,
+  lat,
+  paribahanName,
+  deviceInfo,
+  ipAddress,
+}) {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -58,6 +66,9 @@ export function ReviewForm({ busId, paribahanName, deviceInfo, ipAddress }) {
       tripTime: "",
       comment: "",
       images: [],
+      emergency: Boolean(emergency),
+      lon: lon,
+      lat: lat,
     },
   });
 

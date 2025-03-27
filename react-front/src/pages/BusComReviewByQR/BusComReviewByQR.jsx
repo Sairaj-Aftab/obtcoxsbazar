@@ -8,7 +8,7 @@ import { Star } from "lucide-react";
 import { ReviewForm } from "@/components/ReviewForm";
 
 const BusComReviewByQR = () => {
-  const { id } = useParams();
+  const { id, emergency, lon, lat } = useParams();
   const [busInfo, setBusInfo] = useState(null);
   const [totalReview, setTotalReview] = useState(0);
   const [averageReview, setAverageReview] = useState(0);
@@ -120,6 +120,9 @@ const BusComReviewByQR = () => {
         {/* Review Form */}
         <ReviewForm
           busId={id}
+          emergency={emergency}
+          lon={lon}
+          lat={lat}
           paribahanName={busInfo.paribahanName}
           deviceInfo={deviceInfo}
           ipAddress={ipAddress}

@@ -98,6 +98,10 @@ const publicRoutes = [
         path: "/bus/comp/:slug/:id",
         element: <BusComReviewByQR />,
       },
+      {
+        path: "/bus/comp/:slug/:id/:emergency/:lon/:lat",
+        element: <BusComReviewByQR />,
+      },
     ],
   },
 ];

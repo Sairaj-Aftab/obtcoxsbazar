@@ -19,6 +19,9 @@ export const createReview = async (req, res, next) => {
       rating,
       name,
       comment,
+      emergency,
+      lon,
+      lat,
       phoneNumber,
       destination,
       tripTime,
@@ -61,6 +64,14 @@ export const createReview = async (req, res, next) => {
         ipAddress,
         phoneName,
         phoneModel,
+        emergencyAlert: emergency === "true" ? true : false,
+        ...(lon &&
+          lat && {
+            location: {
+              type: "Point",
+              coordinates: [parseFloat(lon), parseFloat(lat)],
+            },
+          }),
         ...(fileNamesWithFolders.length > 0 && {
           images: fileNamesWithFolders,
         }),
@@ -77,6 +88,8 @@ export const createReview = async (req, res, next) => {
       .status(200)
       .json({ busReview, message: "Submitted successfully" });
   } catch (error) {
+    console.log(error);
+
     return next(error);
   }
 };

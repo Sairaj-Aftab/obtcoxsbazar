@@ -14,13 +14,63 @@ import { getSingleBusData } from "../../services/bus.service";
 import useSchedules from "../../store/useSchedules";
 import usePlaces from "../../store/usePlaces";
 import useNotice from "../../store/useNotice";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const BusInformation = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const [locationError, setLocationError] = useState(null);
+  const [locationErrorModal, setLocationErrorModal] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const { regularSchedules, regularScheduleLoader: loader } = useSchedules();
   const { destinationPlaces } = usePlaces();
   const { paribahanNotices } = useNotice();
+
+  const handleOpenLocationPopup = () => {
+    handleGetLocation();
+  };
+
+  const handleGetLocation = () => {
+    setIsGettingLocation(true);
+    setLocationErrorModal(false);
+    setLocationError(null);
+
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser");
+      setIsGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationErrorModal(false);
+        setLocationError(null);
+        setIsGettingLocation(false);
+        navigate(
+          `/bus/comp/${params.slug}/${params.id}/true/${position.coords.longitude}/${position.coords.latitude}`
+        );
+      },
+      (error) => {
+        setLocationError(
+          "Unable to retrieve your location. Please enable location services."
+        );
+        setLocationErrorModal(true);
+        setIsGettingLocation(false);
+      }
+    );
+  };
 
   const [paribahanNotice, setParibahanNotice] = useState(null);
   const { data: busInfo, isLoading } = useQuery({
@@ -287,25 +337,40 @@ const BusInformation = () => {
           />
         )}
       </div>
-      <div className="container w-full mx-auto flex flex-col items-center">
-        <div
-          onClick={handleGoReviewPage}
-          className="flex gap-1 items-center text-yellow_500 cursor-pointer shadow-md bg-white py-1 px-3 rounded-full"
-        >
-          <FaStar />
-          <FaStar />
-          <FaStar />
-          <FaStar />
-          <FaStar />
+      <div className="container mx-auto flex flex-col md:flex-row items-center justify-center gap-5">
+        <div className="flex flex-col items-center">
+          <div
+            onClick={handleGoReviewPage}
+            className="flex gap-1 items-center text-yellow_500 cursor-pointer shadow-md bg-white py-1 px-3 rounded-full"
+          >
+            <FaStar />
+            <FaStar />
+            <FaStar />
+            <FaStar />
+            <FaStar />
+          </div>
+          <div
+            onClick={handleGoReviewPage}
+            className="flex gap-2 items-center text-sm font-semibold cursor-pointer"
+          >
+            <span className="text-primary-color">Review</span>&#10072;
+            <span className="text-yellow_500">Rating</span>&#10072;
+            <span className="text-primary-color">Comment</span>
+          </div>
         </div>
-        <div
-          onClick={handleGoReviewPage}
-          className="flex gap-2 items-center text-sm font-semibold cursor-pointer"
+        <Button
+          variant="destructive"
+          size="sm"
+          className={cn(
+            "rounded-sm shadow-lg flex items-center justify-center",
+            "hover:bg-red-700 active:bg-red-800 transition-all duration-200",
+            "animate-pulse"
+          )}
+          onClick={handleOpenLocationPopup}
         >
-          <span className="text-primary-color">Review</span>&#10072;
-          <span className="text-yellow_500">Rating</span>&#10072;
-          <span className="text-primary-color">Comment</span>
-        </div>
+          <AlertTriangle className="h-5 w-5" />
+          <span className="text-sm">Emergency Alert</span>
+        </Button>
       </div>
       <section className="container w-full mx-auto mt-3 mb-2 p-4 bg-white border border-primary-color md:rounded-lg">
         <div className="flex justify-between items-center mb-3 sm:mb-4">
@@ -367,6 +432,21 @@ const BusInformation = () => {
           </div>
         )}
       </section>
+      <AlertDialog
+        open={locationErrorModal}
+        onOpenChange={setLocationErrorModal}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Location Alert</AlertDialogTitle>
+            <AlertDialogDescription>{locationError}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -94,4 +94,7 @@ export const reviewFormSchema = z.object({
     .array(z.instanceof(File))
     .max(3, "Maximum 3 images can be uploaded")
     .optional(),
+  emergency: z.boolean().default(false),
+  lon: z.string().optional(),
+  lat: z.string().optional(),
 });

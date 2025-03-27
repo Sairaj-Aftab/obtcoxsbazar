@@ -133,6 +133,8 @@ model BusReview {
     phoneName String?
     phoneModel String?
     images String[]
+    location       Json?       // {type : "Point", coordinates : [longitude, latitude] }
+    emergencyAlert Boolean? @default(false)
     busInfo BusInfo? @relation(fields: [busInfoId], references: [id])
     busInfoId String? @db.ObjectId
     paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])

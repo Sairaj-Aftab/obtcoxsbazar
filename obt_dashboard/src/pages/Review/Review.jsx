@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertTriangle,
   Bus,
   Calendar,
   ChevronLeft,
@@ -123,6 +124,25 @@ const Review = () => {
     {
       name: "Reg No",
       selector: (data) => data.regNo,
+      cell: (data) => (
+        <div className="flex items-center gap-2">
+          {data.emergencyAlert && (
+            <AlertTriangle className="h-5 w-5 text-red-500" />
+          )}
+          {data?.location?.coordinates[0] && data?.location?.coordinates[1] && (
+            <MapPin
+              className="h-5 w-5 text-primary cursor-pointer"
+              onClick={() => {
+                window.open(
+                  `https://www.google.com/maps?q=${data.location.coordinates[1]},${data.location.coordinates[0]}`,
+                  "_blank"
+                );
+              }}
+            />
+          )}
+          <span>{data.regNo}</span>
+        </div>
+      ),
       sortable: true,
     },
     // {
