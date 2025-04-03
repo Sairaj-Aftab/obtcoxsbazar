@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import PageLoader from "@/components/Loader/PageLoader";
 
 const BusInformation = () => {
   const params = useParams();
@@ -57,10 +58,10 @@ const BusInformation = () => {
       (position) => {
         setLocationErrorModal(false);
         setLocationError(null);
-        setIsGettingLocation(false);
         navigate(
           `/bus/comp/${params.slug}/${params.id}/true/${position.coords.longitude}/${position.coords.latitude}`
         );
+        setIsGettingLocation(false);
       },
       (error) => {
         setLocationError(
@@ -225,6 +226,13 @@ const BusInformation = () => {
     const notice = getParibahanNotice();
     setParibahanNotice(notice);
   }, [paribahanNotices, params.id]);
+
+  if (isGettingLocation)
+    return (
+      <div>
+        <PageLoader />
+      </div>
+    );
   return (
     <>
       <div className="container mx-auto bg-white rounded-lg my-5">
@@ -369,7 +377,7 @@ const BusInformation = () => {
           onClick={handleOpenLocationPopup}
         >
           <AlertTriangle className="h-5 w-5" />
-          <span className="text-sm">Emergency Alert</span>
+          <span className="text-sm">Emergency Alarm</span>
         </Button>
       </div>
       <section className="container w-full mx-auto mt-3 mb-2 p-4 bg-white border border-primary-color md:rounded-lg">
