@@ -1,0 +1,25 @@
+model EmergencyAlarm {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    alarmId Int?
+    paribahanName String
+    regNo String?
+    type String?
+    name String
+    description String?
+    phoneNumber String?
+    ipAddress String?
+    phoneName String?
+    phoneModel String?
+    images String[]
+    location       Json?       // {type : "Point", coordinates : [longitude, latitude] }
+    locationName   String?
+    emergencyType String?
+    busInfo BusInfo? @relation(fields: [busInfoId], references: [id])
+    busInfoId String? @db.ObjectId
+    paribahanUser ParibahanUser? @relation(fields: [paribahanUserId], references: [id])
+    paribahanUserId String? @db.ObjectId
+    status Boolean @default(true)
+    trash Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

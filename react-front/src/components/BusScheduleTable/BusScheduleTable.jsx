@@ -10,7 +10,6 @@ const BusScheduleTable = () => {
   const navigate = useNavigate();
   const { destinationPlaces } = usePlaces();
   const { todaySchedules, todayScheduleLoader } = useSchedules();
-  console.log(todaySchedules);
 
   const now = new Date();
   const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);

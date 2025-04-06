@@ -98,3 +98,18 @@ export const reviewFormSchema = z.object({
   lon: z.string().optional(),
   lat: z.string().optional(),
 });
+// Emergency Form schema with Zod validation
+export const alarmFormSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  phoneNumber: z.string().optional(),
+  regNo: z.string().optional(),
+  emergencyType: z.string().optional(),
+  location: z.string().optional(),
+  description: z.string().optional(),
+  images: z
+    .array(z.instanceof(File))
+    .max(3, "Maximum 3 images can be uploaded")
+    .optional(),
+  lon: z.string().optional(),
+  lat: z.string().optional(),
+});

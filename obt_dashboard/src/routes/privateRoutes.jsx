@@ -16,6 +16,7 @@ import TouristBusPermission from "../pages/TouristBusPermission/TouristBusPermis
 import Layout from "@/components/Layout";
 import LostFound from "@/pages/LostFound/LostFound";
 import TodaysSchedule from "@/pages/TodaysSchedule/TodaysSchedule";
+import EmergencyAlarm from "@/pages/EmergencyAlarm/EmergencyAlarm";
 
 const privateRoutes = [
   {
@@ -87,6 +88,10 @@ const privateRoutes = [
           {
             path: "/review",
             element: <Review />,
+          },
+          {
+            path: "/emergency-alarm",
+            element: <EmergencyAlarm />,
           },
         ],
       },

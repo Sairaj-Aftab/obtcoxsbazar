@@ -19,6 +19,7 @@ import guideInfo from "./routes/guideInfo.js";
 import driverInfo from "./routes/driverInfo.js";
 import touristPermission from "./routes/touristBusEntryPermission.js";
 import review from "./routes/review.js";
+import emergencyAlarm from "./routes/emergencyAlarm.js";
 import visitor from "./routes/visitorCount.js";
 import setting from "./routes/settings.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -86,6 +87,7 @@ app.use("/api/v1/driverinfo", driverInfo);
 app.use("/api/v1/tourist-permission", touristPermission);
 app.use("/api/v1/lost-found", lostAndFound);
 app.use("/api/v1/review", review);
+app.use("/api/v1/alarm", emergencyAlarm);
 app.use("/api/v1/visitorcount", visitor);
 app.use("/api/v1/setting", setting);
 

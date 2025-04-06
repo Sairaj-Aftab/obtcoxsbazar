@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Key,
   BadgeHelp,
+  AlertTriangle,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -122,6 +123,12 @@ export default function Layout() {
       name: "Reviews",
       icon: <Star className="w-4 h-4" />,
       permission: "REVIEWS",
+    },
+    {
+      to: "/emergency-alarm",
+      name: "Emergency Alarm",
+      icon: <AlertTriangle className="w-4 h-4" />,
+      permission: "EMERGENCY-ALARM",
     },
     {
       to: "/users",

@@ -92,6 +92,7 @@ model ParibahanUser {
     guideInfo GuideInfo[]
     driverInfo DriverInfo[]
     reviews BusReview[]
+    emergencyAlarm EmergencyAlarm[]
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())
@@ -111,6 +112,7 @@ model BusInfo {
     paribahanUser ParibahanUser @relation(fields: [paribahanUserId], references: [id])
     paribahanUserId String @db.ObjectId
     reviews BusReview[]
+    emergencyAlarm EmergencyAlarm[]
     status Boolean @default(true)
     trash Boolean @default(false)
     createdAt DateTime @default(now())

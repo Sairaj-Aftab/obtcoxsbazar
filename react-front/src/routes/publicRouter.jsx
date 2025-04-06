@@ -18,6 +18,7 @@ import TouristBusEntryPermission from "../pages/TouristBusEntryPermission/Touris
 import TouristBusEntryPermissionList from "../pages/TouristBusEntryPermission/TouristBusEntryPermissionList";
 import LostAndFoundEntry from "@/pages/LostAndFound/LostAndFoundEntry";
 import LostAndFoundHeader from "@/components/LostAndFoundHeader";
+import EmergencyAlarm from "@/pages/EmergencyAlarm/EmergencyAlarm";
 
 const publicRoutes = [
   {
@@ -100,7 +101,7 @@ const publicRoutes = [
       },
       {
         path: "/bus/comp/:slug/:id/:emergency/:lon/:lat",
-        element: <BusComReviewByQR />,
+        element: <EmergencyAlarm />,
       },
     ],
   },
