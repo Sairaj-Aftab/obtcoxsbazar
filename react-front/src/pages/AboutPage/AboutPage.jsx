@@ -4,6 +4,7 @@ import sp from "../../assets/image/sp.jpeg";
 import jsp from "../../assets/image/jashim_uddin.jpeg";
 import sai from "../../assets/image/Sairaj_Aftab.png";
 import pol from "../../assets/image/police_logo.png";
+import ideaInnTech from "../../assets/image/ideainntech.jpg";
 import bizman from "../../assets/image/bizman.jpg";
 import avatar from "../../assets/image/avatar.jfif";
 const AboutPage = () => {
@@ -185,7 +186,7 @@ const AboutPage = () => {
           <div className="relative w-full md:w-1/2 text-center bg-gray-200 p-4 rounded-lg">
             <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
               <img
-                src={avatar}
+                src={pol}
                 alt=""
                 className="rounded-full w-24 h-24 object-cover border-2 border-primary-color"
               />
@@ -193,12 +194,8 @@ const AboutPage = () => {
             <h3 className="text-base font-bold text-black mt-10 mb-2">
               Direction
             </h3>
-            <h3 className="text-base font-bold text-black">
-              Md. Rahamat Ullah
-            </h3>
-            <h3 className="text-base font-bold text-black">
-              Police Super, Cox&apos;s Bazar
-            </h3>
+            <h3 className="text-base font-bold text-black">Police Super</h3>
+            <h3 className="text-base font-bold text-black">Cox&apos;s Bazar</h3>
           </div>
           <div className="relative w-full md:w-1/2 mt-14 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
             <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
@@ -223,7 +220,7 @@ const AboutPage = () => {
           <div className="relative w-full md:w-1/2 mt-2 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
             <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
               <img
-                src={avatar}
+                src={ideaInnTech}
                 alt=""
                 className="rounded-full w-24 h-24 object-cover border-2 border-primary-color"
               />
@@ -233,11 +230,11 @@ const AboutPage = () => {
             </h3>
             <h3 className="text-base font-bold text-black">
               <Link target="_blank" to="https://sairaj-aftab.vercel.app/">
-                Sairaj Aftab
+                IdeaInnTech
               </Link>
             </h3>
             <h3 className="text-base font-bold text-black">
-              sairajaftab@gmail.com
+              ideainntech.bd@gmail.com
             </h3>
           </div>
           <div className="relative w-full md:w-1/2 mt-14 md:mt-0 text-center bg-gray-200 p-4 rounded-lg">
