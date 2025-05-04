@@ -28,6 +28,7 @@ export const scheduleFormSchema = z.object({
     ])
     .optional(),
   seatStatus: z.boolean(),
+  comment: z.string().optional(),
 });
 
 export const rgScheduleFormSchema = z.object({

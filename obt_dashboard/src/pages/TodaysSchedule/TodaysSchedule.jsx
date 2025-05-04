@@ -115,6 +115,7 @@ const TodaysSchedule = () => {
       rent: 0,
       discountRent: 0,
       seatStatus: false,
+      comment: "",
     },
   });
 
@@ -196,6 +197,7 @@ const TodaysSchedule = () => {
     form.setValue("rent", data.rent);
     form.setValue("discountRent", data.discountRent);
     form.setValue("seatStatus", data.seatStatus);
+    form.setValue("comment", data.comment);
     setIsDialogOpen(true);
   };
 
@@ -387,8 +389,8 @@ const TodaysSchedule = () => {
                       <FormControl>
                         <Input
                           type="datetime-local"
-                          min={minDateTime}
-                          max={maxDateTime}
+                          // min={minDateTime}
+                          // max={maxDateTime}
                           {...field}
                           onChange={(e) => {
                             // Only validate the date part, not the time
@@ -889,6 +891,21 @@ const TodaysSchedule = () => {
                   )}
                 />
               </div>
+
+              {/* Comment */}
+              <FormField
+                control={form.control}
+                name="comment"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Comment</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="!mt-0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {/* Seat Status */}
               <FormField

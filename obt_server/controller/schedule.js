@@ -44,9 +44,9 @@ export const createSchedule = async (req, res, next) => {
         time,
         busNo,
         guideName,
-        guidePhone,
+        guidePhone: guidePhone.trim(),
         driverName,
-        driverPhone,
+        driverPhone: driverPhone.trim(),
         leavingPlace,
         leavingMapLink,
         destinationPlace,
@@ -92,6 +92,7 @@ export const updateSchedule = async (req, res, next) => {
       rent,
       discountRent,
       seatStatus,
+      comment,
     } = req.body;
 
     const busSchedule = await prisma.busSchedule.update({
@@ -103,9 +104,9 @@ export const updateSchedule = async (req, res, next) => {
         time,
         busNo,
         guideName,
-        guidePhone,
+        guidePhone: guidePhone.trim(),
         driverName,
-        driverPhone,
+        driverPhone: driverPhone.trim(),
         leavingPlace,
         leavingMapLink,
         destinationPlace,
@@ -113,6 +114,7 @@ export const updateSchedule = async (req, res, next) => {
         rent: Number(rent),
         discountRent: Number(discountRent),
         seatStatus: seatStatus,
+        comment,
       },
       include: {
         paribahanUser: true,
