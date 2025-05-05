@@ -47,7 +47,7 @@ import {
 import useAuth from "@/store/useAuth";
 import { formatDateTime } from "@/utils/timeAgo";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Edit, Loader2, Trash } from "lucide-react";
+import { Check, Edit, Loader2, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { useForm } from "react-hook-form";
@@ -239,8 +239,13 @@ const TodaysSchedule = () => {
   const columns = [
     {
       name: "#",
-      selector: (data, index) => calculateItemIndex(page, rowPage, index),
-      width: "60px",
+      cell: (data, index) => (
+        <div className="flex items-center gap-1">
+          {calculateItemIndex(page, rowPage, index)}
+          {data.comment && <Check className="h-4 w-4 text-primary" />}
+        </div>
+      ),
+      width: "90px",
     },
     {
       name: "#",
@@ -308,6 +313,10 @@ const TodaysSchedule = () => {
       name: "Destination",
       selector: (data) => data.destinationPlace,
       sortable: true,
+    },
+    {
+      name: "Comment",
+      selector: (data) => data.comment,
     },
     {
       name: "Entry Date",
