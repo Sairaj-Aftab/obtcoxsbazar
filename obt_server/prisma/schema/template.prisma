@@ -1,0 +1,25 @@
+enum TemplateType {
+  WELCOME
+  BIRTHDAY
+  ANNIVERSARY
+  PROMOTION
+  GENERAL
+}
+
+enum TemplateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Template {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    title         String @unique
+    content       String     // HTML or plain text
+    type          TemplateType
+    showFrom      String? @unique      // Optional: start of visibility
+    showUntil     String? @unique      // Optional: end of visibility
+    status        TemplateStatus @default(INACTIVE)
+    trash Boolean @default(false)
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+}

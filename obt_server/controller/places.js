@@ -22,7 +22,7 @@ export const createPlace = async (req, res, next) => {
         slug: createSlug(placeName),
         status,
         mapLink,
-        destinationKM,
+        destinationKM: String(destinationKM),
         bdTicketLink,
       },
     });
@@ -58,7 +58,7 @@ export const updatePlace = async (req, res, next) => {
         placeName,
         slug: createSlug(placeName),
         mapLink,
-        destinationKM,
+        destinationKM: String(destinationKM),
         bdTicketLink,
       },
     });

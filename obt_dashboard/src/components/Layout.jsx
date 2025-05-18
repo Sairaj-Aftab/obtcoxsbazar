@@ -17,6 +17,7 @@ import {
   Key,
   BadgeHelp,
   AlertTriangle,
+  Gift,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -129,6 +130,12 @@ export default function Layout() {
       name: "Emergency Alarm",
       icon: <AlertTriangle className="w-4 h-4" />,
       permission: "EMERGENCY-ALARM",
+    },
+    {
+      to: "/display-template",
+      name: "Display Template",
+      icon: <Gift className="w-4 h-4" />,
+      permission: "DISPLAY-TEMPLATE",
     },
     {
       to: "/users",

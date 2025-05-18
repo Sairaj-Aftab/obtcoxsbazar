@@ -111,7 +111,7 @@ const Destination = () => {
     form.setValue("placeName", data.placeName);
     form.setValue("status", data.status);
     form.setValue("mapLink", data.mapLink);
-    form.setValue("destinationKM", data.destinationKM);
+    form.setValue("destinationKM", parseInt(data.destinationKM));
     form.setValue("bdTicketLink", data.bdTicketLink);
     setIsDialogOpen(true);
   };

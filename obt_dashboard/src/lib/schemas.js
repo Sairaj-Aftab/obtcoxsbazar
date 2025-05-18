@@ -5,7 +5,7 @@ export const scheduleFormSchema = z.object({
     "AC",
     "Non-AC",
     "Sleeper Coach",
-    "Double Decker",
+    "Double-decker",
     "Suite Class",
     "Hyundai Biz Class",
     "Mercedes-Benz",
@@ -28,7 +28,7 @@ export const scheduleFormSchema = z.object({
     ])
     .optional(),
   seatStatus: z.boolean(),
-  comment: z.string().optional(),
+  comment: z.string().nullable().optional(),
 });
 
 export const rgScheduleFormSchema = z.object({
@@ -115,4 +115,12 @@ export const guideFormSchema = z.object({
   address: z.string().optional(),
   comment: z.string().optional(),
   report: z.string().optional(),
+});
+export const templateSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  type: z.enum(["WELCOME", "BIRTHDAY", "ANNIVERSARY", "PROMOTION", "GENERAL"]),
+  showFrom: z.string().min(1, "Show from is required"),
+  showUntil: z.string().min(1, "Show until is required"),
+  status: z.enum(["ACTIVE", "INACTIVE"]),
 });

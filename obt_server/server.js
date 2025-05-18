@@ -24,6 +24,7 @@ import visitor from "./routes/visitorCount.js";
 import setting from "./routes/settings.js";
 import errorHandler from "./middleware/errorHandler.js";
 import lostAndFound from "./routes/lostAndFound.js";
+import displayTemplate from "./routes/displayTemplate.js";
 
 const app = express();
 const server = createServer(app);
@@ -87,6 +88,7 @@ app.use("/api/v1/driverinfo", driverInfo);
 app.use("/api/v1/tourist-permission", touristPermission);
 app.use("/api/v1/lost-found", lostAndFound);
 app.use("/api/v1/review", review);
+app.use("/api/v1/template", displayTemplate);
 app.use("/api/v1/alarm", emergencyAlarm);
 app.use("/api/v1/visitorcount", visitor);
 app.use("/api/v1/setting", setting);

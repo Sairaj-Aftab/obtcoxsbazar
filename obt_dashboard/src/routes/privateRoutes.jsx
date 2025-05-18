@@ -17,6 +17,7 @@ import Layout from "@/components/Layout";
 import LostFound from "@/pages/LostFound/LostFound";
 import TodaysSchedule from "@/pages/TodaysSchedule/TodaysSchedule";
 import EmergencyAlarm from "@/pages/EmergencyAlarm/EmergencyAlarm";
+import DisplayTemplate from "@/pages/DisplayTemplate/DisplayTemplate";
 
 const privateRoutes = [
   {
@@ -92,6 +93,10 @@ const privateRoutes = [
           {
             path: "/emergency-alarm",
             element: <EmergencyAlarm />,
+          },
+          {
+            path: "/display-template",
+            element: <DisplayTemplate />,
           },
         ],
       },
